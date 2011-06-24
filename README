@@ -1,0 +1,8 @@
+Colorado College Electronic Thesis and Dataset (CCETD) is a Django application
+for submitting an electronic thesis and an optional dataset to a Fedora
+Commons repository.
+
+Dependencies:
+-------------
+1. eulfedora - https://github.com/emory-libraries/eulfedora
+2. pymarc - http://pypi.python.org/pypi/pymarc/ 
