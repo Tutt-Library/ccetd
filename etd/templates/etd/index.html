@@ -1,0 +1,11 @@
+<DOCTYPE html />
+<head>
+ <title>CCETD Home</title>
+</head>
+<body>
+<h1>CCETD Active Workflows</h1>
+{% for row in active %}
+ <h2>Workflow {{ forloop.counter }}</h2>
+ <p><a href="etd/{{ row.0 }}">{{ row.0 }}</a></p>
+{% endfor %}
+</body>
