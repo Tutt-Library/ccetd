@@ -21,7 +21,7 @@
   fill out any required fields that are marked with an *. To increase the utility of your electronic thesis,
   include an abstract and keywords describing your work.  
  </p>
- <h3 class="error">Please correct the errors below</h3>
+<form method="POST">
 <div id="accordion">
 	<h3><a href="#">Step 1: Enter Author Information</a>
         </a>
@@ -52,84 +52,69 @@
       {{ form.graduation_dates }}
      </div>
 
-	<h3><a href="#">Step 2: Upload Thesis and Enter Information
-        % if c.form_errors.has_key('thesis_doc') or c.form_errors.has_key('title'):
-        <span class="error">Errors!!</span>
-        % endif
-        </a></h3>
+	<h3><a href="#">Step 2: Upload Thesis and Enter Information</a></h3>
 	<div>
 	  <label>
-      % if c.form_errors.has_key('thesis_doc'):
-      <span class="error">${c.form_errors['thesis_doc']}</span>
-      % endif
       <b>Thesis*</b> (<i>Browse to attach thesis</i>):</label>
-      ${h.file("thesis_doc")}<br/>
+      {{ form.thesis_file }}<br/>
       <label for="id-title">
-      % if c.form_errors.has_key('title'):
-      <span class="error">${c.form_errors['title']}</span>
-      % endif
-      Thesis Title*
+      {{ form.title.label }}*
       </label><br/>
-      ${h.text("title",size="60")}
+      {{ form.title }}
       <br/>
       <fieldset>
       <legend for="id-extent">About your thesis:</legend>
       <ul>
-      <li>Last page number: ${h.text("page_nums",size="10")}</li>
-      <li>Contains illustrations and/or graphics: ${h.radio("has_illustrations","yes",label="Yes")} ${h.radio("has_illustrations","no",checked=True,label="No")}</li>
-      <li>Contains maps: ${h.radio("has_maps","yes",label="Yes")}${h.radio("has_maps","no",checked=True,label="No")}</li> 
+      <li>Last page number: {{ form.page_numbers }}</li>
+      <li>Contains illustrations and/or graphics: {{ form.has_illustrations }} {{ form.has_illustrations.label}}</li>
+      <li>Contains maps: {{ form.has_maps }}{{ form.has_maps.label }}</li> 
       </ul>
      </fieldset>
      <br/>
-	   <label for='id-abstract'>Abstract:</label><br/>
-       ${h.textarea("abstract","",cols="60",rows="5")}
+	   <label for='id-abstract'>{{ form.abstract.label }}:</label><br/>
+       {{ form.abstract }}
        <br/>
        <label for="id-subjects">Tags or Keywords</label><br/>
        <span id="span-keywords">
-       ${h.text("subject-1",size=20)}${h.text("subject-2",size=20)}${h.text("subject-3",size=20)}
+       {{ form.keyword_0  }}{{ form.keyword_1 }} {{ form.keyword_2 }}
        </span>
        <a href="#" onclick="AddKeywords();" id="more-a">+ More</a>
        <br/>
 	</div>
-        ## END Thesis accordion
-        ## START Dataset accordion
+        {# END Thesis accordion #}
+        {# START Dataset accordion #}
 	<h3><a href="#">Step 3 (Optional): Upload Dataset and Enter Information</a></h3>
 	<div>
-      <label><b>Dataset</b> (<i>browse to attach</i>):</label>
-      ${h.file("thesis-data")}
+      <label><b>{{ form.dataset_file.label  }}</b> (<i>browse to attach</i>):</label>
+      {{ form.dataset_file  }}
 	  <br/>
-	  <label>Software/version: (example - Stata version 10, EViews version 7)</label>
+	  <label>{{ form.dataset_info.label }}: (example - Stata version 10, EViews version 7)</label>
 	  <br/>
-	  ${h.textarea("dataset-info","",cols=60,rows=3)} 
+	  {{ form.dataset_info  }} 
 	  <br/>
-	  <label>Abstract of dataset: (briefly describe variables, years, or number of observations, etc.)</label><br/>
-      ${h.textarea("dataset-abstract","",cols=60,rows=5)}
+	  <label>{{ form.dataset_abstract.label }}: (briefly describe variables, years, or number of observations, etc.)</label><br/>
+          {{ form.dataset_abstract }}
 	  <br/>
 	  <label>If you agree, your dataset will be publically available.</label>
-	 I agree: ${h.radio("dataset-access-note",value="yes",checked=True,label="Yes")}
-			  ${h.radio("dataset-access-note",value="no",label="No")}
+	  {{ form.dataset_available_public }}{{ form.dataset_available_public.label }}
 	</div>
-        ## END Dataset accordion
-        ## START Honor-code and Submission accordion
-	<h3><a href="#">Step 4: Honor Code and Submission Agreements
-        % if c.form_errors.has_key('honor_code') or c.form_errors.has_key('agreement'):
-        <span class="error">Errors!!</span>
-        % endif
-        </a></h3>
+        {# END Dataset accordion #}
+        {# START Honor-code and Submission accordion #}
+	<h3><a href="#">Step 4: Honor Code and Submission Agreements</a></h3>
 	<div>
-	% if c.form_errors.has_key('honor_code'):
+        {% comment %}
 	<div class="error">
 	 You must agree to the honor code to submit your thesis to the digital
 	 archive.
-	</div>
-	% endif
+	</div> 
+	{% endcomment %}
         <h3 class="chk_box">Honor Code</h3>
-        ## START honor-code div
+        {# START honor-code div #}
         <div id="honor-code">
 	${h.checkbox("honor_code",value="yes")} By checking this box I indicate agreement with this
 	statement: On my honor, I have neither given nor received unauthorized aid on this thesis.
         </div>
-        ## END honor-code div
+        {# END honor-code div #}
 	<h3 class="chk_box">Submission Agreement</h3>
 	% if c.form_errors.has_key('agreement'):
 	<div class="error">
@@ -137,29 +122,29 @@
 	 digital archive.
 	</div>
 	% endif
-        ## START agreement div
+        {# START agreement div #}
         <div id="agreement">
-	<p><b>${h.checkbox("agreement",value="yes",label="I agree")}</b>
-	By checking the agreement box and submitting this form, I (the author and copyright owner) grant ${c.form['institution']}
+	<p><b>{{ form.honor_code.label }}{{ form.honor_code }}</b>
+	By checking the agreement box and submitting this form, I (the author and copyright owner) grant {{ default.institution }}
 		the non-exclusive right to reproduce and distribute my thesis/work in print and electronic form. I agree
-	   that ${c.form['institution']} may, without changing the content, convert my thesis/work to any medium or format for the 
+	   that {{ default.institution }} may, without changing the content, convert my thesis/work to any medium or format for the 
 	   purpose of historical preservation and to make publically available in open access to a larger community of
 	   scholars. All such copies will retain original notices of authorship and copyright.</p>
 	<p>I understand that as the author of this work, I shall, without limitation, have the right to use, reproduce,
 	   distribute, update, create derivatives, and make copies of the work (electronically or in print). U.S. Copyright
 	   law protects me against the unauthorized use of this work; the right to use in future works all or part of this
 	   work.</p>
-	<p>I understand that ${c.form['institution']} shall have the right to non-commerical use which includes the right to reproduce,
+	<p>I understand that {{ default.institution }} shall have the right to non-commerical use which includes the right to reproduce,
 	   distribute, and make copies of the work (electronically or in print) in connection with digital repositories, 
-	   teaching, and scholarly activities at ${c.form['institution']}.</p>
+	   teaching, and scholarly activities at {{ default.institution }}.</p>
         </div>
-        ## END agreement div
+        {# END agreement div #}
         </div>
-        ## END Honor-code accordion
+        {# END Honor-code accordion #}
    </div>
-   ## END accordion div
+   {# END accordion div #}
 </div>
-${h.submit("submit","Submit Thesis")}
-${h.end_form()}
+<input type="submit" value="Submit Thesis" />
+</form>
 </body>
 </html>

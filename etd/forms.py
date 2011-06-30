@@ -16,6 +16,8 @@ class UploadThesisForm(forms.Form):
     master thesis and dataset into a Fedora Commons repository using eulfedora
     module.
     """
+    abstract = forms.CharField(label='Abstract',
+                               widget=forms.Textarea)
     creator_family = forms.CharField(max_length=50,
                                      label='Last name',
                                      help_text='Creator of thesis family or last name')
@@ -35,11 +37,27 @@ class UploadThesisForm(forms.Form):
                                                 ("II","II"),
                                                 ("III","III"),
                                                 ("IV","IV")])
+    dataset_abstract = forms.CharField(required=False,
+                                       label='Abstract of dataset',
+                                       widget=forms.Textarea)
+    dataset_available_public = forms.BooleanField(required=False,label='I agree')
+    dataset_info = forms.CharField(required=False,
+                                   label='Software/version:',
+                                   widget=forms.Textarea)
+    dataset_file = forms.FileField(required=False,
+                                   label='Dataset')
     email = forms.EmailField(required=False,
                              label='Your Email:')
+    has_illustrations = forms.BooleanField(required=False,label='Yes')
+    has_maps = forms.BooleanField(required=False,label='Yes')
+    honor_code = forms.BooleanField(label='Yes')
+    page_numbers = forms.IntegerField(required=False)
+    submission_agreement = forms.BooleanField(label='I agree')
     thesis_label = forms.CharField(max_length=255,
                                    help_text='Label for thesis object, 255 characters max')
     thesis_file = forms.FileField()
+    title = forms.CharField(max_length=225,
+                            label='Thesis Title')
 
     def __init__(self,advisors,grad_dates,*args,**kwargs):
         """Initializes instance of UploadThesisForm, creates list of

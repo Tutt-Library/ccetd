@@ -5,6 +5,8 @@ from django.conf.urls.defaults import patterns, include, url
 # admin.autodiscover()
 
 urlpatterns = patterns('',
+    # ETD
+    (r'^etd',include('etd.urls')),
     # Examples:
     # url(r'^$', 'djccetd.views.home', name='home'),
     # url(r'^djccetd/', include('djccetd.foo.urls')),
