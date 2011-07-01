@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,8 +6,8 @@
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
   <title>{{default.institution}} {{default.department}} Thesis Submission</title>
- <link type="text/css" href="/thesis.css" rel="stylesheet" />
- <script type="text/javascript" src="/thesis.js"></script>
+ <link type="text/css" href="{% get_static_prefix %}thesis.css" rel="stylesheet" />
+ <script type="text/javascript" src="{% get_static_prefix %}thesis.js"></script>
   <script>
   $(document).ready(function() {
     $("#accordion").accordion();
@@ -14,16 +15,24 @@
   </script>
 </head>
 <body style="font-size:62.5%;">
-<h1>{{default.institution}} </h1>
+<h1>{{default.institution}} Electronic Thesis and Dataset Submission</h1>
 <h2>Your Digital Archive</h2>
+ {% if  form.errors %}
+ <div class="error">You have errors in your form, please correct and resubmit your thesis</div>
+ {{ form.errors }}
+ {% endif %}
  <p>
   Preserve your work in the Digital Archives at {{default.institution}}. Please
   fill out any required fields that are marked with an *. To increase the utility of your electronic thesis,
   include an abstract and keywords describing your work.  
  </p>
-<form method="POST">
+<form method="POST" action="/etd/{{ workflow }}/upload" enctype="multipart/form-data">
+{% csrf_token %}
 <div id="accordion">
-	<h3><a href="#">Step 1: Enter Author Information</a>
+	<h3><a href="#">Step 1: Enter Author Information
+        {% if form.creator_given.errors or form.creator_family.errors or form.email.errors %}
+        <span class="error">Error(s), please fix</span>
+        {% endif %}
         </a>
         </h3>
 	<div>
@@ -32,35 +41,44 @@
          </p>
 	  <fieldset>
       <legend for="id-creator">Your Name:</legend>
-      {{ form.creator_given.errors }}
-      {{ form.creator_given.label }}*:{{ form.creator_given }}<br/>
+      {{ form.creator_given.label }}*:{{ form.creator_given }}{{ form.creator_given.errors }}<br/>
       {{ form.creator_middle.label }}:{{ form.creator_middle }}<br/>
-      {{ form.creator_family.label }}*:{{ form.creator_family }}<br/>
+      {{ form.creator_family.label }}*:{{ form.creator_family }}{{ form.creator_family.errors }}<br/>
       {{ form.creator_suffix.label }}:{{ form.creator_suffix }}
       </fieldset>
       {% if default.email_notices %}
       <br/>
+      {{ form.email.errors }}
       <label>{{ form.email.label }}</label>{{ form.email }}<br/>
       (<i>To receive a notification e-mail when your thesis is submitted</i>)
       <br/>
       {% endif %}
+      {{ form.advisors.errors }}
+      {{ form.advisors.label }}
       <label>{{ form.advisors.label }}</label>
       <br/>
       {{ form.advisors }}
       <br/>
+      {{ form.graduation_dates.errors }}
       <label for='id-grad-date'>Graduation Date:</label>
       {{ form.graduation_dates }}
      </div>
 
-	<h3><a href="#">Step 2: Upload Thesis and Enter Information</a></h3>
+	<h3><a href="#">Step 2: Upload Thesis and Enter Information
+        {% if form.thesis_file.errors or form.title.errors %}
+        <span class="error">Errors(s), please fix</span>
+        {% endif %}
+        </a></h3>
 	<div>
 	  <label>
       <b>Thesis*</b> (<i>Browse to attach thesis</i>):</label>
-      {{ form.thesis_file }}<br/>
+      {{ form.thesis_file }}
+      {{ form.thesis_file.errors }}<br/>
       <label for="id-title">
       {{ form.title.label }}*
       </label><br/>
       {{ form.title }}
+      {{ form.title.errors }}
       <br/>
       <fieldset>
       <legend for="id-extent">About your thesis:</legend>
@@ -76,7 +94,7 @@
        <br/>
        <label for="id-subjects">Tags or Keywords</label><br/>
        <span id="span-keywords">
-       {{ form.keyword_0  }}{{ form.keyword_1 }} {{ form.keyword_2 }}
+       {{ form.keyword_1 }}{{ form.keyword_2 }}{{ form.keyword_3 }}
        </span>
        <a href="#" onclick="AddKeywords();" id="more-a">+ More</a>
        <br/>
@@ -101,30 +119,20 @@
         {# END Dataset accordion #}
         {# START Honor-code and Submission accordion #}
 	<h3><a href="#">Step 4: Honor Code and Submission Agreements</a></h3>
-	<div>
-        {% comment %}
-	<div class="error">
-	 You must agree to the honor code to submit your thesis to the digital
-	 archive.
-	</div> 
-	{% endcomment %}
+        <div>
         <h3 class="chk_box">Honor Code</h3>
         {# START honor-code div #}
         <div id="honor-code">
-	${h.checkbox("honor_code",value="yes")} By checking this box I indicate agreement with this
+        {{ form.honor_code.errors }}
+	{{ form.honor_code }}<b>{{ form.honor_code.label }}</b> By checking this box I indicate agreement with this
 	statement: On my honor, I have neither given nor received unauthorized aid on this thesis.
         </div>
         {# END honor-code div #}
 	<h3 class="chk_box">Submission Agreement</h3>
-	% if c.form_errors.has_key('agreement'):
-	<div class="error">
-	 You must check this submission agreement to submit your thesis to the 
-	 digital archive.
-	</div>
-	% endif
+        {{ form.submission_agreement.errors }}
         {# START agreement div #}
         <div id="agreement">
-	<p><b>{{ form.honor_code.label }}{{ form.honor_code }}</b>
+	<p><b>{{ form.submission_agreement }} {{ form.submission_agreement.label }} </b>
 	By checking the agreement box and submitting this form, I (the author and copyright owner) grant {{ default.institution }}
 		the non-exclusive right to reproduce and distribute my thesis/work in print and electronic form. I agree
 	   that {{ default.institution }} may, without changing the content, convert my thesis/work to any medium or format for the 

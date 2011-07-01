@@ -1,0 +1,104 @@
+<html>
+<head>
+ <title>Success ingesting  with PID: </title>
+ <link type="text/css" href="${url('/thesis.css')}" rel="stylesheet" />
+</head>
+<body>
+<section>
+<header>
+ <h1>Successfully submitted to ${c.mods['institution']}'s Digital Archive</h1>
+ <h3>${c.mods['title']}</h3> 
+</header>
+</section>
+<section>
+<header>
+ <h2>Your Thesis PID is ${c.pid}</h2>
+ <p>
+  Your Thesis will now be added to the Digital Archives of ${c.mods['institution']}
+  with a Persistent Identifier (PID) of ${c.pid}.
+ % if :
+  An e-mail has been sent to ${c.student_email}. 
+ </p>
+ % endif
+ % if c.output_url:
+ <p>
+  You will be able to access your thesis at <a href="${c.output_url}">${c.output_url}</a> after
+  Library staff review. 
+ </p>
+ % endif
+</header>
+<body>
+<table class="field-values">
+<tr>
+ <th>Field</th>
+ <th>Your value</th>
+</tr>
+<tr>
+ <td class="field">Your name</td>
+ <td class="value">${c.mods['author']}</td>
+</tr>
+<tr>
+ <td class="field">Faculty Advisor</td>
+ <td class="value">
+ % for advisor in c.mods['advisors']:
+ ${advisor}<br/>
+ % endfor
+ </td>
+</tr>
+<tr>
+ <td class="field">Thesis Title</td>
+ <td class="value">${c.mods['title']}</td>
+</tr>
+<tr>
+ <td class="field">Thesis filename</td>
+ <td class="value">${c.thesis_filename}</td>
+</tr>
+<tr>
+ <td class="field">Thesis Abstract</td>
+ <td class="value">${c.mods['abstract']}</td>
+</tr>
+<tr>
+ <td class="field">About your thesis</td>
+ <td class="value">${c.mods['extent']}</td>
+</tr>
+<tr>
+ <td class="field">Tags or Keywords</td>
+ <td class="value">
+ <ul>
+ % for kw in c.mods['subjects']:
+ <li>${kw}</li>
+ % endfor 
+ </ul>
+ </td>
+</tr>
+<tr>
+ <td class="field">Dataset filename</td>
+ <td class="value">
+ % if c.dataset_filename is not None:
+ ${c.dataset_filename}
+ % else:
+ No dataset submitted.
+ % endif
+ </td>
+</tr>
+<tr>
+ <td class="field">About your dataset</td>
+ <td class="value">
+ % if c.mods['admin_note'] != None:
+  ${c.mods['admin_note']}
+ % else:
+ No dataset software or abstract information submitted.
+ % endif 
+</td>
+<tr>
+ <td class="field">Dataset publically available</td>
+ <td class="value">${c.dataset_agreement}</td>
+</tr>
+
+</tr>
+
+</table>
+</body>
+</section>
+</body>
+</html>
