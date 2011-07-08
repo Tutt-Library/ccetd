@@ -1,5 +1,6 @@
 __author__ = 'Jeremy Nelson'
 
+import os,ConfigParser,logging
 from etd.forms import *
 from operator import itemgetter
 from django import forms
@@ -7,7 +8,7 @@ from django.views.generic.simple import direct_to_template
 from django.shortcuts import render_to_response
 from django.http import Http404,HttpResponseRedirect
 from django.template import RequestContext
-import os,ConfigParser,logging
+from eulxml.xmlmap import load_xmlobject_from_string,mods
 
 # Sets workflows dict
 workflows = dict()
@@ -61,10 +62,9 @@ def upload(request,workflow=None):
     Creates MODS and other metadata along with the file uploads to Fedora.
 
     Parameters:
-    `request`: HTTP request, required
-    `workflow`; Specific workflow for individual departments, blank value displays
-                default view.
-
+     `request`: HTTP request, required
+    `workflow`: Specific workflow for individual departments, blank value 
+                displays default view.
     """
     if request.method != 'POST':
         return Http404
@@ -74,7 +74,35 @@ def upload(request,workflow=None):
         default[row[0]] = row[1]
     upload_thesis_form = UploadThesisForm(request.POST,request.FILES)
     if upload_thesis_form.is_valid():
-        return HttpResponseRedirect('/success')
+        # Create ETD MODS metadata from valid form
+        mods_xml = mods.MetadataObjectDescriptionSchema()
+        mods_xml.title_info = mods.titleInfo('')
+        mods_xml.title_info.title = upload_thesis_form.cleaned_data['title']
+        # Build mods name for thesis creator
+        creator = mods.name('')
+        creator.name_part_list.append(\
+            mods.name.name_part(value=upload_thesis_form.cleaned_data['creator_family'],
+                                type='family'))
+        creator.name_part_list.append(\
+            mods.name.name_part(value=upload_thesis_form.cleaned_data['creator_given'],
+                                type='given'))
+        if upload_thesis_form.cleaned_data['creator_middle']:
+            creator.name_part_list.append(\
+                mods.name.name_part(value=upload_thesis_form.cleaned_data['creator_middle'],
+                                    type='middle')
+        if upload_thesis_form.cleaned_data['creator_suffix']:
+            suffix = upload_thesis_form.cleaned_data['creator_suffix']
+            if len(suffix) > 1:
+                creator.name_part_list.append(\
+                    mods.name.name_part(value=suffix,
+                                        type="termsOfAddress"))
+        mods_xml.names.append(creator)
+        # Create and add thesis abstract
+        mods_xml.abstract = upload_thesis_form.cleaned_data['abstract']
+        
+        
+        
+        return HttpResponseRedirect('/etd/success')
     faculty_choices = sorted(config.items('FACULTY'),
                              key=itemgetter(1))
     if upload_thesis_form.fields.has_key('advisors'):
@@ -97,9 +125,9 @@ def workflow(request,workflow=None):
     Displays thesis entry form to end user.
 
     Parameters:
-    `request`: HTTP request, required
-    `workflow`; Specific workflow for individual departments, blank value displays
-                default view.
+     `request`: HTTP request, required
+    `workflow`: Specific workflow for individual departments, blank value 
+                displays default view.
     """
     if request.method == 'POST':
         logging.error("IN WORKFLOW POST")

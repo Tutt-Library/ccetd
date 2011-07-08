@@ -1,104 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
 <html>
 <head>
- <title>Success ingesting  with PID: </title>
- <link type="text/css" href="${url('/thesis.css')}" rel="stylesheet" />
+ <title>Status of {mods.title}</title>
+ <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+
+ <link type="text/css" href="{% get_static_prefix %}status.css')}" rel="stylesheet" />
+ <script type="text/javascript" src="{% get_static_prefix %}status.js')}"></script>
+ <script type="text/javascript">
+  $(function() {
+     $('#status-tabs').tabs();
+  });
+ </script>
 </head>
 <body>
-<section>
-<header>
- <h1>Successfully submitted to ${c.mods['institution']}'s Digital Archive</h1>
- <h3>${c.mods['title']}</h3> 
-</header>
-</section>
-<section>
-<header>
- <h2>Your Thesis PID is ${c.pid}</h2>
- <p>
-  Your Thesis will now be added to the Digital Archives of ${c.mods['institution']}
-  with a Persistent Identifier (PID) of ${c.pid}.
- % if :
-  An e-mail has been sent to ${c.student_email}. 
- </p>
- % endif
- % if c.output_url:
- <p>
-  You will be able to access your thesis at <a href="${c.output_url}">${c.output_url}</a> after
-  Library staff review. 
- </p>
- % endif
-</header>
-<body>
-<table class="field-values">
-<tr>
- <th>Field</th>
- <th>Your value</th>
-</tr>
-<tr>
- <td class="field">Your name</td>
- <td class="value">${c.mods['author']}</td>
-</tr>
-<tr>
- <td class="field">Faculty Advisor</td>
- <td class="value">
- % for advisor in c.mods['advisors']:
- ${advisor}<br/>
- % endfor
- </td>
-</tr>
-<tr>
- <td class="field">Thesis Title</td>
- <td class="value">${c.mods['title']}</td>
-</tr>
-<tr>
- <td class="field">Thesis filename</td>
- <td class="value">${c.thesis_filename}</td>
-</tr>
-<tr>
- <td class="field">Thesis Abstract</td>
- <td class="value">${c.mods['abstract']}</td>
-</tr>
-<tr>
- <td class="field">About your thesis</td>
- <td class="value">${c.mods['extent']}</td>
-</tr>
-<tr>
- <td class="field">Tags or Keywords</td>
- <td class="value">
- <ul>
- % for kw in c.mods['subjects']:
- <li>${kw}</li>
- % endfor 
- </ul>
- </td>
-</tr>
-<tr>
- <td class="field">Dataset filename</td>
- <td class="value">
- % if c.dataset_filename is not None:
- ${c.dataset_filename}
- % else:
- No dataset submitted.
- % endif
- </td>
-</tr>
-<tr>
- <td class="field">About your dataset</td>
- <td class="value">
- % if c.mods['admin_note'] != None:
-  ${c.mods['admin_note']}
- % else:
- No dataset software or abstract information submitted.
- % endif 
-</td>
-<tr>
- <td class="field">Dataset publically available</td>
- <td class="value">${c.dataset_agreement}</td>
-</tr>
-
-</tr>
-
-</table>
-</body>
-</section>
+  <h1>Submitting Thesis to the Digital Archives of ${c.mods['institution']}</h1>
+  <h3>Submitting <em>${c.mods['title']}</em> to digital archives</h3>
+   <p><b>Note:</b> This may take some time if you have a large thesis</p>
+  <div id="status-tabs">
+    <ul>
+     <li><a href="#current-tab">Current Status</a></li>
+     <li><a href="#submitted-tab">Submitted Values</a></li>
+    </ul>
+    <div id="current-tab">
+    <div id="progressbar"><img src="${url('/ajax-loader.gif')}" /></div>
+    <ul id="status-list">
+      <li class="info">Submission started ${time_stamp()}</li>
+    </ul>
+    </div>
+    <div id="submitted-tab">
+    <table class="submitted-tbl">
+     <tr>
+      <th>Field</th><th>Value</th>
+      <th>Field</th><th>Value</th>
+     </tr>
+     <tr>
+      <td class="fld">Your Name</td><td class="val">${c.mods['author']}</td>
+      <td class="fld">Faculty Advisor</td>
+      <td class="val">
+      % for advisor in c.mods['advisors']:
+      ${advisor}
+      % endfor
+      </td>
+     </tr>
+	 <tr>
+      <td class="fld">Thesis Title</td>
+      <td class="val" colspan="3">${c.mods['title']}</td>
+	 </tr>
+	 <tr>
+	  <td class="fld">Thesis filename</td>
+      <td class="val">${c.thesis_filename}</td>
+	  <td class="fld">Thesis Abstract</td>
+      <td class="val">${c.mods['abstract']}</td>
+	 </tr>
+	 <tr>
+      <td class="fld">About your thesis</td>
+      <td class="val">${c.mods['extent']}</td>	 
+	  <td class="fld">Tags or Keywords</td>
+      <td class="val">
+      <ul>
+	  % for kw in c.mods['subjects']:
+	  <li>${kw}</li>
+      % endfor 
+      </ul>
+       </td>
+	 </tr>
+	 <tr>
+	  <td class="fld">Dataset filename</td>
+      <td class="val">
+      % if c.dataset_filename is not None:
+      ${c.dataset_filename}
+      % else:
+      No dataset submitted.
+      % endif
+      </td>
+	  <td class="fld">About your dataset</td>
+      <td class="val">
+      % if c.mods['admin_note'] != None:
+      ${c.mods['admin_note']}
+      % else:
+      No dataset software or abstract information submitted.
+      % endif 
+      </td>
+      </tr>
+	 <tr>
+	  <td class="fld">Dataset publically available</td>
+	  <td class="val">${c.dataset_agreement}</td>
+	  <td class="fld">Honor-code agreement</td>
+	  <td class="val">
+	  % if c.honor_code is not None:
+	   Yes
+	  % else:
+	   No
+	  % endif
+	  </td>
+	 </tr>
+    </table> 
+    </div>
+  </p>
+  </div>
+<!-- <input type="button" value="Check status" onclick="quick_status()" /> //-->
+<script>
+//function quick_submit() {
+//  getSubmissionStatus("${url('get')}");
+//}
+pollStatus("${url('get')}");
+</script>
 </body>
 </html>
