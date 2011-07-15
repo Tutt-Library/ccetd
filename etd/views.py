@@ -89,7 +89,7 @@ def upload(request,workflow=None):
         if upload_thesis_form.cleaned_data['creator_middle']:
             creator.name_part_list.append(\
                 mods.name.name_part(value=upload_thesis_form.cleaned_data['creator_middle'],
-                                    type='middle')
+                                    type='middle'))
         if upload_thesis_form.cleaned_data['creator_suffix']:
             suffix = upload_thesis_form.cleaned_data['creator_suffix']
             if len(suffix) > 1:
