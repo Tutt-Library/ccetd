@@ -22,6 +22,19 @@ for filename in os.listdir(workflow_dir):
         workflows[fileinfo[0].lower()] = workflow_config
 
 # Helper functions 
+def get_advisors(config):
+    """
+     Helper function returns a sorted list of advisor email and
+     name tuples from a workflow config object.
+
+     Parameters:
+     `config`: Workflow RawConfigObject, required
+    """
+    faculty_choices = sorted(config.items('FACULTY'),
+                             key=itemgetter(1))
+    return faculty_choices
+
+
 def get_grad_dates(config):
     """
     Helper function returns a list of tuples for graduation
@@ -72,47 +85,15 @@ def upload(request,workflow=None):
     default = dict()
     for row in config.items('FORM'):
         default[row[0]] = row[1]
-    upload_thesis_form = UploadThesisForm(request.POST,request.FILES)
+    upload_thesis_form = UploadThesisForm(request.POST,
+                                          request.FILES)
+    logging.error("IS VALID? %s" % upload_thesis_form.is_valid())
+    logging.error("Error  %s" % len(upload_thesis_form.errors))
     if upload_thesis_form.is_valid():
-        # Create ETD MODS metadata from valid form
-        mods_xml = mods.MetadataObjectDescriptionSchema()
-        mods_xml.title_info = mods.titleInfo('')
-        mods_xml.title_info.title = upload_thesis_form.cleaned_data['title']
-        # Build mods name for thesis creator
-        creator = mods.name('')
-        creator.name_part_list.append(\
-            mods.name.name_part(value=upload_thesis_form.cleaned_data['creator_family'],
-                                type='family'))
-        creator.name_part_list.append(\
-            mods.name.name_part(value=upload_thesis_form.cleaned_data['creator_given'],
-                                type='given'))
-        if upload_thesis_form.cleaned_data['creator_middle']:
-            creator.name_part_list.append(\
-                mods.name.name_part(value=upload_thesis_form.cleaned_data['creator_middle'],
-                                    type='middle'))
-        if upload_thesis_form.cleaned_data['creator_suffix']:
-            suffix = upload_thesis_form.cleaned_data['creator_suffix']
-            if len(suffix) > 1:
-                creator.name_part_list.append(\
-                    mods.name.name_part(value=suffix,
-                                        type="termsOfAddress"))
-        mods_xml.names.append(creator)
-        # Create and add thesis abstract
-        mods_xml.abstract = upload_thesis_form.cleaned_data['abstract']
-        
-        
-        
+        result = upload_thesis_form.save(workflow=config)
         return HttpResponseRedirect('/etd/success')
-    faculty_choices = sorted(config.items('FACULTY'),
-                             key=itemgetter(1))
-    if upload_thesis_form.fields.has_key('advisors'):
-        upload_thesis_form.fields['advisors'].choices = faculty_choices
-    else:
-        upload_thesis_form.fields['advisors'] = forms.MultipleChoiceField(choices=faculty_choices)
-    if upload_thesis_form.fields.has_key('graduation_dates'):
-        upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(config)
-    else:
-        upload_thesis_form.fields['graduation_dates']= forms.ChoiceField(choices=get_grad_dates(config))
+    upload_thesis_form.fields['advisors'].choices = get_advisors(config)
+    upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(config)
     template = config.get('FORM','template_name')
     return render_to_response('etd/%s' % template,
                              {'default': default,
@@ -140,9 +121,9 @@ def workflow(request,workflow=None):
     for row in form_items:
         default[row[0]] = row[1]
     upload_thesis_form = UploadThesisForm()
-    upload_thesis_form.fields['advisors'] = forms.MultipleChoiceField(choices = sorted(custom.items('FACULTY'),
-                                                                                       key=itemgetter(1)))
-    upload_thesis_form.fields['graduation_dates'] = forms.ChoiceField(choices = get_grad_dates(custom))
+    upload_thesis_form.fields['advisors'].choices = get_advisors(custom)
+    upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(custom)
+
     return direct_to_template(request,
                               'etd/%s' % custom.get('FORM',
                                                     'template_name'),
