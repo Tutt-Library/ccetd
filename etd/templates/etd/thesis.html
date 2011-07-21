@@ -41,10 +41,10 @@
          </p>
 	  <fieldset>
       <legend for="id-creator">Your Name:</legend>
-      {{ form.creator_given.label }}*:{{ form.creator_given }}{{ form.creator_given.errors }}<br/>
-      {{ form.creator_middle.label }}:{{ form.creator_middle }}<br/>
-      {{ form.creator_family.label }}*:{{ form.creator_family }}{{ form.creator_family.errors }}<br/>
-      {{ form.creator_suffix.label }}:{{ form.creator_suffix }}
+      {{ creator_form.given.label }}*:{{ creator_form.given }}{{ creator_form.given.errors }}<br/>
+      {{ creator_form.middle.label }}:{{ creator_form.middle }}<br/>
+      {{ creator_form.family.label }}*:{{ creator_form.family }}{{ creator_form.family.errors }}<br/>
+      {{ creator_form.suffix.label }}:{{ creator_form.suffix }}
       </fieldset>
       {% if default.email_notices %}
       <br/>
@@ -53,11 +53,10 @@
       (<i>To receive a notification e-mail when your thesis is submitted</i>)
       <br/>
       {% endif %}
-      {{ form.advisors.errors }}
-      {{ form.advisors.label }}
-      <label>{{ form.advisors.label }}</label>
+      {{ advisor_form.advisors.errors }}
+      <label>{{ advisor_form.advisors.label }}</label>
       <br/>
-      {{ form.advisors }}
+      {{ advisor_form.advisors }}
       <br/>
       {{ form.graduation_dates.errors }}
       <label for='id-grad-date'>Graduation Date:</label>
@@ -75,17 +74,17 @@
       {{ form.thesis_file }}
       {{ form.thesis_file.errors }}<br/>
       <label for="id-title">
-      {{ form.title.label }}*
+      {{ title_form.title.label }}*
       </label><br/>
-      {{ form.title }}
-      {{ form.title.errors }}
+      {{ title_form.title }}
+      {{ title_form.title.errors }}
       <br/>
       <fieldset>
       <legend for="id-extent">About your thesis:</legend>
       <ul>
-      <li>Last page number: {{ form.page_numbers }}</li>
-      <li>Contains illustrations and/or graphics: {{ form.has_illustrations }} {{ form.has_illustrations.label}}</li>
-      <li>Contains maps: {{ form.has_maps }}{{ form.has_maps.label }}</li> 
+      <li>Last page number: {{ about_form.page_numbers }}</li>
+      <li>Contains illustrations and/or graphics: {{ about_form.has_illustrations }} {{ about_form.has_illustrations.label}}</li>
+      <li>Contains maps: {{ about_form.has_maps }}{{ about_form.has_maps.label }}</li> 
       </ul>
      </fieldset>
      <br/>
@@ -94,7 +93,7 @@
        <br/>
        <label for="id-subjects">Tags or Keywords</label><br/>
        <span id="span-keywords">
-       {{ form.keyword_1 }}{{ form.keyword_2 }}{{ form.keyword_3 }}
+       {{ subjects_form.keyword_1 }}{{ subjects_form.keyword_2 }}{{ subjects_form.keyword_3 }}
        </span>
        <a href="#" onclick="AddKeywords();" id="more-a">+ More</a>
        <br/>
@@ -103,18 +102,18 @@
         {# START Dataset accordion #}
 	<h3><a href="#">Step 3 (Optional): Upload Dataset and Enter Information</a></h3>
 	<div>
-      <label><b>{{ form.dataset_file.label  }}</b> (<i>browse to attach</i>):</label>
-      {{ form.dataset_file  }}
+      <label><b>{{ dataset_form.dataset_file.label  }}</b> (<i>browse to attach</i>):</label>
+      {{ dataset_form.dataset_file  }}
 	  <br/>
-	  <label>{{ form.dataset_info.label }}: (example - Stata version 10, EViews version 7)</label>
+	  <label>{{ dataset_form.info_note.label }}: (example - Stata version 10, EViews version 7)</label>
 	  <br/>
-	  {{ form.dataset_info  }} 
+	  {{ dataset_form.info_note  }} 
 	  <br/>
-	  <label>{{ form.dataset_abstract.label }}: (briefly describe variables, years, or number of observations, etc.)</label><br/>
-          {{ form.dataset_abstract }}
+	  <label>{{ dataset_form.abstract.label }}: (briefly describe variables, years, or number of observations, etc.)</label><br/>
+          {{ dataset_form.abstract }}
 	  <br/>
 	  <label>If you agree, your dataset will be publically available.</label>
-	  {{ form.dataset_available_public }}{{ form.dataset_available_public.label }}
+	  {{ dataset_form.is_publically_available }}{{ dataset_form.is_publically_available.label }}
 	</div>
         {# END Dataset accordion #}
         {# START Honor-code and Submission accordion #}

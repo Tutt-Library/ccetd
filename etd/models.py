@@ -20,6 +20,10 @@ class ThesisDatasetObject(DigitalObject):
     dataset = FileDatastream("FILE",
                              "Dataset datastream",
                              defaults={'versionable': True })
+    mods = FileDatastream("FILE",
+                          "MODS XML datastream",
+                          defaults={'versionable': True,
+                                    'mimetype':'text/xml'})
     thesis = FileDatastream("FILE",
                             "Thesis datastream",
                             defaults={'versionable': True,

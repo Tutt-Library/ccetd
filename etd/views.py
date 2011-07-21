@@ -85,18 +85,65 @@ def upload(request,workflow=None):
     default = dict()
     for row in config.items('FORM'):
         default[row[0]] = row[1]
+    about_form = PhysicalDescriptionForm(request.POST,
+                                         prefix='about')
+    advisor_form = AdvisorForm(request.POST,
+                               prefix='advisor')
+    creator_form = CreatorForm(request.POST,
+                               prefix='creator')
+    dataset_form = DatasetForm(request.POST,
+                               request.FILES,
+                               prefix='dataset')
+    subjects_form = SubjectsForm(request.POST,
+                                prefix='subject')
+    title_form = ThesisTitleForm(request.POST,
+                                 prefix='title')
+
     upload_thesis_form = UploadThesisForm(request.POST,
-                                          request.FILES)
-    logging.error("IS VALID? %s" % upload_thesis_form.is_valid())
-    logging.error("Error  %s" % len(upload_thesis_form.errors))
-    if upload_thesis_form.is_valid():
-        result = upload_thesis_form.save(workflow=config)
+                                          request.FILES,
+                                          prefix='thesis')
+    if about_form.is_valid() and\
+       advisor_form.is_valid() and\
+       creator_form.is_valid() and\
+       dataset_form.is_valid() and\
+       subjects_form.is_valid() and\
+       title_form.is_valid() and\
+       upload_thesis_form.is_valid():
+        mods_xml = upload_thesis_form.save(workflow=config)
+        mods_xml.physical_description = about_form.save()
+        mods_xml.names.append(creator_form.save())
+        advisors = advisor_form.save(config=config)
+        for advisor in advisors:
+            mods_xml.names.append(advisor)
+        if not dataset_form.is_empty():
+            mods_xml = dataset_form.save(mods_xml=mods_xml)
+        subjects = subjects_form.save()
+        for subject_keyword in subjects:
+            mods_xml.subjects.append(subject_keyword)
+        mods_xml.title_info = title_form.save()
+        # Generate workflow constant metadata 
+        year_result = re.search(r'(\d+)',
+                                upload_thesis_form.fields['graduation_date'])
+        if year_result:
+            year = year_result.groups()[0]
+        else:
+            year = datetime.datetime.today().year
+        mods_xml.origin_info = OriginInfoForm().save(config=config,
+                                                     year=year)
+        mods_xml.names.append(DepartmentForm().save(config=config))
+        mods_xml.names.append(InstitutionForm().save(config=config))
         return HttpResponseRedirect('/etd/success')
-    upload_thesis_form.fields['advisors'].choices = get_advisors(config)
+    advisor_form.fields['advisors'].choices = get_advisors(config)
     upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(config)
     template = config.get('FORM','template_name')
     return render_to_response('etd/%s' % template,
                              {'default': default,
+                              'about_form':about_form,
+                              'advisor_form':advisor_form,
+                              'creator_form':creator_form,
+                              'dataset_form':dataset_form,
+                              'subjects_form':subjects_form,
+                              'title_form':title_form,
                               'form':upload_thesis_form,
                               'workflow':workflow},
                               context_instance=RequestContext(request))
@@ -120,14 +167,26 @@ def workflow(request,workflow=None):
     default = dict()
     for row in form_items:
         default[row[0]] = row[1]
-    upload_thesis_form = UploadThesisForm()
-    upload_thesis_form.fields['advisors'].choices = get_advisors(custom)
+    about_form = PhysicalDescriptionForm(prefix='about')
+    advisor_form = AdvisorForm(prefix='advisor')
+    advisor_form.fields['advisors'].choices = get_advisors(custom)
+    dataset_form = DatasetForm(prefix='dataset')
+    creator_form = CreatorForm(prefix='creator')
+    subject_form = SubjectsForm(prefix='subject')
+    title_form = ThesisTitleForm(prefix='title')
+    upload_thesis_form = UploadThesisForm(prefix='thesis')
     upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(custom)
 
     return direct_to_template(request,
                               'etd/%s' % custom.get('FORM',
                                                     'template_name'),
                               {'default':default,
+                               'about_form':about_form,
+                               'advisor_form':advisor_form,
+                               'creator_form':creator_form,
+                               'dataset_form':dataset_form,
+                               'subjects_form':subject_form,
+                               'title_form':title_form,
                                'form':upload_thesis_form,
                                'workflow':workflow})
     
