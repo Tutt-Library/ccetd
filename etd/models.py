@@ -7,7 +7,7 @@
 
 """
 from django.db import models
-from eulfedora.models import DigitalObject,FileDatastream
+from eulfedora.models import DigitalObject,FileDatastream,XmlDatastream
 import settings
 
 class ThesisDatasetObject(DigitalObject):
@@ -17,14 +17,14 @@ class ThesisDatasetObject(DigitalObject):
     """
     ETD_CONTENT_MODEL = 'info:fedora/coalliance:%s' % settings.FEDORA_ETDCMODEL
     CONTENT_MODELS = [ ETD_CONTENT_MODEL ]
-    dataset = FileDatastream("FILE",
+    dataset = FileDatastream("DATASET",
                              "Dataset datastream",
                              defaults={'versionable': True })
-    mods = FileDatastream("FILE",
-                          "MODS XML datastream",
-                          defaults={'versionable': True,
-                                    'mimetype':'text/xml'})
-    thesis = FileDatastream("FILE",
+    mods = XmlDatastream("XML",
+                         "MODS XML datastream",
+                         defaults={'versionable': True,
+                                   'mimetype':'text/xml'})
+    thesis = FileDatastream("THESIS",
                             "Thesis datastream",
                             defaults={'versionable': True,
                                       'mimetype': 'application/pdf'})

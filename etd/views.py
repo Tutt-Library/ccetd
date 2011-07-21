@@ -1,7 +1,9 @@
 __author__ = 'Jeremy Nelson'
 
 import os,ConfigParser,logging
+from eulfedora.server import Repository
 from etd.forms import *
+from etd.models import ThesisDatasetObject
 from operator import itemgetter
 from django import forms
 from django.views.generic.simple import direct_to_template
@@ -85,30 +87,32 @@ def upload(request,workflow=None):
     default = dict()
     for row in config.items('FORM'):
         default[row[0]] = row[1]
+    form_list = []
     about_form = PhysicalDescriptionForm(request.POST,
                                          prefix='about')
+    form_list.append(about_form)
     advisor_form = AdvisorForm(request.POST,
                                prefix='advisor')
+    form_list.append(advisor_form)
     creator_form = CreatorForm(request.POST,
                                prefix='creator')
+    form_list.append(creator_form)
     dataset_form = DatasetForm(request.POST,
                                request.FILES,
                                prefix='dataset')
+    form_list.append(dataset_form)
     subjects_form = SubjectsForm(request.POST,
                                 prefix='subject')
+
+    form_list.append(subjects_form)
     title_form = ThesisTitleForm(request.POST,
                                  prefix='title')
-
+    form_list.append(title_form)
     upload_thesis_form = UploadThesisForm(request.POST,
                                           request.FILES,
                                           prefix='thesis')
-    if about_form.is_valid() and\
-       advisor_form.is_valid() and\
-       creator_form.is_valid() and\
-       dataset_form.is_valid() and\
-       subjects_form.is_valid() and\
-       title_form.is_valid() and\
-       upload_thesis_form.is_valid():
+    form_list.append(upload_thesis_form)
+    if all([form.is_valid() for form in form_list]):
         mods_xml = upload_thesis_form.save(workflow=config)
         mods_xml.physical_description = about_form.save()
         mods_xml.names.append(creator_form.save())
@@ -123,15 +127,31 @@ def upload(request,workflow=None):
         mods_xml.title_info = title_form.save()
         # Generate workflow constant metadata 
         year_result = re.search(r'(\d+)',
-                                upload_thesis_form.fields['graduation_date'])
+                                upload_thesis_form.cleaned_data['graduation_dates'])
         if year_result:
             year = year_result.groups()[0]
         else:
             year = datetime.datetime.today().year
         mods_xml.origin_info = OriginInfoForm().save(config=config,
-                                                     year=year)
+                                                     year_value=year)
         mods_xml.names.append(DepartmentForm().save(config=config))
         mods_xml.names.append(InstitutionForm().save(config=config))
+        # Connect and save to Fedora repository
+        repo = Repository()
+        thesis_obj = repo.get_object(type=ThesisDatasetObject)
+        thesis_obj.mods = mods_xml
+        thesis_obj.thesis = request.FILES['thesis-thesis_file']
+        thesis_obj.thesis.label = thesis_obj.mods.title_info.title
+        if request.FILES.has_key('dataset-dataset_fie'):
+            thesis_obj.dataset = request.FILES['dataset-dataset_file']
+            thesis_obj.dataset.label = 'Dataset for %s' % thesis_obj.mods.title_info.title
+            if dataset_form.cleaned_data['is_publically_available'] == False:
+                # This needs to be set correctly
+                # thesis_obj.rels_ext.content
+                print("Not happy")
+        thesis_obj.dc.content.title = thesis_obj.mods.title_info.title
+        thesis_obj.label = 'Thesis - %s' % thesis_obj.mods.title_info.title
+        thesis_obj.save()
         return HttpResponseRedirect('/etd/success')
     advisor_form.fields['advisors'].choices = get_advisors(config)
     upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(config)

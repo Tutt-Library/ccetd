@@ -58,12 +58,13 @@ class AdvisorForm(forms.Form):
        
 
 def pretty_name_generator(name_parts):
-    suffix = reduce([name.value for name in name_parts if name.type == 'suffix'])
-    middle_names = reduce([name.value for name in name_parts if name.type == 'middle'])
+    suffix = filter(lambda x: x.name == 'suffix', name_parts)
+    middle_names = reduce(lambda x,y: '%s %s' % (x,y),
+                          [name.value for name in name_parts if name.type == 'middle'])
     for name in name_parts:
         if name.type == 'family':
             if len(suffix) > 0:
-                yield '%s %s, ' % (name.value,suffix[0])
+                yield '%s %s, ' % (name.value,suffix[0].value)
             else:
                 yield '%s, ' % name.value
         elif name.type == 'given':
@@ -139,6 +140,12 @@ class DatasetForm(forms.Form):
     dataset_file = forms.FileField(required=False,
                                    label='Dataset')
 
+    def is_empty(self):
+        for k,v in self.cleaned_data.iteritems():
+            if v != None:
+                return False
+        return True
+
     def save(self,
              mods_xml=None):
         """
@@ -207,7 +214,7 @@ class InstitutionForm(forms.Form):
                                                                    type="text",
                                                                    value="degree grantor")))
         institution.name_parts.append(mods.namePart(value=name))
-        return name
+        return institution
 
 class OriginInfoForm(forms.Form):
     """OriginInfoForm associates fields with MODS originInfo element
@@ -355,11 +362,16 @@ class UploadThesisForm(forms.Form):
         """
         obj_mods = mods.MetadataObjectDescriptionSchema()
         if self.cleaned_data.has_key('abstract'):
-            obj_mods.abstract = self.cleaned_data['abstract']
+            obj_mods.abstract = mods.abstract(value=self.cleaned_data['abstract'])
         # Create and set default genre for thesis
         obj_mods.genre = mods.genre(authority='marcgt',value='thesis')
         # Type of resource, default to text
         obj_mods.type_of_resource = mods.typeOfResource(value="text")
+        # Creates a thesis note for graduation date of creator
+        #if self.cleaned_data.has_key('graduation_dates'):
+        #    obj_mods.notes.append(mods.note(type='thesis',
+        #                                    display_label='Graduation Date',
+        #                                    value=self.cleaned_data['graduation_dates']))
         if workflow:
             obj_mods.notes.append(mods.note(type='thesis',
                                             value=workflow.get('FORM','thesis_note')))
