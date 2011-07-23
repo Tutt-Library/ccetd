@@ -1,8 +1,30 @@
+"""
+
+ views.py -- Views for ETD application.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+ Copyright: 2011 Colorado College
+
+"""
+
+
 __author__ = 'Jeremy Nelson'
 
 import os,ConfigParser,logging
 from eulfedora.server import Repository
 from etd.forms import *
+from datasets.forms import ThesisDatasetForm
 from etd.models import ThesisDatasetObject
 from operator import itemgetter
 from django import forms
@@ -97,7 +119,7 @@ def upload(request,workflow=None):
     creator_form = CreatorForm(request.POST,
                                prefix='creator')
     form_list.append(creator_form)
-    dataset_form = DatasetForm(request.POST,
+    dataset_form = ThesisDatasetForm(request.POST,
                                request.FILES,
                                prefix='dataset')
     form_list.append(dataset_form)
@@ -190,7 +212,7 @@ def workflow(request,workflow=None):
     about_form = PhysicalDescriptionForm(prefix='about')
     advisor_form = AdvisorForm(prefix='advisor')
     advisor_form.fields['advisors'].choices = get_advisors(custom)
-    dataset_form = DatasetForm(prefix='dataset')
+    dataset_form = ThesisDatasetForm(prefix='dataset')
     creator_form = CreatorForm(prefix='creator')
     subject_form = SubjectsForm(prefix='subject')
     title_form = ThesisTitleForm(prefix='title')

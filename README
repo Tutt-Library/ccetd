@@ -1,8 +1,20 @@
-Colorado College Electronic Thesis and Dataset (CCETD) is a Django application
-for submitting an electronic thesis and an optional dataset to a Fedora
-Commons repository.
+== Discover Aristotle Project ==
+
+Electronic Thesis and Dissertation Django Application
+
+The Electronic Thesis and Dissertation Django application was originally a 
+pylons application developed at Colorado College. It has been migrated to the
+Django and now is part of the Discover Aristotle bibliographic, repository, 
+and access framework being actively developed at Colorado College Tutt Library
+and other institutions. Unless explictly set, all software code, ideas, 
+configuations, and any associated intellectual work is licensed under the Apache 2 
+open source license or under a Creative Commons copyright.
+
 
 Dependencies:
--------------
-1. eulfedora - https://github.com/emory-libraries/eulfedora
-2. pymarc - http://pypi.python.org/pypi/pymarc/ 
+- eulfedora
+- eulxml
+
+Optional: 
+- aristotle.datasets # Supports dataset submission
+- aristotle.marc # Supports MARC record generation from MODS metadata

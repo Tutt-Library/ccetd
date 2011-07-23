@@ -1,5 +1,5 @@
 """
- urls.py - URL routing for ETD django app
+ tests.py
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -18,11 +18,12 @@
 """
 __author__ = 'Jeremy Nelson'
 
-from django.conf.urls.defaults import *
+from django.test import TestCase
 
-urlpatterns = patterns('etd.views',
-    (r'^$','default'),
-    (r'/success$','success'),
-    (r'(\w+)/upload','upload'),
-    (r'(\w+)','workflow'),
-)
+
+class SimpleTest(TestCase):
+    def test_basic_addition(self):
+        """
+        Tests that 1 + 1 always equals 2.
+        """
+        self.assertEqual(1 + 1, 2)
