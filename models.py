@@ -24,12 +24,14 @@ __author__ = 'Jeremy Nelson'
 
 from django.db import models
 from eulfedora.models import DigitalObject,FileDatastream,XmlDatastream
+from eulxml.xmlmap import mods
 import settings
+
 
 class ThesisDatasetObject(DigitalObject):
     """
-    `ThesisDatasetObject` models the Electronic Thesis and Dataset datastreams
-    for ingestion into a Fedora Repository.
+    `ThesisObject` models the Electronic Thesis and Dataset datastreams
+     and assocated MODS Xml datastream for ingestion into a Fedora Repository.
     """
     ETD_CONTENT_MODEL = 'info:fedora/coalliance:%s' % settings.FEDORA_ETDCMODEL
     CONTENT_MODELS = [ ETD_CONTENT_MODEL ]
@@ -38,11 +40,11 @@ class ThesisDatasetObject(DigitalObject):
                              defaults={'versionable': True })
     mods = XmlDatastream("XML",
                          "MODS XML datastream",
+                         objtype=mods,
                          defaults={'versionable': True,
                                    'mimetype':'text/xml'})
     thesis = FileDatastream("THESIS",
                             "Thesis datastream",
                             defaults={'versionable': True,
                                       'mimetype': 'application/pdf'})
-    
 

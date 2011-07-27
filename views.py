@@ -161,8 +161,8 @@ def upload(request,workflow=None):
         # Connect and save to Fedora repository
         repo = Repository()
         thesis_obj = repo.get_object(type=ThesisDatasetObject)
-        thesis_obj.mods = mods_xml
-        thesis_obj.thesis = request.FILES['thesis-thesis_file']
+        thesis_obj.mods.content = mods_xml
+        thesis_obj.thesis.content = request.FILES['thesis-thesis_file']
         thesis_obj.thesis.label = thesis_obj.mods.title_info.title
         if request.FILES.has_key('dataset-dataset_fie'):
             thesis_obj.dataset = request.FILES['dataset-dataset_file']
