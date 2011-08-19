@@ -32,6 +32,7 @@ from django.views.generic.simple import direct_to_template
 from django.shortcuts import render_to_response
 from django.http import Http404,HttpResponseRedirect
 from django.template import RequestContext
+from django.contrib.formtools.wizard.views import SessionWizardView
 from eulxml.xmlmap import load_xmlobject_from_string,mods
 
 # Sets workflows dict
@@ -83,7 +84,7 @@ def default(request):
     workflows.
     """
     return direct_to_template(request,
-                              'etd/index.html',
+                              'etd/default_new.html',
                               {'active':sorted(workflows.items())})
 
 def success(request):
@@ -218,10 +219,10 @@ def workflow(request,workflow=None):
     title_form = ThesisTitleForm(prefix='title')
     upload_thesis_form = UploadThesisForm(prefix='thesis')
     upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(custom)
-
+    #template_name = custom.get('FORM','template_name')
+    template_name = 'default_new.html'
     return direct_to_template(request,
-                              'etd/%s' % custom.get('FORM',
-                                                    'template_name'),
+                              'etd/%s' % template_name,
                               {'default':default,
                                'about_form':about_form,
                                'advisor_form':advisor_form,
@@ -232,3 +233,11 @@ def workflow(request,workflow=None):
                                'form':upload_thesis_form,
                                'workflow':workflow})
     
+class ThesisSubmissionWizard(SessionWizardView):
+    """
+    Class breaks down thesis submission workflow into 
+    discrete steps.
+    """
+    def done(self,form_list,**kwargs):
+        submit_thesis(form_list)
+        return HttpResponseRedirect('/etd/thankyou')

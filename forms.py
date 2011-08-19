@@ -399,3 +399,88 @@ class UploadThesisForm(forms.Form):
         obj_mods.notes.append(mods.note(type='bibliography',
                                         value='Includes bibliographical references'))
         return obj_mods
+
+class ThesisStepOneForm(forms.Form):
+    """
+    Fields for the first step, "Enter Author Information", in a Thesis Wizard
+    """
+    advisors = AdvisorsField(label='Advisors',
+                             required=False)
+    email = forms.EmailField(required=False,
+                             label='Your Email:',
+                             widget=forms.TextInput(attrs={'size':60}))
+    family = forms.CharField(max_length=50,
+                             label='Last name',
+                             help_text='Creator of thesis family or last name')
+    given = forms.CharField(max_length=50,
+                            label='First name',
+                            help_text='Creator of thesis given or first name')
+    graduation_date = GradDatesField(label='Grduation Date')
+    middle = forms.CharField(max_length=50,
+                             required=False,
+                             label='Middle name',
+                             help_text='Creator of thesis middle name')
+    suffix = forms.ChoiceField(required=False,
+                               label='Suffix',
+                               choices=[("None",""),
+                                        ('Jr.',"Jr."),
+                                        ("Sr.","Sr."),
+                                        ("II","II"),
+                                        ("III","III"),
+                                        ("IV","IV")])
+
+class ThesisStepTwoForm(forms.Form):
+    """
+    Fields for the second step, "Upload Thesis and Enter Information"  in the Thesis Wizard
+    """
+    abstract = forms.CharField(label='Abstract',
+                               required=False,
+                               widget=forms.Textarea(attrs={'cols':60,
+                                                            'rows':5}))
+    has_illustrations = forms.BooleanField(required=False,label='Yes')
+    has_maps = forms.BooleanField(required=False,label='Yes')
+    keyword_1 = forms.CharField(max_length=30,
+                                required=False,
+                                label='Keyword 1',
+                                help_text = 'Keyword for thesis')
+    keyword_2 = forms.CharField(max_length=30,
+                                required=False,
+                                label='Keyword 2',
+                                help_text = 'Keyword for thesis')
+    keyword_3 = forms.CharField(max_length=30,
+                                required=False,
+                                label='Keyword 3',
+                                help_text = 'Keyword for thesis')
+    page_numbers = forms.IntegerField(required=False)
+    thesis_file = forms.FileField()
+    title = forms.CharField(max_length=225,
+                            label='Thesis Title',
+                            widget=forms.TextInput(attrs={'size':60}))
+
+class ThesisStepThreeForm(forms.Form):
+    """
+    Fields for the third optional step, "Upload Dataset and Enter Information"  
+    in the Thesis Wizard
+    """
+    abstract = forms.CharField(required=False,
+                               label='Abstract of dataset',
+                               widget=forms.Textarea(attrs={'cols':60,
+                                                            'rows':5}))
+    is_publically_available = forms.BooleanField(required=False,label='I agree')
+    info_note = forms.CharField(required=False,
+                                label='Software/version',
+                                widget=forms.Textarea(attrs={'cols':60,
+                                                             'rows':5}))
+    dataset_file = forms.FileField(required=False,
+                                   label='Dataset')
+
+class ThesisStepFourForm(forms.Form):
+    """
+    Fields for the forth step, "Honor Code and Submission Agreements"  
+    in the Thesis Wizard
+    """
+    honor_code = forms.BooleanField(label='I agree')
+    submission_agreement = forms.BooleanField(label='I agree',required=False)
+
+   
+
