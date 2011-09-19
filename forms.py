@@ -21,6 +21,7 @@ __author__ = 'Jeremy Nelson'
 import logging,re
 from django import forms
 from models import ThesisDatasetObject
+from django.contrib.formtools.wizard import FormWizard
 from eulxml.xmlmap import mods
 from eulxml.forms import XmlObjectForm,SubformField
 
@@ -115,26 +116,24 @@ class CreatorForm(forms.Form):
         Method save method for creating MODS name with creator role
         for MODS datastream in Fedora Commons server.
         """
-        creator = mods.name(type="personal")
-        creator_role = mods.role(role_term=mods.roleTerm(authority='marcrt',
-                                                         type='text',
-                                                         value='creator'))
-        creator.roles.append(creator_role)
-        creator.name_parts.append(mods.namePart(type="given",
-                                                value=self.cleaned_data['given']))
+        creator = mods.Name(type="personal",
+                            roles=[mods.Role(authority='marcrt',
+                                             type='creator'),])
+        creator.name_parts.append(mods.NamePart(type="given",
+                                                text=self.cleaned_data['given']))
         if self.cleaned_data.has_key('middle'):
-            creator.name_parts.append(mods.namePart(type="middle",
-                                                    value=self.cleaned_data['middle']))
-        creator.name_parts.append(mods.namePart(type="family",
-                                                value=self.cleaned_data['family']))
+            creator.name_parts.append(mods.NamePart(type="middle",
+                                                    text=self.cleaned_data['middle']))
+        creator.name_parts.append(mods.NamePart(type="family",
+                                                text=self.cleaned_data['family']))
         if self.cleaned_data.has_key('suffix'):
-             creator.name_parts.append(mods.namePart(type="suffix",
+             creator.name_parts.append(mods.NamePart(type="suffix",
                                                      value=self.cleaned_data['suffix']))
         creator_display = str()
         last_first_name = pretty_name_generator(creator.name_parts)
         for name in last_first_name:
             creator_display += name
-        creator.displayLabel = creator_display
+        creator.display_form = creator_display
         return creator
 
 class DatasetForm(forms.Form):
@@ -167,17 +166,15 @@ class DatasetForm(forms.Form):
         creates a new MODS XML datastream if not present.
         """
         if not mods_xml:
-            mods_xml = mods.MetadataObjectDescriptionSchema()
+            mods_xml = mods.MODS()
         if self.cleaned_data.has_key('abstract'):
-            abstract = mods.note(value=self.cleaned_data['abstract'],
-                                 type='source type',
-                                 display_label='Dataset Abstract')
-            mods_xml.notes.append(abstract)
+            mods_xml.notes.append(mods.Note(text=self.cleaned_data['abstract'],
+                                            type='source type',
+                                            label='Dataset Abstract'))
         if self.cleaned_data.has_key('info_note'):
-            info = mods.note(value=self.cleaned_data['info_note'],
-                             type='source note',
-                             display_label='Dataset Information')
-            mods_xml.notes.append(info)
+            mods_xml.notes.append(mods.Note(text=self.cleaned_data['info_note'],
+                                            type='source note',
+                                            label='Dataset Information'))
         return mods_xml
          
 class DepartmentForm(forms.Form):
@@ -258,9 +255,9 @@ class OriginInfoForm(forms.Form):
         else:
             place_term = self.cleaned_data['location']
             publisher = self.cleaned_data['publisher']
-        origin_info = mods.originInfo(date_captured=year,
-                                      date_issued=year,
-                                      date_issued_keydate='yes',
+        origin_info = mods.OriginInfo(date_captured=mods.Date(date=year),
+                                      date_issued=mods.Date(date=year,
+                                                            key_date='yes'),
                                       place_term=place_term,
                                       publisher=publisher)
         return origin_info
@@ -292,7 +289,7 @@ class PhysicalDescriptionForm(forms.Form):
             digital_origin = self.cleaned_data['digital_origin']
         else:
             digital_origin = 'born digital'
-        physical_description = mods.physicalDescription(extent=extent,
+        physical_description = mods.PhysicalDescription(extent=extent,
                                                         digital_origin=digital_origin)
         return physical_description
 
@@ -325,7 +322,7 @@ class SubjectsForm(forms.Form):
         for i in range(1,total_keywords):
             field_name = 'keyword_%s' % i
             if self.cleaned_data.has_key(field_name):
-                output.append(mods.subject(topics=[self.cleaned_data[field_name],]))
+                output.append(mods.Subject(topic=self.cleaned_data[field_name]))
         return output
     
 class ThesisTitleForm(forms.Form):
@@ -344,9 +341,9 @@ class ThesisTitleForm(forms.Form):
         return title_info
 
 class UploadThesisForm(forms.Form):
-    """ThesisForm contains fields specific to ingesting an undergraduate or 
-    master thesis and dataset into a Fedora Commons repository using eulfedora
-    module.
+    """:class:`~aristotle.etd.ThesisForm` contains fields specific to ingesting an 
+    undergraduate or master thesis and dataset into a Fedora Commons repository using 
+    eulfedora module.
     """
     abstract = forms.CharField(label='Abstract',
                                required=False,
@@ -376,9 +373,9 @@ class UploadThesisForm(forms.Form):
         """
         obj_mods = mods.MetadataObjectDescriptionSchema()
         if self.cleaned_data.has_key('abstract'):
-            obj_mods.abstract = mods.abstract(value=self.cleaned_data['abstract'])
+            obj_mods.abstract = self.cleaned_data['abstract']
         # Create and set default genre for thesis
-        obj_mods.genre = mods.genre(authority='marcgt',value='thesis')
+        obj_mods.genres.append(mods.Genre(authority='marcgt',text='thesis'))
         # Type of resource, default to text
         obj_mods.type_of_resource = mods.typeOfResource(value="text")
         # Creates a thesis note for graduation date of creator
@@ -387,100 +384,16 @@ class UploadThesisForm(forms.Form):
         #                                    display_label='Graduation Date',
         #                                    value=self.cleaned_data['graduation_dates']))
         if workflow:
-            obj_mods.notes.append(mods.note(type='thesis',
-                                            value=workflow.get('FORM','thesis_note')))
-            obj_mods.notes.append(mods.note(display_label='Degree Name',
+            obj_mods.notes.append(mods.Note(type='thesis',
+                                            text=workflow.get('FORM','thesis_note')))
+            obj_mods.notes.append(mods.Note(label='Degree Name',
                                             type='thesis',
-                                            value=workflow.get('FORM','degree_name')))
-            obj_mods.notes.append(mods.note(display_label='Degree Type',
+                                            text=workflow.get('FORM','degree_name')))
+            obj_mods.notes.append(mods.Note(label='Degree Type',
                                             type='thesis',
-                                            value=workflow.get('FORM','degree_name')))
+                                            text=workflow.get('FORM','degree_name')))
         # Assumes thesis will have bibliography, potentially bad
         obj_mods.notes.append(mods.note(type='bibliography',
-                                        value='Includes bibliographical references'))
+                                        text='Includes bibliographical references'))
         return obj_mods
-
-class ThesisStepOneForm(forms.Form):
-    """
-    Fields for the first step, "Enter Author Information", in a Thesis Wizard
-    """
-    advisors = AdvisorsField(label='Advisors',
-                             required=False)
-    email = forms.EmailField(required=False,
-                             label='Your Email:',
-                             widget=forms.TextInput(attrs={'size':60}))
-    family = forms.CharField(max_length=50,
-                             label='Last name',
-                             help_text='Creator of thesis family or last name')
-    given = forms.CharField(max_length=50,
-                            label='First name',
-                            help_text='Creator of thesis given or first name')
-    graduation_date = GradDatesField(label='Grduation Date')
-    middle = forms.CharField(max_length=50,
-                             required=False,
-                             label='Middle name',
-                             help_text='Creator of thesis middle name')
-    suffix = forms.ChoiceField(required=False,
-                               label='Suffix',
-                               choices=[("None",""),
-                                        ('Jr.',"Jr."),
-                                        ("Sr.","Sr."),
-                                        ("II","II"),
-                                        ("III","III"),
-                                        ("IV","IV")])
-
-class ThesisStepTwoForm(forms.Form):
-    """
-    Fields for the second step, "Upload Thesis and Enter Information"  in the Thesis Wizard
-    """
-    abstract = forms.CharField(label='Abstract',
-                               required=False,
-                               widget=forms.Textarea(attrs={'cols':60,
-                                                            'rows':5}))
-    has_illustrations = forms.BooleanField(required=False,label='Yes')
-    has_maps = forms.BooleanField(required=False,label='Yes')
-    keyword_1 = forms.CharField(max_length=30,
-                                required=False,
-                                label='Keyword 1',
-                                help_text = 'Keyword for thesis')
-    keyword_2 = forms.CharField(max_length=30,
-                                required=False,
-                                label='Keyword 2',
-                                help_text = 'Keyword for thesis')
-    keyword_3 = forms.CharField(max_length=30,
-                                required=False,
-                                label='Keyword 3',
-                                help_text = 'Keyword for thesis')
-    page_numbers = forms.IntegerField(required=False)
-    thesis_file = forms.FileField()
-    title = forms.CharField(max_length=225,
-                            label='Thesis Title',
-                            widget=forms.TextInput(attrs={'size':60}))
-
-class ThesisStepThreeForm(forms.Form):
-    """
-    Fields for the third optional step, "Upload Dataset and Enter Information"  
-    in the Thesis Wizard
-    """
-    abstract = forms.CharField(required=False,
-                               label='Abstract of dataset',
-                               widget=forms.Textarea(attrs={'cols':60,
-                                                            'rows':5}))
-    is_publically_available = forms.BooleanField(required=False,label='I agree')
-    info_note = forms.CharField(required=False,
-                                label='Software/version',
-                                widget=forms.Textarea(attrs={'cols':60,
-                                                             'rows':5}))
-    dataset_file = forms.FileField(required=False,
-                                   label='Dataset')
-
-class ThesisStepFourForm(forms.Form):
-    """
-    Fields for the forth step, "Honor Code and Submission Agreements"  
-    in the Thesis Wizard
-    """
-    honor_code = forms.BooleanField(label='I agree')
-    submission_agreement = forms.BooleanField(label='I agree',required=False)
-
-   
 

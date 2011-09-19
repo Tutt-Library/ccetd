@@ -1,16 +1,18 @@
-{% extends 'cc-library-inside-base.html' %}
+{% extends 'cc-inside-base-twocol.html' %}
 {% load static %}
+{% load etd_extras %}
 
 {% block head-title %}Electronic Thesis Submission for Colorado College {% endblock %}
 {% block more-css %}
- <link href="{% get_static_prefix %}/thesis.css" rel="stylesheet" />
+ <link href="{% get_static_prefix %}jquery-ui-1.8.13.custom.css" rel="stylesheet" />
+ <link href="{% get_static_prefix %}thesis.css" rel="stylesheet" />
 {% endblock %}
 
 {% block library-breadcrumb %}
  <div id="breadcrumb">
-  <div class="stage"><a href="#">Library Home</a>&nbsp;&raquo;&nbsp;<a href="/etd">ETD</a>&nbsp;&raquo;&nbsp;
+  <div class="stage"><a href="http://www.coloradocollege.edu/library">Library Home</a>&nbsp;&raquo;&nbsp;<a href="/etd">ETD</a>&nbsp;&raquo;&nbsp;
   {% if workflow %}
-   <a href="#" class="on">{{ workflow|title }}</a>
+   <a href="#" class="on">{{ config|get_department }}</a>
   {% endif %}
    </div>
  </div>
@@ -18,18 +20,21 @@
 
 {% block subnavigation %}
 {% if workflow %}
-<h1><strong><a href="#">Submitting your thesis</a></strong></h1>
+<h1><strong><a href="#">Follow these steps to submit your thesis</a></strong></h1>
 <ol start="1">
- <li>Fill out the form describing your thesis{% if workflow.dataset %} and optional dataset{% endif %}.</li>
- <li>Upload a PDFa<sup><a href="#" onclick="alert('PDFa is an archival PDF format, most Word Processors should allow you to save your thesis as a PDFa. Please contact the library at 389-6661 for more information.')">?</a></sup>{% if workflow.dataset %} and any
-supporting datasets.{% endif %}</li>
+ <li>Enter Author Information</li>
+ <li>Upload Thesis and Information</li>
+ {% if has_dataset %}<li>(Optional) Upload dataset and supporting information</li>{% endif %}
+ <li>Honor code and submission agreements</li>
+ {% comment %}<li>Upload a PDFa<sup><a href="#" onclick="alert('PDFa is an archival PDF format, most Word Processors should allow you to save your thesis as a PDFa. Please contact the library at 389-6661 for more information.')">?</a></sup>{% if workflow.dataset %} and any
+supporting datasets.{% endif %}</li>{% endcomment %}
  <li>Submit your thesis to the Digital Archives of Colorado College</li>
 </ol> 
 {% else %}
 <h1><strong><a href="#">Active ETD Forms</a></strong></h1>
 <ul>
 {% for workflow in active %}
-<li><a href="/etd/{{ workflow.0 }}">{{ workflow.0|title }}</a></li> 
+<li><a href="/etd/{{ workflow.0 }}">{{ workflow.1|get_department }}</a></li> 
 {% endfor %}
 </ul>
 {% endif %}
@@ -37,18 +42,15 @@ supporting datasets.{% endif %}</li>
 
 {% block left-aside-two %}
 <aside class="aside">
-<div id="contact-lib-detail">
- <p>Nothing to see here</p>
-{% comment %}
+<div id="contact-lib-detail" style="background-color: #2D4873">
  {% include 'contact-library.html' %}
-{% endcomment %}
 </div>
 </aside>
 {% endblock %}
 
-{% block main-column %}
+{% block main-content %}
  {% if workflow %}
- <h1>{{ workflow|title }} Thesis Submission</h1>
+ <h1>{{ config|get_department }} Thesis Submission</h1>
  {% include 'thesis-form.html' %}
  {% else %}
  <h1>Colorado College ETD Home</h1>
@@ -58,13 +60,14 @@ supporting datasets.{% endif %}</li>
     web forms are available below:</p>
  <ul>
  {% for workflow in active %}
-   <li><a href="/etd/{{ workflow.0 }}">{{ workflow.0|title }}</a></li>
+   <li><a href="/etd/{{ workflow.0 }}">{{ workflow.1|get_department }}</a></li>
  {% endfor %}
  </ul>
  {% endif %}
 {% endblock %}
 
 {% block right-aside-one %}
+{% comment %}
 <aside class="slideshow">
 <dl>
  <dt><h3>Why submit your thesis to DACC?</h3></td>
@@ -73,34 +76,19 @@ supporting datasets.{% endif %}</li>
      or CV</dd>
 </dl>
 </aside>
-
+{% endcomment %}
 {% endblock %}
 
 {% block right-aside-two %}
+{% comment %}
  <div id="item-info">
  <h2>Your submission details</h2>
  <p>You have entered the following information:</p>
- 
- {% comment %}
- <p>Located at: <strong>{{ record.location }}</strong><br/>
-   at this Call Number: {{ record.lc_callnum_display.0 }}. Availability: 
-  <strong>{{ record.item_ils_number.0|get_item_status }}</strong>
- </p>
- <h2>Other Libraries</h2>
- <p>
-  If this copy is unavailable, search Prospector and WorldCat and request
-  the item.  
- </p>
- <ul>
-  <li><a href="#">Prospector</a></li>
-  <li><a href="#">Worldcat</a></li>
- </ul>
- </div>
-<br/>
- {% endcomment %}
+{% endcomment %}
 {% endblock %}
 
 {% block right-aside-three %}
+{% comment %}
 <aside class="social-media">
 <ul>
  <li class="rss">Get updates via <a href="#">RSS feed</a></li>
@@ -108,10 +96,23 @@ supporting datasets.{% endif %}</li>
  <li>Leave a <a href="#">comment</a></li>
 </ul>
 </aside>
+{% endcomment %}
+
 {% endblock %}
 
 
 {% block more-scripts %}
+<script src="{% get_static_prefix %}jquery.ui.core.js"></script>
+<script src="{% get_static_prefix %}jquery.ui.widget.js"></script>
+<script src="{% get_static_prefix %}jquery.ui.accordion.js"></script>
+<script src="{% get_static_prefix %}thesis.js"></script>
+<script>
+ $(function() {
+   $("#accordion" ).accordion({
+     autoHeight: false,
+    });
+  });
+</script>
 {% endblock %}
 
 {% block dialogs %}

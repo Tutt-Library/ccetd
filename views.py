@@ -1,22 +1,20 @@
 """
-
  views.py -- Views for ETD application.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-
- Copyright: 2011 Colorado College
-
 """
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Copyright: 2011 Colorado College
+
 
 
 __author__ = 'Jeremy Nelson'
@@ -32,7 +30,6 @@ from django.views.generic.simple import direct_to_template
 from django.shortcuts import render_to_response
 from django.http import Http404,HttpResponseRedirect
 from django.template import RequestContext
-from django.contrib.formtools.wizard.views import SessionWizardView
 from eulxml.xmlmap import load_xmlobject_from_string,mods
 
 # Sets workflows dict
@@ -84,7 +81,7 @@ def default(request):
     workflows.
     """
     return direct_to_template(request,
-                              'etd/default_new.html',
+                              'etd/default.html',
                               {'active':sorted(workflows.items())})
 
 def success(request):
@@ -178,11 +175,13 @@ def upload(request,workflow=None):
         return HttpResponseRedirect('/etd/success')
     advisor_form.fields['advisors'].choices = get_advisors(config)
     upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(config)
-    template = config.get('FORM','template_name')
+    #template = config.get('FORM','template_name')
+    template = 'default.html'
     return render_to_response('etd/%s' % template,
                              {'default': default,
                               'about_form':about_form,
                               'advisor_form':advisor_form,
+                              'config':config,
                               'creator_form':creator_form,
                               'dataset_form':dataset_form,
                               'subjects_form':subjects_form,
@@ -220,24 +219,20 @@ def workflow(request,workflow=None):
     upload_thesis_form = UploadThesisForm(prefix='thesis')
     upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(custom)
     #template_name = custom.get('FORM','template_name')
-    template_name = 'default_new.html'
+    template_name = 'default.html'
+    has_dataset = False
+    if custom.has_option('FORM','dataset'):
+        has_dataset = custom.get('FORM','dataset')
     return direct_to_template(request,
                               'etd/%s' % template_name,
                               {'default':default,
                                'about_form':about_form,
                                'advisor_form':advisor_form,
+                               'config':custom,
                                'creator_form':creator_form,
                                'dataset_form':dataset_form,
+                               'has_dataset':has_dataset,
                                'subjects_form':subject_form,
                                'title_form':title_form,
                                'form':upload_thesis_form,
                                'workflow':workflow})
-    
-class ThesisSubmissionWizard(SessionWizardView):
-    """
-    Class breaks down thesis submission workflow into 
-    discrete steps.
-    """
-    def done(self,form_list,**kwargs):
-        submit_thesis(form_list)
-        return HttpResponseRedirect('/etd/thankyou')
