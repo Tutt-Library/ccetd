@@ -354,6 +354,8 @@ class UploadThesisForm(forms.Form):
                              widget=forms.TextInput(attrs={'size':60}))
     graduation_dates = GradDatesField(required=False,
                                       label='Graduation Date')
+    #languages = forms.CharField(widget=forms.HiddenInput,
+    #                            required=False)
     honor_code = forms.BooleanField(label='I agree')
     submission_agreement = forms.BooleanField(label='I agree')
     thesis_label = forms.CharField(max_length=255,

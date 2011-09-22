@@ -1,4 +1,3 @@
-{% load static %}
 <form method="POST" action="/etd/{{ workflow }}/upload" enctype="multipart/form-data">
 {% csrf_token %}
 <div style="width: 600px">
@@ -58,7 +57,10 @@
       <ul>
       <li>Last page number: {{ about_form.page_numbers }}</li>
       <li>Contains illustrations and/or graphics: {{ about_form.has_illustrations }} {{ about_form.has_illustrations.label}}</li>
-      <li>Contains maps: {{ about_form.has_maps }}{{ about_form.has_maps.label }}</li> 
+      <li>Contains maps: {{ about_form.has_maps }}{{ about_form.has_maps.label }}</li>
+      {% if form.languages %}
+      <li>{{ form.languages.label }}:<br/> {{ form.languages }}</li>
+      {% endif %} 
       </ul>
      </fieldset>
      <br/>

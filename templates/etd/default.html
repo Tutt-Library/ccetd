@@ -1,11 +1,10 @@
 {% extends 'cc-inside-base-twocol.html' %}
-{% load static %}
 {% load etd_extras %}
 
 {% block head-title %}Electronic Thesis Submission for Colorado College {% endblock %}
 {% block more-css %}
- <link href="{% get_static_prefix %}jquery-ui-1.8.13.custom.css" rel="stylesheet" />
- <link href="{% get_static_prefix %}thesis.css" rel="stylesheet" />
+ <link href="{{ STATIC_URL }}css/jquery-ui-1.8.13.custom.css" rel="stylesheet" />
+ <link href="{{ STATIC_URL }}etd/css/thesis.css" rel="stylesheet" />
 {% endblock %}
 
 {% block library-breadcrumb %}
@@ -102,10 +101,10 @@ supporting datasets.{% endif %}</li>{% endcomment %}
 
 
 {% block more-scripts %}
-<script src="{% get_static_prefix %}jquery.ui.core.js"></script>
-<script src="{% get_static_prefix %}jquery.ui.widget.js"></script>
-<script src="{% get_static_prefix %}jquery.ui.accordion.js"></script>
-<script src="{% get_static_prefix %}thesis.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.ui.core.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.ui.widget.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.ui.accordion.js"></script>
+<script src="{{ STATIC_URL }}etd/js/thesis.js"></script>
 <script>
  $(function() {
    $("#accordion" ).accordion({

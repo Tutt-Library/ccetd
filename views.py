@@ -131,6 +131,10 @@ def upload(request,workflow=None):
     upload_thesis_form = UploadThesisForm(request.POST,
                                           request.FILES,
                                           prefix='thesis')
+    if config.has_section('LANGUAGE'):
+        upload_thesis_form.languages = forms.MultipleChoiceField(label="Languages",
+                                                                 required=False,
+                                                                 choices=config.items('LANGUAGE'))
     form_list.append(upload_thesis_form)
     if all([form.is_valid() for form in form_list]):
         mods_xml = upload_thesis_form.save(workflow=config)
@@ -190,7 +194,7 @@ def upload(request,workflow=None):
                               'workflow':workflow},
                               context_instance=RequestContext(request))
     
-def workflow(request,workflow=None):
+def workflow(request,workflow='default'):
     """
     Displays thesis entry form to end user.
 
@@ -223,6 +227,10 @@ def workflow(request,workflow=None):
     has_dataset = False
     if custom.has_option('FORM','dataset'):
         has_dataset = custom.get('FORM','dataset')
+    if custom.has_section('LANGUAGE'):
+        upload_thesis_form.fields['languages'] = forms.MultipleChoiceField(label="Languages",
+                                                                           required=False,
+                                                                           choices=custom.items('LANGUAGE'))
     return direct_to_template(request,
                               'etd/%s' % template_name,
                               {'default':default,

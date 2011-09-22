@@ -24,5 +24,5 @@ urlpatterns = patterns('etd.views',
     (r'^$','default'),
     (r'/success$','success'),
     (r'(\w+)/upload','upload'),
-    (r'/(.*)$','workflow'),
+    (r'(.*)$','workflow'),
 )
