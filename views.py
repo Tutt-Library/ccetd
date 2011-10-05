@@ -22,13 +22,14 @@ __author__ = 'Jeremy Nelson'
 import os,ConfigParser,logging
 from eulfedora.server import Repository
 from etd.forms import *
+from etd.conf import *
 from datasets.forms import ThesisDatasetForm
 from etd.models import ThesisDatasetObject
 from operator import itemgetter
 from django import forms
 from django.views.generic.simple import direct_to_template
 from django.shortcuts import render_to_response
-from django.http import Http404,HttpResponseRedirect
+from django.http import HttpResponse,Http404,HttpResponseRedirect
 from django.template import RequestContext
 from eulxml.xmlmap import load_xmlobject_from_string,mods
 
@@ -41,6 +42,9 @@ for filename in os.listdir(workflow_dir):
     if fileinfo[1] == '.ini':
         workflow_config = ConfigParser.RawConfigParser()
         workflow_config.read(os.path.join(workflow_dir,filename))
+        # Add universal constants to config object
+        workflow_config.set('FORM','institution',INSTITUTION)
+        workflow_config.set('FORM','location',LOCATION)
         workflows[fileinfo[0].lower()] = workflow_config
 
 # Helper functions 
@@ -88,9 +92,10 @@ def success(request):
     """
     Displays result from a successful thesis submission to the repository
     """
-    return direct_to_template(request,
-                              'etd/success.html',
-                             {})
+    return HttpResponse('Success!')
+    #return direct_to_template(request,
+    #                          'etd/success.html',
+    #                         {})
 
 def upload(request,workflow=None):
     """
@@ -144,11 +149,11 @@ def upload(request,workflow=None):
         for advisor in advisors:
             mods_xml.names.append(advisor)
         if not dataset_form.is_empty():
-            mods_xml = dataset_form.save(mods_xml=mods_xml)
+            mods_xml = dataset_form.mods(mods_xml=mods_xml)
         subjects = subjects_form.save()
         for subject_keyword in subjects:
             mods_xml.subjects.append(subject_keyword)
-        mods_xml.title_info = title_form.save()
+        mods_xml.title = title_form.save()
         # Generate workflow constant metadata 
         year_result = re.search(r'(\d+)',
                                 upload_thesis_form.cleaned_data['graduation_dates'])
@@ -165,7 +170,7 @@ def upload(request,workflow=None):
         thesis_obj = repo.get_object(type=ThesisDatasetObject)
         thesis_obj.mods.content = mods_xml
         thesis_obj.thesis.content = request.FILES['thesis-thesis_file']
-        thesis_obj.thesis.label = thesis_obj.mods.title_info.title
+        thesis_obj.thesis.label = thesis_obj.mods.content.title
         if request.FILES.has_key('dataset-dataset_fie'):
             thesis_obj.dataset = request.FILES['dataset-dataset_file']
             thesis_obj.dataset.label = 'Dataset for %s' % thesis_obj.mods.title_info.title
@@ -173,9 +178,13 @@ def upload(request,workflow=None):
                 # This needs to be set correctly
                 # thesis_obj.rels_ext.content
                 print("Not happy")
-        thesis_obj.dc.content.title = thesis_obj.mods.title_info.title
-        thesis_obj.label = 'Thesis - %s' % thesis_obj.mods.title_info.title
+        thesis_obj.dc.content.title = thesis_obj.mods.content.title
+        thesis_obj.label = 'Thesis - %s' % thesis_obj.mods.content.title
         thesis_obj.save()
+        thesis_obj.add_relationship('info:fedora/fedora-systems:def/relations-external#isMemberOfCollection',
+                                    default['fedora_collection'])
+        thesis_obj.save()
+        logging.error("Successfully ingested thesis with pid=%s" % thesis_obj.pid)
         return HttpResponseRedirect('/etd/success')
     advisor_form.fields['advisors'].choices = get_advisors(config)
     upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(config)

@@ -1,3 +1,7 @@
+ h3 { 
+  font-size: 1.1em !important;
+ }
+
  input,select {
   font-size: 0.8em;
   color: #777777;}

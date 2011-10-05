@@ -59,31 +59,31 @@ class AdvisorForm(forms.Form):
         output = []
         if self.cleaned_data.has_key('advisors'):
             advisors = self.cleaned_data['advisors']
-            advisor_role = mods.role(role_term=mods.roleTerm(authority='marcrt',
-                                                             type='text',
-                                                             value='advisor'))
+            advisor_role = mods.Role(authority='marcrt',
+                                     type='text',
+                                     text='advisor')
             advisor_dict = dict(iter(config.items('FACULTY')))
             for row in advisors:
-                advisor = mods.name(type="personal")
+                advisor = mods.Name(type="personal")
                 advisor.roles.append(advisor_role)
                 name = advisor_dict[row]
-                advisor.name_parts.append(mods.namePart(value=name))
+                advisor.name_parts.append(mods.NamePart(text=name))
                 output.append(advisor)
         return output
        
 
 def pretty_name_generator(name_parts):
-    suffix = filter(lambda x: x.name == 'suffix', name_parts)
+    suffix = filter(lambda x: x.type == 'suffix', name_parts)
     middle_names = reduce(lambda x,y: '%s %s' % (x,y),
-                          [name.value for name in name_parts if name.type == 'middle'])
+                          [name.text for name in name_parts if name.type == 'middle'])
     for name in name_parts:
         if name.type == 'family':
             if len(suffix) > 0:
-                yield '%s %s, ' % (name.value,suffix[0].value)
+                yield '%s %s, ' % (name.text,suffix[0].text)
             else:
-                yield '%s, ' % name.value
+                yield '%s, ' % name.text
         elif name.type == 'given':
-            yield '%s %s' % (name.value,middle_names)
+            yield '%s %s' % (name.text,middle_names)
         else:
             yield ''
          
@@ -119,21 +119,13 @@ class CreatorForm(forms.Form):
         creator = mods.Name(type="personal",
                             roles=[mods.Role(authority='marcrt',
                                              type='creator'),])
-        creator.name_parts.append(mods.NamePart(type="given",
-                                                text=self.cleaned_data['given']))
-        if self.cleaned_data.has_key('middle'):
-            creator.name_parts.append(mods.NamePart(type="middle",
-                                                    text=self.cleaned_data['middle']))
-        creator.name_parts.append(mods.NamePart(type="family",
-                                                text=self.cleaned_data['family']))
+        name_part = self.cleaned_data['family']
         if self.cleaned_data.has_key('suffix'):
-             creator.name_parts.append(mods.NamePart(type="suffix",
-                                                     value=self.cleaned_data['suffix']))
-        creator_display = str()
-        last_first_name = pretty_name_generator(creator.name_parts)
-        for name in last_first_name:
-            creator_display += name
-        creator.display_form = creator_display
+            name_part = name_part + ' %s' % self.cleaned_data['suffix']
+        name_part = '%s, %s' % (name_part,self.cleaned_data['given'])
+        if self.cleaned_data.has_key('middle'):
+            name_part = '%s %s' % (name_part,self.cleaned_data['middle'])
+        creator.name_parts.append(mods.NamePart(text=name_part))
         return creator
 
 class DatasetForm(forms.Form):
@@ -195,11 +187,11 @@ class DepartmentForm(forms.Form):
             name = config.get('FORM','department')
         else:
             name = self.cleaned_data['name']
-        department = mods.name(type="corporate")
-        department.roles.append(mods.role(role_term=mods.roleTerm(authority='marcrt',
-                                                                  type="text",
-                                                                  value="sponsor")))
-        department.name_parts.append(mods.namePart(value=name))
+        department = mods.Name(type="corporate")
+        department.roles.append(mods.Role(authority='marcrt',
+                                          type="text",
+                                          text="sponsor"))
+        department.name_parts.append(mods.NamePart(text=name))
         return department
 
 class InstitutionForm(forms.Form):
@@ -220,11 +212,11 @@ class InstitutionForm(forms.Form):
             name = config.get('FORM','institution')
         else:
             name = self.cleaned_data['name']
-        institution = mods.name(type="corporate")
-        institution.roles.append(mods.role(role_term=mods.roleTerm(authority='marcrt',
-                                                                   type="text",
-                                                                   value="degree grantor")))
-        institution.name_parts.append(mods.namePart(value=name))
+        institution = mods.Name(type="corporate",
+                                name_parts=[mods.NamePart(text=name),])
+        institution.roles.append(mods.Role(authority='marcrt',
+                                           type="text",
+                                           text="degree grantor"))
         return institution
 
 class OriginInfoForm(forms.Form):
@@ -255,10 +247,12 @@ class OriginInfoForm(forms.Form):
         else:
             place_term = self.cleaned_data['location']
             publisher = self.cleaned_data['publisher']
-        origin_info = mods.OriginInfo(date_captured=mods.Date(date=year),
-                                      date_issued=mods.Date(date=year,
-                                                            key_date='yes'),
-                                      place_term=place_term,
+        date_created = mods.DateCreated(date=year)
+        date_issued = mods.DateIssued(date=year,
+                                      key_date='yes')
+        origin_info = mods.OriginInfo(created=[date_created,],
+                                      issued=[date_issued,],
+                                      place=place_term,
                                       publisher=publisher)
         return origin_info
 
@@ -337,8 +331,7 @@ class ThesisTitleForm(forms.Form):
         """Save method creates a MODS titleInfo and child element from field
            value.
         """
-        title_info = mods.titleInfo(title=self.cleaned_data['title'])
-        return title_info
+        return self.cleaned_data['title']
 
 class UploadThesisForm(forms.Form):
     """:class:`~aristotle.etd.ThesisForm` contains fields specific to ingesting an 
@@ -373,13 +366,13 @@ class UploadThesisForm(forms.Form):
         Method save method for custom processing and object creation
         for Fedora Commons server.
         """
-        obj_mods = mods.MetadataObjectDescriptionSchema()
+        obj_mods = mods.MODS()
         if self.cleaned_data.has_key('abstract'):
             obj_mods.abstract = self.cleaned_data['abstract']
         # Create and set default genre for thesis
         obj_mods.genres.append(mods.Genre(authority='marcgt',text='thesis'))
         # Type of resource, default to text
-        obj_mods.type_of_resource = mods.typeOfResource(value="text")
+        obj_mods.type_of_resource = mods.TypeOfResource(text="text")
         # Creates a thesis note for graduation date of creator
         #if self.cleaned_data.has_key('graduation_dates'):
         #    obj_mods.notes.append(mods.note(type='thesis',
@@ -395,7 +388,7 @@ class UploadThesisForm(forms.Form):
                                             type='thesis',
                                             text=workflow.get('FORM','degree_name')))
         # Assumes thesis will have bibliography, potentially bad
-        obj_mods.notes.append(mods.note(type='bibliography',
+        obj_mods.notes.append(mods.Note(type='bibliography',
                                         text='Includes bibliographical references'))
         return obj_mods
 
