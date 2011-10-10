@@ -27,6 +27,7 @@ from datasets.forms import ThesisDatasetForm
 from etd.models import ThesisDatasetObject
 from operator import itemgetter
 from django import forms
+from django.core.mail import send_mail
 from django.views.generic.simple import direct_to_template
 from django.shortcuts import render_to_response
 from django.http import HttpResponse,Http404,HttpResponseRedirect
@@ -92,6 +93,11 @@ def success(request):
     """
     Displays result from a successful thesis submission to the repository
     """
+    etd_success_msg = request.session['etd-info']
+    if etd_success_msg:
+        return direct_to_template(request,
+                                  'etd/success.html',
+                                  {'info':etd_success_msg})
     return HttpResponse('Success!')
     #return direct_to_template(request,
     #                          'etd/success.html',
@@ -184,6 +190,14 @@ def upload(request,workflow=None):
         thesis_obj.add_relationship('info:fedora/fedora-systems:def/relations-external#isMemberOfCollection',
                                     default['fedora_collection'])
         thesis_obj.save()
+        etd_success_msg = {'pid':thesis_obj.pid,
+                           'title':mods_xml.title,
+                           'advisors':[]}
+        if upload_thesis_form.cleaned_data.has_key('email'):
+            etd_success_msg['email'] = upload_thesis_form.cleaned_data['email']
+        for advisor in advisor_form.cleaned_data['advisors']:
+            etd_success_msg['advisors'].append(advisor)
+        request.session['etd-info'] = etd_success_msg
         logging.error("Successfully ingested thesis with pid=%s" % thesis_obj.pid)
         return HttpResponseRedirect('/etd/success')
     advisor_form.fields['advisors'].choices = get_advisors(config)
