@@ -30,7 +30,7 @@ class ThesisDatasetObject(DigitalObject):
     `ThesisObject` models the Electronic Thesis and Dataset datastreams
      and assocated MODS Xml datastream for ingestion into a Fedora Repository.
     """
-    ETD_CONTENT_MODEL = 'info:fedora/coalliance:%s' % settings.FEDORA_ETDCMODEL
+    ETD_CONTENT_MODEL = 'info:fedora/%s' % settings.FEDORA_ETDCMODEL
     CONTENT_MODELS = [ ETD_CONTENT_MODEL ]
     dataset = FileDatastream("DATASET",
                              "Dataset datastream",

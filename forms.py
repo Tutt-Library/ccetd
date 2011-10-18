@@ -124,6 +124,7 @@ class CreatorForm(forms.Form):
             name_part = name_part + ' %s' % self.cleaned_data['suffix']
         name_part = '%s, %s' % (name_part,self.cleaned_data['given'])
         if self.cleaned_data.has_key('middle'):
+            logging.error("Middle name is %s" % self.cleaned_data['middle'])
             name_part = '%s %s' % (name_part,self.cleaned_data['middle'])
         creator.name_parts.append(mods.NamePart(text=name_part))
         return creator
