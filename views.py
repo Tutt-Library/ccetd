@@ -33,6 +33,8 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse,Http404,HttpResponseRedirect
 from django.template import RequestContext
 from eulxml.xmlmap import load_xmlobject_from_string,mods
+from vendors.iii.bots.iiibots import PatronBot
+
 
 # Sets workflows dict
 workflows = dict()
@@ -54,8 +56,7 @@ def get_advisors(config):
      Helper function returns a sorted list of advisor email and
      name tuples from a workflow config object.
 
-     Parameters:
-     `config`: Workflow RawConfigObject, required
+    :param config: Workflow RawConfigObject, required
     """
     faculty_choices = sorted(config.items('FACULTY'),
                              key=itemgetter(1))
@@ -67,8 +68,7 @@ def get_grad_dates(config):
     Helper function returns a list of tuples for graduation
     dates in a workflow config object.
 
-    Parameters:
-    `config`: Workflow RawConfigObject, required
+    :param config: Workflow RawConfigObject, required
     """
     grad_dates = []
     if config.has_option('FORM','winter_grad'):
@@ -107,10 +107,9 @@ def upload(request,workflow=None):
     """
     Creates MODS and other metadata along with the file uploads to Fedora.
 
-    Parameters:
-     `request`: HTTP request, required
-    `workflow`: Specific workflow for individual departments, blank value 
-                displays default view.
+    :param request: HTTP request, required
+    :param workflow: Specific workflow for individual departments, blank value 
+                     displays default view.
     """
     if request.method != 'POST':
         return Http404
@@ -226,6 +225,9 @@ def workflow(request,workflow='default'):
     `workflow`: Specific workflow for individual departments, blank value 
                 displays default view.
     """
+    if not request.user.is_authenticated():
+         return HttpResponseRedirect("/vendors/iii/patron_login?next=%s" % request.path)
+                                   
     if request.method == 'POST':
         logging.error("IN WORKFLOW POST")
     if workflow is None:
