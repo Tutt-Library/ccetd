@@ -1,7 +1,8 @@
 {% extends 'cc-inside-base-twocol.html' %}
 {% load etd_extras %}
+{% load i18n %}
 
-{% block head-title %}Electronic Thesis Submission for Colorado College {% endblock %}
+{% block head-title %}{% trans "Electronic Thesis Submission for Colorado College" %}{% endblock %}
 {% block more-css %}
  <link href="{{ STATIC_URL }}css/jquery-ui-1.8.13.custom.css" rel="stylesheet" />
  <link href="{{ STATIC_URL }}etd/css/thesis.css" rel="stylesheet" />
@@ -9,7 +10,7 @@
 
 {% block library-breadcrumb %}
  <div id="breadcrumb">
-  <div class="stage"><a href="http://www.coloradocollege.edu/library">Library Home</a>&nbsp;&raquo;&nbsp;<a href="/etd">ETD</a>&nbsp;&raquo;&nbsp;
+  <div class="stage"><a href="http://www.coloradocollege.edu/library">{% trans "Library Home" %}</a>&nbsp;&raquo;&nbsp;<a href="/etd">{% trans "ETD" %}</a>&nbsp;&raquo;&nbsp;
   {% if workflow %}
    <a href="#" class="on">{{ config|get_department }}</a>
   {% endif %}
@@ -30,19 +31,27 @@ supporting datasets.{% endif %}</li>{% endcomment %}
  <li>Submit your thesis to the Digital Archives of Colorado College</li>
 </ol> 
 {% else %}
-<h1><strong><a href="#">Active ETD Forms</a></strong></h1>
-<ul>
-{% for workflow in active %}
-<li><a href="/etd/{{ workflow.0 }}">{{ workflow.1|get_department }}</a></li> 
-{% endfor %}
-</ul>
+<h1><strong><a href="#">{% trans "What now?" %}</a></strong></h1>
+<ol start="1">
+ <li>Select your department web form</li>
+ <li>Enter your last name and TIGER library number</li>
+ <li>Fill-out information about your thesis</li>
+ <li>Upload your thesis in PDFa format</li>
+ <li>Done!</li>
+</ol>
 {% endif %}
 {% endblock %}
 
 {% block left-aside-two %}
 <aside class="aside">
 <div id="contact-lib-detail" style="background-color: #2D4873">
- {% include 'contact-library.html' %}
+ <div id="contact-library">
+ <h5><strong>Questions? Need Help?</strong></h5>
+ <p>Contact <a href="mailto:llister@coloradocollege.edu">Lisa Lister</a>,
+    Digital Archives manager, at 389-6242 or your 
+    <a href="#">Library Liaison</a>. You can also contact the 
+    Tutt Library Reference Desk at 389-6662.</p>
+ </div>
 </div>
 </aside>
 {% endblock %}

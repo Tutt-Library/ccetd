@@ -44,6 +44,11 @@ class AdvisorForm(forms.Form):
     """
     advisors = AdvisorsField(label='Advisors',
                              required=False)
+    freeform_advisor = forms.CharField(max_length=50,
+                                       label='Other',
+                                       help_text='Please enter last name, first name of advisor')
+
+
     def clean_advisors(self):
         advisors = self.cleaned_data['advisors']
         return advisors
@@ -57,17 +62,24 @@ class AdvisorForm(forms.Form):
         of MODS name elements
         """
         output = []
+        advisor_role = mods.Role(authority='marcrt',
+                                 type='text',
+                                 text='advisor')
         if self.cleaned_data.has_key('advisors'):
             advisors = self.cleaned_data['advisors']
-            advisor_role = mods.Role(authority='marcrt',
-                                     type='text',
-                                     text='advisor')
             advisor_dict = dict(iter(config.items('FACULTY')))
             for row in advisors:
                 advisor = mods.Name(type="personal")
                 advisor.roles.append(advisor_role)
                 name = advisor_dict[row]
                 advisor.name_parts.append(mods.NamePart(text=name))
+                output.append(advisor)
+        if self.cleaned_data.has_key('freeform_advisor'):
+            raw_name = self.cleaned_data['freeform_advisor']
+            if len(raw_name) > 0:
+                advisor = mods.Name(type="personal")
+                advisor.roles.append(advisor_role)
+                advisor.name_parts.append(mods.NamePart(text=self.cleaned_data))
                 output.append(advisor)
         return output
        
@@ -83,7 +95,10 @@ def pretty_name_generator(name_parts):
             else:
                 yield '%s, ' % name.text
         elif name.type == 'given':
-            yield '%s %s' % (name.text,middle_names)
+            if len(middle_names) > 0:
+                yield '%s %s' % (name.text,middle_names)
+            else:
+                yield '%s' % name.text
         else:
             yield ''
          

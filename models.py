@@ -35,7 +35,7 @@ class ThesisDatasetObject(DigitalObject):
     dataset = FileDatastream("DATASET",
                              "Dataset datastream",
                              defaults={'versionable': True })
-    mods = XmlDatastream("XML",
+    mods = XmlDatastream("MODS",
                          "MODS XML datastream",
                          objtype=mods,
                          defaults={'versionable': True,

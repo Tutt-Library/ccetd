@@ -27,9 +27,10 @@
       <br/>
       {% endif %}
       {{ advisor_form.advisors.errors }}
-      <label>{{ advisor_form.advisors.label }}</label>
-      <br/>
+      <label>{{ advisor_form.advisors.label }}</label><br/>
       {{ advisor_form.advisors }}
+      <label>{{ advisor_form.freeform_advisor.label }}</label>
+      {{ advisor_form.freeform_advisor }}
       <br/>
       {{ form.graduation_dates.errors }}
       <label for='id-grad-date'>Graduation Date:</label>
