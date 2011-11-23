@@ -20,6 +20,7 @@
 __author__ = 'Jeremy Nelson'
 
 import os,ConfigParser,logging
+import settings
 from eulfedora.server import Repository
 from etd.forms import *
 from etd.conf import *
@@ -31,7 +32,7 @@ from django.core.mail import send_mail
 from django.views.generic.simple import direct_to_template
 from django.shortcuts import render_to_response
 from django.http import HttpResponse,Http404,HttpResponseRedirect
-from django.template import RequestContext
+from django.template import Context,Library,Template,loader,RequestContext
 from eulxml.xmlmap import load_xmlobject_from_string,mods
 from vendors.iii.bots.iiibots import PatronBot
 
@@ -186,8 +187,16 @@ def upload(request,workflow=None):
         thesis_obj.dc.content.title = thesis_obj.mods.content.title
         thesis_obj.label = 'Thesis - %s' % thesis_obj.mods.content.title
         thesis_obj.save()
-        thesis_obj.add_relationship('info:fedora/fedora-systems:def/relations-external#isMemberOfCollection',
-                                    default['fedora_collection'])
+        rels_ext_template = loader.get_template('rels-ext.xml')
+        context = Context({'object_pid':thesis_obj.pid,
+                           'parent_pid':default['fedora_collection'],
+                           'content_model':settings.FEDORA_ETDCMODEL})
+        rels_xml = rels_ext_template.render(context)
+        repo.api.addDatastream(pid=thesis_obj.pid,
+                               dsID="RELS-EXT",
+                               dsLabel="RELS-EXT",
+                               mimeType="application/rdf+xml",
+                               content=rels_xml)
         thesis_obj.save()
         etd_success_msg = {'pid':thesis_obj.pid,
                            'title':mods_xml.title,
