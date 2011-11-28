@@ -96,7 +96,11 @@ def pretty_name_generator(name_parts):
                 yield '%s, ' % name.text
         elif name.type == 'given':
             if len(middle_names) > 0:
-                yield '%s %s' % (name.text,middle_names)
+                tmp_name = '%s' % name.text
+                for name in middle_names:
+                    if name is not None:
+                        tmp_name += ' %s' % name
+                yield tmp_name
             else:
                 yield '%s' % name.text
         else:

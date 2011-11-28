@@ -12,7 +12,7 @@
          <p>
           Please fill out any required fields that are marked with an *.
          </p>
-	  <f/ieldset>
+	  <fieldset>
       <legend for="id-creator">Your Name:</legend>
       {{ creator_form.given.label }}*:{{ creator_form.given }}{{ creator_form.given.errors }}<br/>
       {{ creator_form.middle.label }}:{{ creator_form.middle }}<br/>
@@ -44,7 +44,11 @@
         </a></h3>
 	<div>
 	  <label>
-      <b>Thesis*</b> (<i>Browse to attach thesis</i>):</label>
+	      <b>Thesis*</b> (<i>Browse to attach thesis</i>):</label>
+       <p>Before uploading, make sure your thesis is save as a PDF/A.
+       For more information, please see this <a href="{{ STATIC_URL}}etd/img/pdfaInstructions.pdf" target="pdfa">document</a></p>
+
+
       {{ form.thesis_file }}
       {{ form.thesis_file.errors }}<br/>
       <label for="id-title">
