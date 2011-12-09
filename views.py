@@ -93,9 +93,28 @@ def default(request):
 def success(request):
     """
     Displays result from a successful thesis submission to the repository
+
+    :param request: Django request object
     """
     etd_success_msg = request.session['etd-info']
-    if etd_success_msg:
+        
+    if etd_success_msg is not None:
+        if etd_success_msg.has_key('email'):
+            to_email_addrs = [etd_success_msg['email'],]
+            for row in etd_success_msg['advisors']:
+                if row.find("@") > -1:
+                    to_email_addrs.append(row)
+            email_message = "%s successfully submitted to Colorado College" % etd_success_msg['title']
+            email_message += " Digital Archives available at %s%s" % (settings.REPOSITORY_ROOT,
+                                                                      etd_success_msg['pid'])
+            send_mail('%s submitted to DACC' % etd_success_msg['title'],
+                      email_message,
+                      settings.EMAIL_HOST_USER,
+                      to_email_addrs,
+                      fail_silently=False)
+        etd_success_msg['thesis_url'] = '%s%s' % (settings.REPOSITORY_ROOT,
+                                                  etd_success_msg['pid'])
+        etd_success_msg['repository_url'] = settings.REPOSITORY_ROOT
         return direct_to_template(request,
                                   'etd/success.html',
                                   {'info':etd_success_msg})
@@ -147,6 +166,10 @@ def upload(request,workflow=None):
                                                                  required=False,
                                                                  choices=config.items('LANGUAGE'))
     form_list.append(upload_thesis_form)
+    for form in form_list:
+        if not form.is_valid():
+            logging.error("Form %s valid %s" % (form.__class__,
+                                                form.errors))
     if all([form.is_valid() for form in form_list]):
         mods_xml = upload_thesis_form.save(workflow=config)
         mods_xml.physical_description = about_form.save()
@@ -177,7 +200,7 @@ def upload(request,workflow=None):
         thesis_obj.mods.content = mods_xml
         thesis_obj.thesis.content = request.FILES['thesis-thesis_file']
         thesis_obj.thesis.label = thesis_obj.mods.content.title
-        if request.FILES.has_key('dataset-dataset_fie'):
+        if request.FILES.has_key('dataset-dataset_file'):
             thesis_obj.dataset = request.FILES['dataset-dataset_file']
             thesis_obj.dataset.label = 'Dataset for %s' % thesis_obj.mods.title_info.title
             if dataset_form.cleaned_data['is_publically_available'] == False:
@@ -229,10 +252,9 @@ def workflow(request,workflow='default'):
     """
     Displays thesis entry form to end user.
 
-    Parameters:
-     `request`: HTTP request, required
-    `workflow`: Specific workflow for individual departments, blank value 
-                displays default view.
+    :param request: HTTP request, required
+    :param workflow: Specific workflow for individual departments, blank value 
+                     displays default view.
     """
     if not request.user.is_authenticated():
          return HttpResponseRedirect("/vendors/iii/patron_login?next=%s" % request.path)

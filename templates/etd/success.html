@@ -18,8 +18,8 @@
 {% block subnavigation %}
 <h1><strong><a href="#">Next Steps</a></strong></h1>
 <ul>
-<li>Access <a href="#">{{ info.title  }}</a> in the 
- <a href="#">Digital Archives of Colorado College</a></li>
+<li>Access <a href="{{ info.thesis_url }}">{{ info.title  }}</a> in the 
+ <a href="{{ info.repository_url }}">Digital Archives of Colorado College</a></li>
 </ul>
 {% endblock %}
 
@@ -38,7 +38,7 @@
  {{ info.pid }}.
  </p>
  {% if info.email %}
- <p>An email has been sent to {{ info.email }} and your to advisor's email.</p>
+ <p>An email has been sent to {{ info.email }} and to your advisor's email.</p>
  {% endif %}
 {% endblock %}
 

@@ -46,6 +46,7 @@ class AdvisorForm(forms.Form):
                              required=False)
     freeform_advisor = forms.CharField(max_length=50,
                                        label='Other',
+                                       required=False,
                                        help_text='Please enter last name, first name of advisor')
 
 
@@ -98,7 +99,7 @@ def pretty_name_generator(name_parts):
             if len(middle_names) > 0:
                 tmp_name = '%s' % name.text
                 for name in middle_names:
-                    if name is not None:
+                    if name is not None and name is not 'None':
                         tmp_name += ' %s' % name
                 yield tmp_name
             else:
@@ -140,11 +141,13 @@ class CreatorForm(forms.Form):
                                              type='creator'),])
         name_part = self.cleaned_data['family']
         if self.cleaned_data.has_key('suffix'):
-            name_part = name_part + ' %s' % self.cleaned_data['suffix']
+            logging.error(self.cleaned_data['suffix'])
+            if len(self.cleaned_data['suffix']) > 0 and self.cleaned_data['suffix'] != 'None':
+                name_part = name_part + ' %s' % self.cleaned_data['suffix']
         name_part = '%s, %s' % (name_part,self.cleaned_data['given'])
         if self.cleaned_data.has_key('middle'):
-            logging.error("Middle name is %s" % self.cleaned_data['middle'])
-            name_part = '%s %s' % (name_part,self.cleaned_data['middle'])
+            if len(self.cleaned_data['middle']) > 0:
+                name_part = '%s %s' % (name_part,self.cleaned_data['middle'])
         creator.name_parts.append(mods.NamePart(text=name_part))
         return creator
 
