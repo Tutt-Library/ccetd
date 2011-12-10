@@ -100,18 +100,23 @@ def success(request):
         
     if etd_success_msg is not None:
         if etd_success_msg.has_key('email'):
-            to_email_addrs = [etd_success_msg['email'],]
+            raw_email = etd_success_msg['email']
+            if len(raw_email) > 3 and raw_email.find('@') > -1: # Rough email validation
+                to_email_addrs = [etd_success_msg['email'],]
+            else:
+                to_email_addrs = []
             for row in etd_success_msg['advisors']:
                 if row.find("@") > -1:
                     to_email_addrs.append(row)
             email_message = "%s successfully submitted to Colorado College" % etd_success_msg['title']
             email_message += " Digital Archives available at %s%s" % (settings.REPOSITORY_ROOT,
                                                                       etd_success_msg['pid'])
-            send_mail('%s submitted to DACC' % etd_success_msg['title'],
-                      email_message,
-                      settings.EMAIL_HOST_USER,
-                      to_email_addrs,
-                      fail_silently=False)
+            if len(to_email_addrs) > 0:
+                send_mail('%s submitted to DACC' % etd_success_msg['title'],
+                          email_message,
+                          settings.EMAIL_HOST_USER,
+                          to_email_addrs,
+                          fail_silently=False)
         etd_success_msg['thesis_url'] = '%s%s' % (settings.REPOSITORY_ROOT,
                                                   etd_success_msg['pid'])
         etd_success_msg['repository_url'] = settings.REPOSITORY_ROOT
