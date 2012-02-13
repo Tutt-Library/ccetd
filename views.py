@@ -206,12 +206,12 @@ def upload(request,workflow=None):
         thesis_obj.thesis.content = request.FILES['thesis-thesis_file']
         thesis_obj.thesis.label = thesis_obj.mods.content.title
         if request.FILES.has_key('dataset-dataset_file'):
-            thesis_obj.dataset = request.FILES['dataset-dataset_file']
-            thesis_obj.dataset.label = 'Dataset for %s' % thesis_obj.mods.title_info.title
+            thesis_obj.dataset.content = request.FILES['dataset-dataset_file']
+            thesis_obj.dataset.label = 'Dataset for %s' % thesis_obj.mods.content.title
             if dataset_form.cleaned_data['is_publically_available'] == False:
                 # This needs to be set correctly
                 # thesis_obj.rels_ext.content
-                print("Not happy")
+                logging.error("Not happy")
         thesis_obj.dc.content.title = thesis_obj.mods.content.title
         thesis_obj.label = 'Thesis - %s' % thesis_obj.mods.content.title
         thesis_obj.save()

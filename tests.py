@@ -18,7 +18,7 @@
 __author__ = 'Jeremy Nelson'
 
 import os,logging
-from django.test import TestCase
+import unittest
 from eulfedora.server import Repository
 from eulxml.xmlmap import mods
 from etd.models import ThesisDatasetObject
@@ -32,7 +32,7 @@ def fixure_path(filename):
     return os.path.join(FIXTURE_ROOT,filename)
 
 
-class ThesisBase(TestCase):
+class ThesisBase(unittest.TestCase):
     """Base class for testing the functionality of the ETD Django 
      application."""
 
@@ -58,7 +58,7 @@ class ThesisBase(TestCase):
                 logger.warn('Error purging test object %s in tear down:%s' %\
                             (pid,rf)) 
                 
-class SimpleThesisTest(ThesisBase):
+class SimpleThesisTest(unittest.ThesisBase):
 
     def setUp(self):
         """Setup creates a thesis ETD object for ingestion of a thesis pdf 

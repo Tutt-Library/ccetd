@@ -20,7 +20,7 @@ __author__ = 'Jeremy Nelson'
 
 
 from django.db import models
-from eulfedora.models import DigitalObject,FileDatastream,XmlDatastream
+from eulfedora.models import DigitalObject,FileDatastream,XmlDatastream,FileDatastreamObject
 from eulxml.xmlmap import mods
 import settings
 
@@ -32,9 +32,6 @@ class ThesisDatasetObject(DigitalObject):
     """
     ETD_CONTENT_MODEL = 'info:fedora/%s' % settings.FEDORA_ETDCMODEL
     CONTENT_MODELS = [ ETD_CONTENT_MODEL ]
-    dataset = FileDatastream("DATASET",
-                             "Dataset datastream",
-                             defaults={'versionable': True })
     mods = XmlDatastream("MODS",
                          "MODS XML datastream",
                          objtype=mods,
@@ -44,4 +41,7 @@ class ThesisDatasetObject(DigitalObject):
                             "Thesis datastream",
                             defaults={'versionable': True,
                                       'mimetype': 'application/pdf'})
+    dataset = FileDatastream("DATASET",
+                             "Dataset datastream",
+                             defaults={'versionable': True})
 

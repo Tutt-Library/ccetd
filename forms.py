@@ -390,12 +390,12 @@ class UploadThesisForm(forms.Form):
         for Fedora Commons server.
         """
         obj_mods = mods.MODS()
-        if self.cleaned_data.has_key('abstract'):
-            obj_mods.abstract = self.cleaned_data['abstract']
+        #if self.cleaned_data.has_key('abstract'):
+        #    obj_mods.abstract = self.cleaned_data['abstract']
         # Create and set default genre for thesis
         obj_mods.genres.append(mods.Genre(authority='marcgt',text='thesis'))
         # Type of resource, default to text
-        obj_mods.type_of_resource = mods.TypeOfResource(text="text")
+        #obj_mods.type_of_resource = mods.TypeOfResource(text="text")
         # Creates a thesis note for graduation date of creator
         #if self.cleaned_data.has_key('graduation_dates'):
         #    obj_mods.notes.append(mods.note(type='thesis',

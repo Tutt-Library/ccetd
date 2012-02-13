@@ -4,8 +4,8 @@
 
 {% block head-title %}{% trans "Electronic Thesis Submission for Colorado College" %}{% endblock %}
 {% block more-css %}
- <link href="{{ STATIC_URL }}css/jquery-ui-1.8.13.custom.css" rel="stylesheet" />
- <link href="{{ STATIC_URL }}etd/css/thesis.css" rel="stylesheet" />
+ <link href="{{ STATIC_URL }}jquery-ui-1.8.13.custom.css" rel="stylesheet" />
+ <link href="{{ STATIC_URL }}thesis.css" rel="stylesheet" />
 {% endblock %}
 
 {% block library-breadcrumb %}
@@ -113,7 +113,7 @@ supporting datasets.{% endif %}</li>{% endcomment %}
 <script src="{{ STATIC_URL }}js/jquery.ui.core.js"></script>
 <script src="{{ STATIC_URL }}js/jquery.ui.widget.js"></script>
 <script src="{{ STATIC_URL }}js/jquery.ui.accordion.js"></script>
-<script src="{{ STATIC_URL }}etd/js/thesis.js"></script>
+<script src="{{ STATIC_URL }}thesis.js"></script>
 <script>
  $(function() {
    $("#accordion" ).accordion({
