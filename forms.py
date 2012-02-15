@@ -63,24 +63,25 @@ class AdvisorForm(forms.Form):
         of MODS name elements
         """
         output = []
-        advisor_role = mods.Role(authority='marcrt',
+        advisor_role = mods.Role(authority='marcrelator',
                                  type='text',
-                                 text='advisor')
+                                 text='thesis advisor')
         if self.cleaned_data.has_key('advisors'):
             advisors = self.cleaned_data['advisors']
-            advisor_dict = dict(iter(config.items('FACULTY')))
-            for row in advisors:
-                advisor = mods.Name(type="personal")
-                advisor.roles.append(advisor_role)
-                name = advisor_dict[row]
-                advisor.name_parts.append(mods.NamePart(text=name))
-                output.append(advisor)
+            if len(advisors) > 0:
+                advisor_dict = dict(iter(config.items('FACULTY')))
+                for row in advisors:
+                    advisor = mods.Name(type="personal")
+                    advisor.roles.append(advisor_role)
+                    name = advisor_dict[row]
+                    advisor.name_parts.append(mods.NamePart(text=name))
+                    output.append(advisor)
         if self.cleaned_data.has_key('freeform_advisor'):
             raw_name = self.cleaned_data['freeform_advisor']
             if len(raw_name) > 0:
                 advisor = mods.Name(type="personal")
                 advisor.roles.append(advisor_role)
-                advisor.name_parts.append(mods.NamePart(text=self.cleaned_data))
+                advisor.name_parts.append(mods.NamePart(text=raw_name))
                 output.append(advisor)
         return output
        
@@ -136,9 +137,11 @@ class CreatorForm(forms.Form):
         Method save method for creating MODS name with creator role
         for MODS datastream in Fedora Commons server.
         """
+        creator_role = mods.Role(authority='marcrelator',
+                                 type='text',
+                                 text='creator')
         creator = mods.Name(type="personal",
-                            roles=[mods.Role(authority='marcrt',
-                                             type='creator'),])
+                            roles=[creator_role,])
         name_part = self.cleaned_data['family']
         if self.cleaned_data.has_key('suffix'):
             logging.error(self.cleaned_data['suffix'])
