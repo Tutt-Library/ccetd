@@ -163,6 +163,7 @@ def upload(request,workflow=None):
     title_form = ThesisTitleForm(request.POST,
                                  prefix='title')
     form_list.append(title_form)
+    logging.error("Thesis request has thesis-not_publically_available=%s" % request.POST.get('thesis-not_publically_available'))
     upload_thesis_form = UploadThesisForm(request.POST,
                                           request.FILES,
                                           prefix='thesis')

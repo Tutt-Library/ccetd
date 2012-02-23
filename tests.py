@@ -37,7 +37,7 @@ class ThesisBase(unittest.TestCase):
      application."""
 
     def __init__(self, *args, **kwargs):
-        TestCase.__init__(self, *args, **kwargs)
+        unittest.TestCase.__init__(self, *args, **kwargs)
         self.fedora_fixtures_ingested = []
         self.pidspace = FEDORA_PIDSPACE
 
@@ -58,7 +58,7 @@ class ThesisBase(unittest.TestCase):
                 logger.warn('Error purging test object %s in tear down:%s' %\
                             (pid,rf)) 
                 
-class SimpleThesisTest(unittest.ThesisBase):
+class SimpleThesisTest(ThesisBase):
 
     def setUp(self):
         """Setup creates a thesis ETD object for ingestion of a thesis pdf 

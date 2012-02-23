@@ -94,8 +94,13 @@
 	  <label>{{ dataset_form.abstract.label }}: (briefly describe variables, years, or number of observations, etc.)</label><br/>
           {{ dataset_form.abstract }}
 	  <br/>
-	  <label>If you agree, your dataset will be publically available.</label>
-	  {{ dataset_form.is_publically_available }}{{ dataset_form.is_publically_available.label }}
+	  <p><label>If you agree, your dataset will be publically available. </label>
+	  {{ dataset_form.is_publically_available }}&nbsp;<strong> {{ dataset_form.is_publically_available.label }}</strong></p>
+          <p>
+          <label>I do not want my dataset publically available.  The dataset will only be accessible to CC faculty. 
+                 Only the abstract for the dataset will be publically available. </label>
+          {{ dataset_form.not_publically_available }}&nbsp;<strong> {{ dataset_form.not_publically_available.label }}</strong>
+          </p>
 	</div>
         {% endif %}
         {# END Dataset accordion #}
@@ -128,9 +133,15 @@
 	   distribute, update, create derivatives, and make copies of the work (electronically or in print). U.S. Copyright
 	   law protects me against the unauthorized use of this work; the right to use in future works all or part of this
 	   work.</p>
-	<p>I understand that {{ default.institution }} shall have the right to non-commerical use which includes the right to reproduce,
+	<p>I understand that {{ default.institution }} shall have the right to non-commercial use which includes the right to reproduce,
 	   distribute, and make copies of the work (electronically or in print) in connection with digital repositories, 
 	   teaching, and scholarly activities at {{ default.institution }}.</p>
+
+        <p><strong>{{ form.not_publically_available }} {{ form.not_publically_available.label }}</strong>
+           By checking this box and submitting this form, I (the author and copyright owner) do not want my thesis to be 
+           publically available to a larger community of scholars.  Only {{ default.institution }} faculty will be able 
+           to access the full-text of my thesis.  Only the citation for my thesis and the abstract will be made publically 
+           available.</p>
         </div>
         {# END agreement div #}
         </div>

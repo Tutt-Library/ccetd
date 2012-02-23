@@ -22,6 +22,7 @@ import logging,re
 from django import forms
 from models import ThesisDatasetObject
 from django.contrib.formtools.wizard import FormWizard
+from django.core.exceptions import ValidationError
 from eulxml.xmlmap import mods
 from eulxml.forms import XmlObjectForm,SubformField
 
@@ -144,7 +145,6 @@ class CreatorForm(forms.Form):
                             roles=[creator_role,])
         name_part = self.cleaned_data['family']
         if self.cleaned_data.has_key('suffix'):
-            logging.error(self.cleaned_data['suffix'])
             if len(self.cleaned_data['suffix']) > 0 and self.cleaned_data['suffix'] != 'None':
                 name_part = name_part + ' %s' % self.cleaned_data['suffix']
         name_part = '%s, %s' % (name_part,self.cleaned_data['given'])
@@ -153,47 +153,6 @@ class CreatorForm(forms.Form):
                 name_part = '%s %s' % (name_part,self.cleaned_data['middle'])
         creator.name_parts.append(mods.NamePart(text=name_part))
         return creator
-
-class DatasetForm(forms.Form):
-    """DatasetForm associates a form with multiple MODS elements to support a
-    thesis dataset in the Fedora object
-    """
-
-    abstract = forms.CharField(required=False,
-                               label='Abstract of dataset',
-                               widget=forms.Textarea(attrs={'cols':60,
-                                                            'rows':5}))
-    is_publically_available = forms.BooleanField(required=False,label='I agree')
-    info_note = forms.CharField(required=False,
-                                label='Software/version',
-                                widget=forms.Textarea(attrs={'cols':60,
-                                                             'rows':5}))
-    dataset_file = forms.FileField(required=False,
-                                   label='Dataset')
-
-    def is_empty(self):
-        for k,v in self.cleaned_data.iteritems():
-            if v != None:
-                return False
-        return True
-
-    def save(self,
-             mods_xml=None):
-        """
-        Method supports adding a dataset file stream and associated MODS elements,
-        creates a new MODS XML datastream if not present.
-        """
-        if not mods_xml:
-            mods_xml = mods.MODS()
-        if self.cleaned_data.has_key('abstract'):
-            mods_xml.notes.append(mods.Note(text=self.cleaned_data['abstract'],
-                                            type='source type',
-                                            label='Dataset Abstract'))
-        if self.cleaned_data.has_key('info_note'):
-            mods_xml.notes.append(mods.Note(text=self.cleaned_data['info_note'],
-                                            type='source note',
-                                            label='Dataset Information'))
-        return mods_xml
          
 class DepartmentForm(forms.Form):
     """DepartmentForm associates name MODS field with the sponsoring organization, 
@@ -307,6 +266,8 @@ class PhysicalDescriptionForm(forms.Form):
         extent = extent.strip()
         if self.cleaned_data.has_key('digital_origin'):
             digital_origin = self.cleaned_data['digital_origin']
+            if len(digital_origin) < 1:
+                digital_origin = 'born digital'
         else:
             digital_origin = 'born digital'
         physical_description = mods.PhysicalDescription(extent=extent,
@@ -360,7 +321,7 @@ class ThesisTitleForm(forms.Form):
         return self.cleaned_data['title']
 
 class UploadThesisForm(forms.Form):
-    """:class:`~aristotle.etd.ThesisForm` contains fields specific to ingesting an 
+    """:class:`aristotle.etd.ThesisForm` contains fields specific to ingesting an 
     undergraduate or master thesis and dataset into a Fedora Commons repository using 
     eulfedora module.
     """
@@ -376,7 +337,11 @@ class UploadThesisForm(forms.Form):
     #languages = forms.CharField(widget=forms.HiddenInput,
     #                            required=False)
     honor_code = forms.BooleanField(label='I agree')
-    submission_agreement = forms.BooleanField(label='I agree')
+    not_publically_available = forms.BooleanField(required=False,
+                                                  label='I do not agree')
+
+    submission_agreement = forms.BooleanField(required=False,
+                                              label='I agree')
     thesis_label = forms.CharField(max_length=255,
                                    required=False,
                                    help_text='Label for thesis object, 255 characters max')
@@ -386,6 +351,30 @@ class UploadThesisForm(forms.Form):
         grad_dates = self.cleaned_data['graduation_dates']
         return grad_dates
 
+
+    def clean_not_publically_available(self):
+        return self.cleaned_data['not_publically_available']
+
+    def clean_submission_agreement(self):
+        if self.cleaned_data.has_key('submission_agreement'):
+            submission_agreement = self.cleaned_data['submission_agreement']
+        else:
+            submission_agreement = None
+        if self.cleaned_data.has_key('not_publically_available'):
+            not_publically_available = self.cleaned_data['not_publically_available']
+        else:
+            not_publically_available = None
+        for k,v in self.cleaned_data.iteritems():
+            logging.error("%s = %s" % (k,v))
+        if submission_agreement is False and not_publically_available is None:
+            raise ValidationError('Please choose either agreement option for your thesis')
+        if submission_agreement is None and not_publically_available is None:
+            raise ValidationError('Please choose either agreement option for your thesis')
+        if submission_agreement is True and not_publically_available is True:
+            raise ValidationError('Please select one agreement option')
+        return submission_agreement
+
+
     def save(self,
              workflow=None):
         """
@@ -393,8 +382,8 @@ class UploadThesisForm(forms.Form):
         for Fedora Commons server.
         """
         obj_mods = mods.MODS()
-        #if self.cleaned_data.has_key('abstract'):
-        #    obj_mods.abstract = self.cleaned_data['abstract']
+        if self.cleaned_data.has_key('abstract'):
+            obj_mods.abstract = self.cleaned_data['abstract']
         # Create and set default genre for thesis
         obj_mods.genres.append(mods.Genre(authority='marcgt',text='thesis'))
         # Type of resource, default to text
