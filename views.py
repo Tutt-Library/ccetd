@@ -206,6 +206,7 @@ def upload(request,workflow=None):
         thesis_obj.mods.content = mods_xml
         thesis_obj.thesis.content = request.FILES['thesis-thesis_file']
         thesis_obj.thesis.label = thesis_obj.mods.content.title
+        restrictions = None
         if request.FILES.has_key('dataset-dataset_file'):
             thesis_obj.dataset.content = request.FILES['dataset-dataset_file']
             thesis_obj.dataset.label = 'Dataset for %s' % thesis_obj.mods.content.title
@@ -216,10 +217,26 @@ def upload(request,workflow=None):
         thesis_obj.dc.content.title = thesis_obj.mods.content.title
         thesis_obj.label = 'Thesis - %s' % thesis_obj.mods.content.title
         thesis_obj.save()
+        if upload_thesis_form.cleaned_data['not_publically_available'] == True:
+            restrictions = {'by_user':[],
+                            'by_role':['authenticated user',
+                                       'administrator',
+                                       'p-dacc_admin']}
+            xacml_policy_template = loader.get_template('policy.xml')
+            xacml_context = Context({'restrictions':restrictions})
+            xacml_policy = xacml_policy_template.render(xacml_context)
+            repo.api.addDatastream(pid=thesis_obj.pid,
+                                   dsID='POLICY',
+                                   dsLabel='Xacml Policy Stream',
+                                   mimeType="application/rdf+xml",
+                                   content=xacml_policy)
+            logging.error(xacml_policy)
+            thesis_obj.save()
         rels_ext_template = loader.get_template('rels-ext.xml')
         context = Context({'object_pid':thesis_obj.pid,
                            'parent_pid':default['fedora_collection'],
-                           'content_model':settings.FEDORA_ETDCMODEL})
+                           'content_model':settings.FEDORA_ETDCMODEL,
+                           'restrictions':restrictions})
         rels_xml = rels_ext_template.render(context)
         repo.api.addDatastream(pid=thesis_obj.pid,
                                dsID="RELS-EXT",
