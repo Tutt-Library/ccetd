@@ -1,8 +1,7 @@
-
 <Policy xmlns="urn:oasis:names:tc:xacml:1.0:policy" 
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-  PolicyId="islandora-xacml-editor-v1" 
-  RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        PolicyId="islandora-xacml-editor-v1" 
+        RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
   <Target>
     <Subjects>
       <AnySubject></AnySubject>
@@ -14,6 +13,52 @@
       <AnyAction></AnyAction>
     </Actions>
   </Target>
+  {% if restrictions.dataset %}
+  <Rule Effect="Deny" RuleId="deny-dsid-mime">
+    <Target>
+      <Subjects>
+        <AnySubject></AnySubject>
+      </Subjects>
+      <Resources>
+        <Resource>
+          <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">DATASET</AttributeValue>
+            <ResourceAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:resource:datastream:id" DataType="http://www.w3.org/2001/XMLSchema#string"></ResourceAttributeDesignator>
+          </ResourceMatch>
+        </Resource>
+      </Resources>
+      <Actions>
+        <Action>
+          <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-getDatastreamDissemination</AttributeValue>
+            <ActionAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:action:id" DataType="http://www.w3.org/2001/XMLSchema#string"></ActionAttributeDesignator>
+          </ActionMatch>
+        </Action>
+      </Actions>
+    </Target>
+    <Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+      <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:or">
+        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+          <SubjectAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:subject:loginId" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="false"></SubjectAttributeDesignator>
+          <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+			{% for user in restrictions.by_user %}
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">{{ user }}</AttributeValue>
+            {% endfor %}
+          </Apply>
+        </Apply>
+        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+          <SubjectAttributeDesignator AttributeId="fedoraRole" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="false"></SubjectAttributeDesignator>
+          <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+			{% for role in restrictions.by_role %}
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">{{ role }}</AttributeValue>
+            {% endfor %}
+          </Apply>
+        </Apply>
+      </Apply>
+    </Condition>
+  </Rule>
+  {% endif %}
+  {% if restrictions.thesis %}
   <Rule Effect="Deny" RuleId="deny-management-functions">
     <Target>
       <Subjects>
@@ -31,8 +76,8 @@
         </Action>
         <Action>
           <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
-            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-addDisseminator</AttributeValue>
-            <ActionAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:action:id" DataType="http://www.w3.org/2001/XMLSchema#string"></ActionAttributeDesignator>
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-addDisseminator</AttributeValue>          
+  <ActionAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:action:id" DataType="http://www.w3.org/2001/XMLSchema#string"></ActionAttributeDesignator>
           </ActionMatch>
         </Action>
         <Action>
@@ -68,8 +113,8 @@
         <Action>
           <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
             <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-modifyDatastreamByValue</AttributeValue>
-            <ActionAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:action:id" DataType="http://www.w3.org/2001/XMLSchema#string"></ActionAttributeDesignator>  
-        </ActionMatch>
+            <ActionAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:action:id" DataType="http://www.w3.org/2001/XMLSchema#string"></ActionAttributeDesignator>
+          </ActionMatch>
         </Action>
         <Action>
           <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
@@ -86,8 +131,8 @@
         <Action>
           <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
             <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-purgeObject</AttributeValue>
-            <ActionAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:action:id" DataType="http://www.w3.org/2001/XMLSchema#string"></ActionAttributeDesignator>
-          </ActionMatch>
+            <ActionAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:action:id" DataType="http://www.w3.org/2001/XMLSchema#string"></ActionAttributeDesignator>        
+  </ActionMatch>
         </Action>
         <Action>
           <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
@@ -168,7 +213,7 @@
         <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
           <SubjectAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:subject:loginId" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="false"></SubjectAttributeDesignator>
           <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
-		  {% for user in restriction.by_user %}
+	  {% for user in restrictions.by_user %}
             <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">{{ user }}</AttributeValue>
           {% endfor %}
           </Apply>
@@ -176,63 +221,15 @@
         <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
           <SubjectAttributeDesignator AttributeId="fedoraRole" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="false"></SubjectAttributeDesignator>
           <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
-		   {% for role in restriction.by_role %}
-            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">{{ role }}</AttributeValue>            
-           {% endfor %}
-          </Apply>
-        </Apply>
-      </Apply>
-    </Condition>
-  </Rule>
-  <Rule Effect="Deny" RuleId="deny-access-functions">
-    <Target>
-      <Subjects>
-        <AnySubject></AnySubject>
-      </Subjects>
-      <Resources>
-        <AnyResource></AnyResource>
-      </Resources>
-      <Actions>
-        <Action>
-          <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
-            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:api-a</AttributeValue>
-            <ActionAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:action:api" DataType="http://www.w3.org/2001/XMLSchema#string"></ActionAttributeDesignator>
-          </ActionMatch>
-        </Action>
-        <Action>
-          <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
-            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-getDatastreamHistory</AttributeValue>
-            <ActionAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:action:id" DataType="http://www.w3.org/2001/XMLSchema#string"></ActionAttributeDesignator>
-          </ActionMatch>
-        </Action>
-        <Action>
-          <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
-            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:fedora:names:fedora:2.1:action:id-listObjectInResourceIndexResults</AttributeValue>
-            <ActionAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:action:id" DataType="http://www.w3.org/2001/XMLSchema#string"></ActionAttributeDesignator>
-          </ActionMatch>
-        </Action>
-      </Actions>
-    </Target>
-    <Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
-      <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:or">
-        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
-          <SubjectAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:subject:loginId" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="false"></SubjectAttributeDesignator>
-          <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
-		   {% for user in restriction.by_user %}
-            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">{{ user }}</AttributeValue>
-           {% endfor %}
-          </Apply>
-        </Apply>
-        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
-          <SubjectAttributeDesignator AttributeId="fedoraRole" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="false"></SubjectAttributeDesignator>
-          <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
-			{% for role in restriction.by_role %}
+	  {% for role in restrictions.by_role %}
             <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">{{ role }}</AttributeValue>
-            {% endfor %}
+          {% endfor %}
+          </Apply>
         </Apply>
       </Apply>
     </Condition>
   </Rule>
+{% endif %}
   <Rule Effect="Permit" RuleId="allow-everything-else">
     <Target>
       <Subjects>

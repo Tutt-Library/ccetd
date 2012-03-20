@@ -206,22 +206,23 @@ def upload(request,workflow=None):
         thesis_obj.mods.content = mods_xml
         thesis_obj.thesis.content = request.FILES['thesis-thesis_file']
         thesis_obj.thesis.label = thesis_obj.mods.content.title
-        restrictions = None
         if request.FILES.has_key('dataset-dataset_file'):
             thesis_obj.dataset.content = request.FILES['dataset-dataset_file']
             thesis_obj.dataset.label = 'Dataset for %s' % thesis_obj.mods.content.title
-            if dataset_form.cleaned_data['is_publically_available'] == False:
-                # This needs to be set correctly
-                # thesis_obj.rels_ext.content
-                logging.error("Not happy")
         thesis_obj.dc.content.title = thesis_obj.mods.content.title
         thesis_obj.label = 'Thesis - %s' % thesis_obj.mods.content.title
         thesis_obj.save()
+        restrictions = {}
+        if not dataset_form.is_empty():
+            if dataset_form.cleaned_data['is_publically_available'] == True:
+                restrictions['dataset'] = True
         if upload_thesis_form.cleaned_data['not_publically_available'] == True:
-            restrictions = {'by_user':[],
-                            'by_role':['authenticated user',
-                                       'administrator',
-                                       'p-dacc_admin']}
+            restrictions['thesis'] = True
+        if len(restrictions) > 0:
+            restrictions['by_user'] = [] # Allows for future LDAP or Shibboleth support
+            restrictions['by_role']=['authenticated user',
+                                     'administrator',
+                                     'p-dacc_admin']
             xacml_policy_template = loader.get_template('policy.xml')
             xacml_context = Context({'restrictions':restrictions})
             xacml_policy = xacml_policy_template.render(xacml_context)
