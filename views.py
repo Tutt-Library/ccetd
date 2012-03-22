@@ -54,8 +54,8 @@ for filename in os.listdir(workflow_dir):
 # Helper functions 
 def get_advisors(config):
     """
-     Helper function returns a sorted list of advisor email and
-     name tuples from a workflow config object.
+    Helper function returns a sorted list of advisor email and
+    name tuples from a workflow config object.
 
     :param config: Workflow RawConfigObject, required
     """
@@ -124,9 +124,49 @@ def success(request):
                                   'etd/success.html',
                                   {'info':etd_success_msg})
     return HttpResponse('Success!')
-    #return direct_to_template(request,
-    #                          'etd/success.html',
-    #                         {})
+
+def save_rels_ext(repository,
+                  pid,
+                  parent_pid,
+                  restrictions):
+    """
+    Helper function saves RELS-EXT datastream for Thesis object to Repository
+   
+    :param repository: Fedora repository 
+    :param pid: Thesis PID
+    :param parent_pid: Parent Collection PID
+    :param restrictions: Restrictions for RELS-EXT
+    """
+    rels_ext_template = loader.get_template('rels-ext.xml')
+    context = Context({'object_pid':pid,
+                       'parent_pid':parent_pid,
+                       'content_model':settings.FEDORA_ETDCMODEL,
+                       'restrictions':restrictions})
+    rels_xml = rels_ext_template.render(context)
+    repository.api.addDatastream(pid=pid,
+                                 dsID="RELS-EXT",
+                                 dsLabel="RELS-EXT",
+                                 mimeType="application/rdf+xml",
+                                 content=rels_xml)
+
+def save_xacml_policy(repository,
+                      pid,
+                      restrictions):
+    """
+    Helper function saves XACML Policy to Thesis object
+
+    :param repository: Fedora repository 
+    :param pid: Thesis PID
+    :param restrictions: Restrictions for XACML Policy
+    """
+    xacml_policy_template = loader.get_template('policy.xml')
+    xacml_context = Context({'restrictions':restrictions})
+    xacml_policy = xacml_policy_template.render(xacml_context)
+    repository.api.addDatastream(pid=pid,
+                                 dsID='POLICY',
+                                 dsLabel='Xacml Policy Stream',
+                                 mimeType="application/rdf+xml",
+                                 content=xacml_policy)
 
 def upload(request,workflow=None):
     """
@@ -163,7 +203,6 @@ def upload(request,workflow=None):
     title_form = ThesisTitleForm(request.POST,
                                  prefix='title')
     form_list.append(title_form)
-    logging.error("Thesis request has thesis-not_publically_available=%s" % request.POST.get('thesis-not_publically_available'))
     upload_thesis_form = UploadThesisForm(request.POST,
                                           request.FILES,
                                           prefix='thesis')
@@ -172,10 +211,6 @@ def upload(request,workflow=None):
                                                                  required=False,
                                                                  choices=config.items('LANGUAGE'))
     form_list.append(upload_thesis_form)
-    for form in form_list:
-        if not form.is_valid():
-            logging.error("Form %s valid %s" % (form.__class__,
-                                                form.errors))
     if all([form.is_valid() for form in form_list]):
         mods_xml = upload_thesis_form.save(workflow=config)
         mods_xml.physical_description = about_form.save()
@@ -223,28 +258,15 @@ def upload(request,workflow=None):
             restrictions['by_role']=['authenticated user',
                                      'administrator',
                                      'p-dacc_admin']
-            xacml_policy_template = loader.get_template('policy.xml')
-            xacml_context = Context({'restrictions':restrictions})
-            xacml_policy = xacml_policy_template.render(xacml_context)
-            repo.api.addDatastream(pid=thesis_obj.pid,
-                                   dsID='POLICY',
-                                   dsLabel='Xacml Policy Stream',
-                                   mimeType="application/rdf+xml",
-                                   content=xacml_policy)
-            logging.error(xacml_policy)
-            thesis_obj.save()
-        rels_ext_template = loader.get_template('rels-ext.xml')
-        context = Context({'object_pid':thesis_obj.pid,
-                           'parent_pid':default['fedora_collection'],
-                           'content_model':settings.FEDORA_ETDCMODEL,
-                           'restrictions':restrictions})
-        rels_xml = rels_ext_template.render(context)
-        repo.api.addDatastream(pid=thesis_obj.pid,
-                               dsID="RELS-EXT",
-                               dsLabel="RELS-EXT",
-                               mimeType="application/rdf+xml",
-                               content=rels_xml)
+
+        if restrictions.has_key('thesis'):
+            save_rels_ext(repo,thesis_obj.pid,default['fedora_collection'],restrictions)
+        else:
+            save_rels_ext(repo,thesis_obj.pid,default['fedora_collection'],{})
         thesis_obj.save()
+        #if len(restrictions) > 0:
+        #    save_xacml_policy(repo,thesis_obj.pid,restrictions) 
+        #    thesis_obj.save()
         etd_success_msg = {'pid':thesis_obj.pid,
                            'title':mods_xml.title,
                            'advisors':[]}
@@ -254,6 +276,8 @@ def upload(request,workflow=None):
             etd_success_msg['advisors'].append(advisor)
         request.session['etd-info'] = etd_success_msg
         logging.error("Successfully ingested thesis with pid=%s" % thesis_obj.pid)
+        rels_ext = thesis_obj.getDatastreamObject('RELS-EXT')
+        logging.error(rels_ext.content.serialize(format='pretty-xml'))
         return HttpResponseRedirect('/etd/success')
     advisor_form.fields['advisors'].choices = get_advisors(config)
     upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(config)

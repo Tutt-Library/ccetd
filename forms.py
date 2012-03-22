@@ -364,8 +364,6 @@ class UploadThesisForm(forms.Form):
             not_publically_available = self.cleaned_data['not_publically_available']
         else:
             not_publically_available = None
-        for k,v in self.cleaned_data.iteritems():
-            logging.error("%s = %s" % (k,v))
         if submission_agreement is False and not_publically_available is None:
             raise ValidationError('Please choose either agreement option for your thesis')
         if submission_agreement is None and not_publically_available is None:
