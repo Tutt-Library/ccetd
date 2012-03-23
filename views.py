@@ -24,6 +24,7 @@ import settings
 from eulfedora.server import Repository
 from etd.forms import *
 from etd.conf import *
+import islandoraUtils.xacml.tools as islandora
 from datasets.forms import ThesisDatasetForm
 from etd.models import ThesisDatasetObject
 from operator import itemgetter
@@ -159,14 +160,19 @@ def save_xacml_policy(repository,
     :param pid: Thesis PID
     :param restrictions: Restrictions for XACML Policy
     """
-    xacml_policy_template = loader.get_template('policy.xml')
-    xacml_context = Context({'restrictions':restrictions})
-    xacml_policy = xacml_policy_template.render(xacml_context)
+    xacml = islandora.Xacml()
+    if restrictions.has_key('thesis'):
+        xacml.managementRule.addUser(restrictions['by_user'])
+        xacml.managementRule.addRole(restrictions['by_role'])
+    if restrictions.has_key('dataset'):
+        xacml.datastreamRule.addDsid('DATASET')
+        xacml.datastreamRule.addUser(restrictions['by_user'])
+        xacml.datastreamRule.addRole(restrictions['by_role'])
     repository.api.addDatastream(pid=pid,
                                  dsID='POLICY',
                                  dsLabel='Xacml Policy Stream',
                                  mimeType="application/rdf+xml",
-                                 content=xacml_policy)
+                                 content=xacml.getXmlString())
 
 def upload(request,workflow=None):
     """
@@ -264,9 +270,9 @@ def upload(request,workflow=None):
         else:
             save_rels_ext(repo,thesis_obj.pid,default['fedora_collection'],{})
         thesis_obj.save()
-        #if len(restrictions) > 0:
-        #    save_xacml_policy(repo,thesis_obj.pid,restrictions) 
-        #    thesis_obj.save()
+        if len(restrictions) > 0:
+            save_xacml_policy(repo,thesis_obj.pid,restrictions) 
+            thesis_obj.save()
         etd_success_msg = {'pid':thesis_obj.pid,
                            'title':mods_xml.title,
                            'advisors':[]}
