@@ -24,7 +24,7 @@ import settings
 from eulfedora.server import Repository
 from etd.forms import *
 from etd.conf import *
-#import islandoraUtils.xacml.tools as islandora_xacml
+import islandoraUtils.xacml.tools as islandora_xacml
 #import islandoraUtils.metadata.fedora_relationships as islandora_rels_ext
 from datasets.forms import ThesisDatasetForm
 from etd.models import ThesisDatasetObject
@@ -172,21 +172,21 @@ def save_xacml_policy(repository,
     :param pid: Thesis PID
     :param restrictions: Restrictions for XACML Policy
     """
- #   xacml = islandora_xacml.Xacml()
+    xacml = islandora_xacml.Xacml()
 
-#    if restrictions.has_key('thesis'):
-#        xacml.managementRule.addUser(restrictions['by_user'])
-#        xacml.managementRule.addRole(restrictions['by_role'])
-#    if restrictions.has_key('dataset'):
-#        xacml.datastreamRule.addDsid('DATASET')
-#        xacml.datastreamRule.addUser(restrictions['by_user'])
-#        xacml.datastreamRule.addRole(restrictions['by_role'])
-#    repository.api.addDatastream(pid=pid,
-#                                 dsID='POLICY',
-#                                 dsLabel='Xacml Policy Stream',
-#                                 mimeType="application/rdf+xml",
-#                                 content=xacml.getXmlString())
-    pass
+    if restrictions.has_key('thesis'):
+        xacml.managementRule.addUser(restrictions['by_user'])
+        xacml.managementRule.addRole(restrictions['by_role'])
+    if restrictions.has_key('dataset'):
+        xacml.datastreamRule.addDsid('DATASET')
+        xacml.datastreamRule.addUser(restrictions['by_user'])
+        xacml.datastreamRule.addRole(restrictions['by_role'])
+    repository.api.addDatastream(pid=pid,
+                                 dsID='POLICY',
+                                 dsLabel='Xacml Policy Stream',
+                                 mimeType="application/rdf+xml",
+                                 content=xacml.getXmlString())
+
 
 def upload(request,workflow=None):
     """
