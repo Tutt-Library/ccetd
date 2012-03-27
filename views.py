@@ -281,10 +281,10 @@ def upload(request,workflow=None):
         if len(restrictions) > 0:
             save_xacml_policy(repo,thesis_obj.pid,restrictions) 
             thesis_obj.save()
-        if restrictions.has_key('thesis'):
-            save_rels_ext(repo,thesis_obj.pid,default['fedora_collection'],restrictions)
-        else:
-            save_rels_ext(repo,thesis_obj.pid,default['fedora_collection'],{})
+        #if restrictions.has_key('thesis'):
+        #    save_rels_ext(repo,thesis_obj.pid,default['fedora_collection'],restrictions)
+        #else:
+        #    save_rels_ext(repo,thesis_obj.pid,default['fedora_collection'],{})
         thesis_obj.save()
         etd_success_msg = {'pid':thesis_obj.pid,
                            'title':mods_xml.title,
