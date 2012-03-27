@@ -45,8 +45,7 @@
 	<div>
 	  <label>
 	      <b>Thesis*</b> (<i>Browse to attach thesis</i>):</label>
-       <p>Before uploading, make sure your thesis is saved as a PDF/A.
-       For more information, please see this <a href="{{ STATIC_URL}}pdfaInstructions.pdf" target="pdfa">document</a></p>
+       <p>Before uploading, make sure your thesis is saved as a PDF/A.</p>
 
 
       {{ form.thesis_file }}
@@ -96,10 +95,6 @@
 	  <br/>
 	  <p><label>If you agree, your dataset will be publically available. </label>
 	  {{ dataset_form.is_publically_available }}&nbsp;<strong> {{ dataset_form.is_publically_available.label }}</strong></p>
-          <p>
-          <label>I do not want my dataset publically available.  The dataset will only be accessible to CC faculty. 
-          {{ dataset_form.not_publically_available }}&nbsp;<strong> {{ dataset_form.not_publically_available.label }}</strong>
-          </p>
 	</div>
         {% endif %}
         {# END Dataset accordion #}
