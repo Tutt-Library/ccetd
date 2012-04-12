@@ -378,13 +378,14 @@ class UploadThesisForm(forms.Form):
         """
         Method save method for custom processing and object creation
         for Fedora Commons server.
+
+        :param workflow: Workflow configuration
         """
         obj_mods = mods.MODS()
         if self.cleaned_data.has_key('abstract'):
             obj_mods.abstract = self.cleaned_data['abstract']
         # Create and set default genre for thesis
-        obj_mods.genres.append(mods.Genre(authority='marcgt',text='thesis'))
-        # Type of resource, default to text
+                # Type of resource, default to text
         #obj_mods.type_of_resource = mods.TypeOfResource(text="text")
         # Creates a thesis note for graduation date of creator
         #if self.cleaned_data.has_key('graduation_dates'):
@@ -392,13 +393,23 @@ class UploadThesisForm(forms.Form):
         #                                    display_label='Graduation Date',
         #                                    value=self.cleaned_data['graduation_dates']))
         if workflow:
-            obj_mods.notes.append(mods.Note(type='thesis',
+            if workflow.has_option('FORM','genre'):
+                genre=workflow.get('FORM','genre')
+            else:
+                genre='thesis'
+            obj_mods.genres.append(mods.Genre(authority='marcgt',
+                                              text=genre))
+            if workflow.has_option('FORM','note_type'):
+                note_type = workflow.get('FORM','note_type')
+            else:
+                note_type = 'thesis'
+            obj_mods.notes.append(mods.Note(type=note_type,
                                             text=workflow.get('FORM','thesis_note')))
             obj_mods.notes.append(mods.Note(label='Degree Name',
-                                            type='thesis',
-                                            text=workflow.get('FORM','degree_name')))
+                                            type=note_type,
+                                            text=workflow.get('FORM','degree_type')))
             obj_mods.notes.append(mods.Note(label='Degree Type',
-                                            type='thesis',
+                                            type=note_type,
                                             text=workflow.get('FORM','degree_name')))
         # Assumes thesis will have bibliography, potentially bad
         obj_mods.notes.append(mods.Note(type='bibliography',

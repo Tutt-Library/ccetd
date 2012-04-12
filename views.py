@@ -265,7 +265,7 @@ def upload(request,workflow=None):
             thesis_obj.dataset.content = request.FILES['dataset-dataset_file']
             thesis_obj.dataset.label = 'Dataset for %s' % thesis_obj.mods.content.title
         thesis_obj.dc.content.title = thesis_obj.mods.content.title
-        thesis_obj.label = 'Thesis - %s' % thesis_obj.mods.content.title
+        thesis_obj.label = '%s' % thesis_obj.mods.content.title
         thesis_obj.save()
         restrictions = {}
         if not dataset_form.is_empty():
@@ -300,8 +300,10 @@ def upload(request,workflow=None):
         return HttpResponseRedirect('/etd/success')
     advisor_form.fields['advisors'].choices = get_advisors(config)
     upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(config)
-    #template = config.get('FORM','template_name')
-    template = 'default.html'
+    if config.has_option('FORM','template_name'):
+        template = config.get('FORM','template_name')
+    else:
+        template = 'default.html'
     return render_to_response('etd/%s' % template,
                              {'default': default,
                               'about_form':about_form,
@@ -345,8 +347,10 @@ def workflow(request,workflow='default'):
     title_form = ThesisTitleForm(prefix='title')
     upload_thesis_form = UploadThesisForm(prefix='thesis')
     upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(custom)
-    #template_name = custom.get('FORM','template_name')
-    template_name = 'default.html'
+    if custom.has_option('FORM','template_name'):
+        template_name = custom.get('FORM','template_name')
+    else:
+        template_name = 'default.html'
     has_dataset = False
     if custom.has_option('FORM','dataset'):
         has_dataset = custom.get('FORM','dataset')
