@@ -93,8 +93,10 @@
 	  <label>{{ dataset_form.abstract.label }}: (briefly describe variables, years, or number of observations, etc.)</label><br/>
           {{ dataset_form.abstract }}
 	  <br/>
+          {% comment %}
 	  <p><label>If you agree, your dataset will be publically available. </label>
 	  {{ dataset_form.is_publically_available }}&nbsp;<strong> {{ dataset_form.is_publically_available.label }}</strong></p>
+         {% endcomment %}
 	</div>
         {% endif %}
         {# END Dataset accordion #}
@@ -130,12 +132,13 @@
 	<p>I understand that {{ default.institution }} shall have the right to non-commercial use which includes the right to reproduce,
 	   distribute, and make copies of the work (electronically or in print) in connection with digital repositories, 
 	   teaching, and scholarly activities at {{ default.institution }}.</p>
-
+        {% comment %}
         <p><strong>{{ form.not_publically_available }} {{ form.not_publically_available.label }}</strong>
            By checking this box and submitting this form, I (the author and copyright owner) do not want my thesis to be 
            publically available to a larger community of scholars.  Only {{ default.institution }} faculty will be able 
            to access the full-text of my thesis.   
            </p>
+        {% endcomment %}
         </div>
         {# END agreement div #}
         </div>
