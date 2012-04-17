@@ -24,7 +24,7 @@ import settings
 from eulfedora.server import Repository
 from etd.forms import *
 from etd.conf import *
-import islandoraUtils.xacml.tools as islandora_xacml
+#import islandoraUtils.xacml.tools as islandora_xacml
 #import islandoraUtils.metadata.fedora_relationships as islandora_rels_ext
 from datasets.forms import ThesisDatasetForm
 from etd.models import ThesisDatasetObject
@@ -61,8 +61,10 @@ def get_advisors(config):
 
     :param config: Workflow RawConfigObject, required
     """
-    faculty_choices = sorted(config.items('FACULTY'),
-                             key=itemgetter(1))
+    faculty_choices = None
+    if config.has_section('FACULTY'):
+        faculty_choices = sorted(config.items('FACULTY'),
+                                 key=itemgetter(1))
     return faculty_choices
 
 
@@ -195,7 +197,7 @@ def upload(request,workflow=None):
     :param request: HTTP request, required
     :param workflow: Specific workflow for individual departments, blank value 
                      displays default view.
-    """
+   """
     if request.method != 'POST':
         return Http404
     config = workflows[workflow]
@@ -273,18 +275,18 @@ def upload(request,workflow=None):
                 restrictions['dataset'] = True
         if upload_thesis_form.cleaned_data['not_publically_available'] == True:
             restrictions['thesis'] = True
-        if len(restrictions) > 0:
-            restrictions['by_user'] = [] # Allows for future LDAP or Shibboleth support
-            restrictions['by_role']=['authenticated user',
-                                     'administrator',
-                                     'p-dacc_admin']
-        if len(restrictions) > 0:
-            save_xacml_policy(repo,thesis_obj.pid,restrictions) 
-            thesis_obj.save()
+        #if len(restrictions) > 0:
+        #    restrictions['by_user'] = [] # Allows for future LDAP or Shibboleth support
+        #    restrictions['by_role']=['authenticated user',
+        #                             'administrator',
+        #                             'p-dacc_admin']
+        # if len(restrictions) > 0:
+        #    save_xacml_policy(repo,thesis_obj.pid,restrictions) 
+        #    thesis_obj.save()
         #if restrictions.has_key('thesis'):
         #    save_rels_ext(repo,thesis_obj.pid,default['fedora_collection'],restrictions)
         #else:
-        #    save_rels_ext(repo,thesis_obj.pid,default['fedora_collection'],{})
+        save_rels_ext(repo,thesis_obj.pid,default['fedora_collection'],{})
         thesis_obj.save()
         etd_success_msg = {'pid':thesis_obj.pid,
                            'title':mods_xml.title,
@@ -340,7 +342,11 @@ def workflow(request,workflow='default'):
         default[row[0]] = row[1]
     about_form = PhysicalDescriptionForm(prefix='about')
     advisor_form = AdvisorForm(prefix='advisor')
-    advisor_form.fields['advisors'].choices = get_advisors(custom)
+    advisors = get_advisors(custom)
+    if advisors is None:
+        advisor_form.fields['freeform_advisor'].label = 'First Advisor'
+    else:
+        advisor_form.fields['advisors'].choices = advisors
     dataset_form = ThesisDatasetForm(prefix='dataset')
     creator_form = CreatorForm(prefix='creator')
     subject_form = SubjectsForm(prefix='subject')

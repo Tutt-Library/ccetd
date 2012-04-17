@@ -49,6 +49,10 @@ class AdvisorForm(forms.Form):
                                        label='Other',
                                        required=False,
                                        help_text='Please enter last name, first name of advisor')
+    freeform_2nd_advisor = forms.CharField(max_length=50,
+                                           label='Second Advisor',
+                                           required=False,
+                                           help_text='Please enter last name, first name of advisor')
 
 
     def clean_advisors(self):

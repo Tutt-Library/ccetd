@@ -23,6 +23,6 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns('etd.views',
     (r'^$','default'),
     (r'success$','success'),
-    (r'(\w+)/upload','upload'),
+    (r'(?P<workflow>.*)/upload','upload'),
     (r'(.*)$','workflow'),
 )
