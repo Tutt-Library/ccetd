@@ -295,10 +295,13 @@ def upload(request,workflow=None):
             etd_success_msg['email'] = upload_thesis_form.cleaned_data['email']
         for advisor in advisor_form.cleaned_data['advisors']:
             etd_success_msg['advisors'].append(advisor)
+        # Adds staff member to advisor's list for email notification
+        if config.has_section('STAFF'):
+            for staff in config.items('STAFF'):
+                etd_success_msg['advisors'].append(staff[0])
         request.session['etd-info'] = etd_success_msg
         logging.error("Successfully ingested thesis with pid=%s" % thesis_obj.pid)
         rels_ext = thesis_obj.getDatastreamObject('RELS-EXT')
-        logging.error(rels_ext.content.serialize(format='pretty-xml'))
         return HttpResponseRedirect('/etd/success')
     advisor_form.fields['advisors'].choices = get_advisors(config)
     upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(config)
