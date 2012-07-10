@@ -1,0 +1,134 @@
+{% extends 'cc-inside-base-twocol.html' %}
+{% load etd_extras %}
+{% load i18n %}
+
+{% block head-title %}{% trans "Electronic Capstone Submission for Colorado College" %}{% endblock %}
+{% block more-css %}
+ <link href="{{ STATIC_URL }}jquery-ui-1.8.13.custom.css" rel="stylesheet" />
+ <link href="{{ STATIC_URL }}thesis.css" rel="stylesheet" />
+{% endblock %}
+
+{% block library-breadcrumb %}
+ <div id="breadcrumb">
+  <div class="stage"><a href="http://www.coloradocollege.edu/library">{% trans "Library Home" %}</a>&nbsp;&raquo;&nbsp;<a href="/etd">{% trans "ETD" %}</a>&nbsp;&raquo;&nbsp;
+  {% if workflow %}
+   <a href="#" class="on">{{ config|get_department }}</a>
+  {% endif %}
+   </div>
+ </div>
+{% endblock %}
+
+{% block subnavigation %}
+{% if workflow %}
+<h1><strong><a href="#">Follow these steps to submit your Senior Capstone</a></strong></h1>
+<p><i>Before you begin filling out the Senior Capstone submission form:</i></p>
+<ul style="list-style: disc inside">
+ <li>Make sure you have the FINAL version of your capstone</li>
+ <li>Make sure your capstone is saved as a PDF/A. This is an "archival" version 
+ of PDF.  For instructions, please see this <a href="{{ STATIC_URL}}pdfaInstructions.pdf" target="pdfa">document</a></li>
+</ul>
+<p>Then proceed to the electronic capstone submission form:</p>
+<ol start="1">
+ <li>Enter Author Information</li>
+ <li>Upload Capstone and Information</li>
+ {% if has_dataset %}<li>(Optional) Upload dataset and supporting information</li>{% endif %}
+ <li>Honor code and submission agreements</li>
+ {% comment %}<li>Upload a PDFa<sup><a href="#" onclick="alert('PDFa is an archival PDF format, most Word Processors should allow you to save your thesis as a PDFa. Please contact the library at 389-6661 for more information.')">?</a></sup>{% if workflow.dataset %} and any
+supporting datasets.{% endif %}</li>{% endcomment %}
+ <li>Submit your Senior Capstone to the Digital Archives of Colorado College</li>
+</ol> 
+{% else %}
+<h1><strong><a href="#">{% trans "What now?" %}</a></strong></h1>
+<ol start="1">
+ <li>Select your department web form</li>
+ <li>Enter your last name and TIGER library number</li>
+ <li>Fill-out information about your Senior Capstone/li>
+ <li>Upload your capstone in PDFa format</li>
+ <li>Done!</li>
+</ol>
+{% endif %}
+{% endblock %}
+
+{% block left-aside-two %}
+<aside class="aside">
+<div id="contact-lib-detail" style="background-color: #2D4873">
+ <div id="contact-library">
+ <h5><strong>Questions? Need Help?</strong></h5>
+ <p>Contact <a href="mailto:llister@coloradocollege.edu">Lisa Lister</a>,
+    Digital Archives manager, at 389-6242 or your 
+    <a href="#">Library Liaison</a>. You can also contact the 
+    Tutt Library Reference Desk at 389-6662.</p>
+ </div>
+</div>
+</aside>
+{% endblock %}
+
+{% block main-content %}
+ {% if workflow %}
+ <h1>{{ config|get_department }} Senior Capstone Submission</h1>
+ {% include 'capstone-form.html' %}
+ {% else %}
+ <h1>Colorado College Electronic Thesis Capstone Submission</h1>
+ <p>The Digital Archives of Colorado College (DACC) electronic thesis and 
+    dataset application allows students to self-submit their senior thesis
+    to our institutional repository. The following departmental
+    web forms are available below:</p>
+ <ul>
+ {% for workflow in active %}
+   <li><a href="/etd/{{ workflow.0 }}">{{ workflow.1|get_department }}</a></li>
+ {% endfor %}
+ </ul>
+ {% endif %}
+{% endblock %}
+
+{% block right-aside-one %}
+{% comment %}
+<aside class="slideshow">
+<dl>
+ <dt><h3>Why submit your thesis to DACC?</h3></td>
+ <dd>The Digital Archives of Colorado College preserves both digital object and
+     makes the thesis available with a stable URL that you can use in your resume
+     or CV</dd>
+</dl>
+</aside>
+{% endcomment %}
+{% endblock %}
+
+{% block right-aside-two %}
+{% comment %}
+ <div id="item-info">
+ <h2>Your submission details</h2>
+ <p>You have entered the following information:</p>
+{% endcomment %}
+{% endblock %}
+
+{% block right-aside-three %}
+{% comment %}
+<aside class="social-media">
+<ul>
+ <li class="rss">Get updates via <a href="#">RSS feed</a></li>
+ <li class="twitter">Tweet about <em>xxxxxxxxx</em></li>
+ <li>Leave a <a href="#">comment</a></li>
+</ul>
+</aside>
+{% endcomment %}
+
+{% endblock %}
+
+
+{% block more-scripts %}
+<script src="{{ STATIC_URL }}js/jquery.ui.core.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.ui.widget.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.ui.accordion.js"></script>
+<script src="{{ STATIC_URL }}thesis.js"></script>
+<script>
+ $(function() {
+   $("#accordion" ).accordion({
+     autoHeight: false,
+    });
+  });
+</script>
+{% endblock %}
+
+{% block dialogs %}
+{% endblock %}
