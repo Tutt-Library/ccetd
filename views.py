@@ -20,7 +20,7 @@
 __author__ = 'Jeremy Nelson'
 
 import os,ConfigParser,logging
-import settings
+import settings,mimetypes
 from eulfedora.server import Repository
 from etd.forms import *
 from etd.conf import *

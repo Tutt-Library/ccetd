@@ -18,7 +18,7 @@
 """
 __author__ = 'Jeremy Nelson'
 
-import logging,re
+import logging,re,mimetypes
 from django import forms
 from models import ThesisDatasetObject
 from django.contrib.formtools.wizard import FormWizard
@@ -376,6 +376,20 @@ class UploadThesisForm(forms.Form):
             raise ValidationError('Please select one agreement option')
         return submission_agreement
 
+    def clean_thesis_file(self):
+        if self.cleaned_data.has_key('thesis_file'):
+            thesis_uploaded_file = self.cleaned_data['thesis_file']
+            thesis_mimetype = mimetypes.guess_type(thesis_uploaded_file.name)
+            if thesis_mimetype[0] is not None:
+                if ["application/pdf",
+                    "video/mp4",
+                    "audio/x-mpg"].count(thesis_mimetype[0]) < 1:
+                    raise ValidationError("Thesis must be a PDF, mp3, or mp4")
+            return thesis_uploaded_file
+        else:
+            raise ValidationError("Thesis file is required and must be either a PDF, mp3, or mp4")
+    
+
 
     def save(self,
              workflow=None):
@@ -387,7 +401,7 @@ class UploadThesisForm(forms.Form):
         """
         obj_mods = mods.MODS()
         if self.cleaned_data.has_key('abstract'):
-            obj_mods.abstract = self.cleaned_data['abstract']
+            obj_mods.abstract = mods.Abstract(text=self.cleaned_data['abstract'])
         # Create and set default genre for thesis
                 # Type of resource, default to text
         #obj_mods.type_of_resource = mods.TypeOfResource(text="text")

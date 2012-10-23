@@ -14,7 +14,9 @@ register = template.Library()
 def get_department(workflow):
     """Function takes workflow CONFIG object and returns
     the department name if present"""
-    if workflow.has_option('FORM','department'):
+    if workflow.has_option('FORM','label'):
+        return mark_safe(workflow.get('FORM','label'))
+    elif workflow.has_option('FORM','department'):
         return mark_safe(workflow.get('FORM','department'))
     else:
         return ''  
