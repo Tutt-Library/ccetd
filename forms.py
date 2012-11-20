@@ -410,7 +410,11 @@ class UploadThesisForm(forms.Form):
         #    obj_mods.notes.append(mods.note(type='thesis',
         #                                    display_label='Graduation Date',
         #                                    value=self.cleaned_data['graduation_dates']))
+        if self.cleaned_data.has_key('honor_code'):
+           obj_mods.notes.append(mods.Note(type="admin",
+                                           text="Colorado College Honor Code upheld."))
         if workflow:
+      
             if workflow.has_option('FORM','genre'):
                 genre=workflow.get('FORM','genre')
             else:
@@ -432,5 +436,9 @@ class UploadThesisForm(forms.Form):
         # Assumes thesis will have bibliography, potentially bad
         obj_mods.notes.append(mods.Note(type='bibliography',
                                         text='Includes bibliographical references'))
+        # Default Rights statement
+        obj_mods.access_conditions.append(mods.AccessCondition(type="use and reproduction",
+                                                               text="Copyright restrictions apply."))
+ 
         return obj_mods
 

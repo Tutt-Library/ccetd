@@ -21,6 +21,7 @@ __author__ = 'Jeremy Nelson'
 
 import os,ConfigParser,logging
 import settings,mimetypes
+from lxml import etree
 from eulfedora.server import Repository
 from etd.forms import *
 from etd.conf import *
@@ -287,6 +288,7 @@ def upload(request,workflow=None):
         #    save_rels_ext(repo,thesis_obj.pid,default['fedora_collection'],restrictions)
         #else:
         save_rels_ext(repo,thesis_obj.pid,default['fedora_collection'],{})
+#        logging.error("Before save {0}".format(dir(thesis_obj.mods)))
         thesis_obj.save()
         etd_success_msg = {'pid':thesis_obj.pid,
                            'title':mods_xml.title,
