@@ -1,3 +1,8 @@
+ h1 {
+  color: #594738 !important;
+  font-size: 1.5em !important;
+}
+
  h3 { 
   font-size: 1.1em !important;
  }
@@ -63,3 +68,47 @@
 .info {color: rgb(0,255,0);}
 .critical {color: rgb(255,0,0);}
 
+.help_steps {
+  background-color: #F1ECE5;
+  border: 4px solid #FFFFFF;
+  box-shadow: 0 2px 7px rgba(0,0,0,0.2);
+  font-size: 1.125em !important;
+  font-family: "Helvetica Neue",Arial,sans-serif !important;
+  padding: 1em;
+}
+
+.help_steps ol {
+  padding-top: 1em;
+}
+
+.help_steps ol li {
+ color: #4C3D38;
+}
+
+.help_steps p {
+  font-size: 1.125em !important;
+  font-family: "Helvetica Neue",Arial,sans-serif !important;
+}
+
+h1.help_step {
+  border-bottom: 1px solid #2A466D;
+  color: #2A466D !important;
+  font-weight: 300;
+  font-size: 2em;
+}
+
+.main {
+ background-color: #FFFFFF;
+ color: #4C3D38;
+ font-family: "Helvetica Neue",Arial,sans-serif !important;
+ padding: 1em;
+}
+
+.main a {
+  color: #660000;
+  font-weight: bold;
+}
+
+.main p {
+ font-size: 1.1em;
+}

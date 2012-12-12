@@ -374,6 +374,7 @@ def workflow(request,workflow='default'):
                               {'default':default,
                                'about_form':about_form,
                                'advisor_form':advisor_form,
+                               'begin_alert':custom.has_option('FORM','begin_alert'),
                                'config':custom,
                                'creator_form':creator_form,
                                'dataset_form':dataset_form,

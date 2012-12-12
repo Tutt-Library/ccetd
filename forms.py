@@ -437,7 +437,7 @@ class UploadThesisForm(forms.Form):
         obj_mods.notes.append(mods.Note(type='bibliography',
                                         text='Includes bibliographical references'))
         # Default Rights statement
-        obj_mods.access_conditions.append(mods.AccessCondition(type="use and reproduction",
+        obj_mods.access_conditions.append(mods.AccessCondition(type="useAndReproduction",
                                                                text="Copyright restrictions apply."))
  
         return obj_mods
