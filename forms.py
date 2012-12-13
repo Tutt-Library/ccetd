@@ -46,7 +46,7 @@ class AdvisorForm(forms.Form):
     advisors = AdvisorsField(label='Advisors',
                              required=False)
     freeform_advisor = forms.CharField(max_length=50,
-                                       label='Other',
+                                       label='Other faculty not listed above',
                                        required=False,
                                        help_text='Please enter last name, first name of advisor')
     freeform_2nd_advisor = forms.CharField(max_length=50,
@@ -316,7 +316,8 @@ class ThesisTitleForm(forms.Form):
     """
     title = forms.CharField(max_length=225,
                             label='Thesis Title',
-                            widget=forms.TextInput(attrs={'size':60}))
+                            widget=forms.TextInput(attrs={'class':'span5',
+                                                          'size':60}))
 
     def save(self):
         """Save method creates a MODS titleInfo and child element from field
@@ -331,11 +332,13 @@ class UploadThesisForm(forms.Form):
     """
     abstract = forms.CharField(label='Abstract',
                                required=False,
-                               widget=forms.Textarea(attrs={'cols':60,
+                               widget=forms.Textarea(attrs={'class':'span5',
+                                                            'cols':60,
                                                             'rows':5}))
     email = forms.EmailField(required=False,
                              label='Your Email:',
-                             widget=forms.TextInput(attrs={'size':60}))
+                             widget=forms.TextInput(attrs={'class':'span4',
+                                                           'size':60}))
     graduation_dates = GradDatesField(required=False,
                                       label='Graduation Date')
     #languages = forms.CharField(widget=forms.HiddenInput,

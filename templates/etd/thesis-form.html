@@ -1,4 +1,4 @@
-<form method="POST" action="/etd/{{ workflow }}/upload" enctype="multipart/form-data">
+<form method="POST" action="/etd/{{ workflow }}/upload" enctype="multipart/form-data" class="form-horizontal">
 {% csrf_token %}
 <div style="width: 600px">
 <div id="accordion">
@@ -12,31 +12,61 @@
          <p>
           Please fill out any required fields that are marked with an *.
          </p>
-	  <fieldset>
-      <legend for="id-creator">Your Name:</legend>
-      {{ creator_form.given.label }}*:{{ creator_form.given }}{{ creator_form.given.errors }}<br/>
-      {{ creator_form.middle.label }}:{{ creator_form.middle }}<br/>
-      {{ creator_form.family.label }}*:{{ creator_form.family }}{{ creator_form.family.errors }}<br/>
-      {{ creator_form.suffix.label }}:{{ creator_form.suffix }}
-      </fieldset>
-      {% if default.email_notices %}
-      <br/>
-      {{ form.email.errors }}
-      <label>{{ form.email.label }}</label>{{ form.email }}<br/>
-      (<i>To receive a notification e-mail when your thesis is submitted</i>)
-      <br/>
-      {% endif %}
-      {{ advisor_form.advisors.errors }}
-      <label>{{ advisor_form.advisors.label }}</label><br/>
-      {{ advisor_form.advisors }}
-      <label>{{ advisor_form.freeform_advisor.label }}</label>
-      {{ advisor_form.freeform_advisor }}
-      <br/>
-      {{ form.graduation_dates.errors }}
-      <label for='id-grad-date'>Graduation Date:</label>
-      {{ form.graduation_dates }}
-     </div>
+    <fieldset>
+      <h3>Your Name:</h3>
+      <div class="control-group">
+       <label class="control-label" for="id_creator-given">{{ creator_form.given.label }}*:</label>
+       <div class="controls">
+        {{ creator_form.given }}{{ creator_form.given.errors }}
+       </div>
+      </div>
+      <div class="control-group">
+       <label class="control-label" for="id_creator-middle">{{ creator_form.middle.label }}:</label>
+       <div class="controls">
+        {{ creator_form.middle }}
+       </div>
+      </div>
+      <div class="control-group">
+      {{ creator_form.family.errors }}
 
+       <label class="control-label" for="id_creator-family">{{ creator_form.family.label }}*:</label>
+       <div class="controls">
+        {{ creator_form.family }}       </div>
+      </div>
+      <div class="control-group">
+       <label class="control-label" for="id_creator-suffix">{{ creator_form.suffix.label }}:</label>
+       <div class="controls">
+        {{ creator_form.suffix }}
+       </div>
+      </div>
+      </fieldset>
+      <div class="control-group">
+      {% if default.email_notices %}
+      {{ form.email.errors }}
+       <label class='control-label' for="id_thesis-email">{{ form.email.label }}</label>
+       <div class="controls">
+       {{ form.email }}
+       <span class="help-block">(<i>To receive a notification e-mail when your thesis is submitted</i>)</span>
+       </div>
+      </div>
+      {% endif %}
+      <div class="control-group">
+       {{ advisor_form.advisors.errors }}
+       <label class='control-label' for='id_advisor-advisors'>{{ advisor_form.advisors.label }}</label>
+       <div class="controls">
+        {{ advisor_form.advisors }}
+        <label>{{ advisor_form.freeform_advisor.label }}</label>
+        {{ advisor_form.freeform_advisor }}
+       </div>
+      </div>
+      <div class="control-group">
+       {{ form.graduation_dates.errors }}
+       <label class='control-label' for='id_grad-date'>Graduation Date*:</label>
+       <div class="controls">
+        {{ form.graduation_dates }}
+       </div>
+      </div>
+     </div>
 	<h3><a href="#" style="color:gray;">Step 2: Upload Thesis and Enter Information
         {% if form.thesis_file.errors or form.title.errors %}
         <span class="error">Errors(s), please fix</span>
@@ -119,12 +149,12 @@
         {{ form.submission_agreement.errors }}
         {# START agreement div #}
         <div id="agreement">
-	<p><b>{{ form.submission_agreement }} {{ form.submission_agreement.label }} </b>
+	<b>{{ form.submission_agreement }} {{ form.submission_agreement.label }} </b>
 	By checking the agreement box and submitting this form, I (the author and copyright owner) grant {{ default.institution }}
 		the non-exclusive right to reproduce and distribute my thesis/work in print and electronic form. I agree
 	   that {{ default.institution }} may, without changing the content, convert my thesis/work to any medium or format for the 
 	   purpose of historical preservation and to make publically available in open access to a larger community of
-	   scholars. All such copies will retain original notices of authorship and copyright.</p>
+	   scholars. All such copies will retain original notices of authorship and copyright.<br/>
 	<p>I understand that as the author of this work, I shall, without limitation, have the right to use, reproduce,
 	   distribute, update, create derivatives, and make copies of the work (electronically or in print). U.S. Copyright
 	   law protects me against the unauthorized use of this work; the right to use in future works all or part of this
