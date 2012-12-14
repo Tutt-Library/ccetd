@@ -258,6 +258,10 @@ def upload(request,workflow=None):
                                                      year_value=year)
         mods_xml.names.append(DepartmentForm().save(config=config))
         mods_xml.names.append(InstitutionForm().save(config=config))
+        if request.REQUEST.has_key('thesis-languages'):
+            language_codes = request.REQUEST.getlist('thesis-languages')
+            for code in language_codes:
+                mods_xml.languages.append(mods.Language(terms=[mods.LanguageTerm(text=code),]))
         # Connect and save to Fedora repository
         repo = Repository()
         thesis_obj = repo.get_object(type=ThesisDatasetObject)

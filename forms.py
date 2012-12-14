@@ -359,6 +359,9 @@ class UploadThesisForm(forms.Form):
         return grad_dates
 
 
+    def clean_languages(self):
+        return self.cleaned_data['languages']
+
     def clean_not_publically_available(self):
         return self.cleaned_data['not_publically_available']
 
@@ -416,6 +419,9 @@ class UploadThesisForm(forms.Form):
         if self.cleaned_data.has_key('honor_code'):
            obj_mods.notes.append(mods.Note(type="admin",
                                            text="Colorado College Honor Code upheld."))
+        if self.cleaned_data.has_key('languages'):
+            for code in self.cleaned_data.get('languages'):
+                obj_mods.languages.append(mods.Language(terms=[LanguageTerm(text=code),]))
         if workflow:
       
             if workflow.has_option('FORM','genre'):
