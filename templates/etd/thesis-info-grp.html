@@ -1,0 +1,53 @@
+{# START Thesis Info Group DIV #}
+<div class="accordion-group">
+ {# START Thesis Info Heading DIV #}
+ <div class="accordion-heading">
+  <a href="#thesis-info-grp-body" 
+     data-toggle="collapse"
+     data-parent="#thesis-accordion"
+     style="color:gray;">Step 2: Upload Thesis and Enter Information
+        {% if form.thesis_file.errors or form.title.errors %}
+        <span class="error">Errors(s), please fix</span>
+        {% endif %}
+        </a>
+ {# END Thesis Info Heading DIV #}
+ </div>
+ {# START Thesis Info Body DIV #}
+ <div class="accordion-body collapse" id="thesis-info-grp-body">
+   <div class="accordion-inner">
+     <label>
+       <b>Thesis*</b> (<i>Browse to attach thesis</i>):</label>
+       <p>Before uploading, make sure your thesis is saved as a PDF/A.</p>
+      {{ form.thesis_file }}
+      {{ form.thesis_file.errors }}<br/>
+      <label for="id-title">
+      {{ title_form.title.label }}*
+      </label><br/>
+      {{ title_form.title }}
+      {{ title_form.title.errors }}
+      <br/>
+      <fieldset>
+      <legend for="id-extent">About your thesis:</legend>
+      <ul>
+      <li>Last page number: {{ about_form.page_numbers }}</li>
+      <li>Contains illustrations and/or graphics: {{ about_form.has_illustrations }} {{ about_form.has_illustrations.label}}</li>
+      <li>Contains maps: {{ about_form.has_maps }}{{ about_form.has_maps.label }}</li>
+      {% if form.languages %}
+      <li>{{ form.languages.errors }}<br/>
+      {{ form.languages.label }}*:<br/> {{ form.languages }}</li>
+      {% endif %} 
+      </ul>
+     </fieldset>
+     <br/>
+	   <label for='id-abstract'>{{ form.abstract.label }}:</label><br/>
+       {{ form.abstract }}
+       <br/>
+       <label for="id-subjects">Tags or Keywords</label><br/>
+       <span id="span-keywords">
+       {{ subjects_form.keyword_1 }}{{ subjects_form.keyword_2 }}{{ subjects_form.keyword_3 }}
+       </span>
+       <a href="#" onclick="AddKeywords();" id="more-a">+ More</a>
+ {# END Thesis Info Body DIV #}
+ </div>
+{# END Thesis Info Group DIV #}
+</div>

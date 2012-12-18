@@ -1,0 +1,55 @@
+{# START Honor-code and Submission DIV #}
+<div class="accordion-group">
+ {# START Honor-code and Submission Heading DIV #}
+ <div class="accordion-heading">
+  <a href="#thesis-honor-grp-body" 
+     data-toggle="collapse"
+     data-parent="#thesis-accordion"
+     style="color:gray;">Step {% if has_dataset %}4{% else %}3{% endif %}: Honor Code and Submission Agreements
+        {% if form.submission_agreement.errors or form.honor_code.errors %}
+        <span class="error">Error(s), please fix</span>
+        {% endif %}
+        </a>
+ {# END Honor-code and Submission Heading DIV #}
+ </div>
+ {# START Honor-code and Submission Body DIV #}
+ <div class="accordion-body collapse" id="thesis-honor-grp-body">
+  <div class="accordion-inner">
+    <h3 class="chk_box">Honor Code</h3>
+        {# START honor-code div #}
+        <div id="honor-code">
+        {{ form.honor_code.errors }}
+	{{ form.honor_code }} <b>{{ form.honor_code.label }}</b> By checking this box I indicate agreement with this
+	statement: <b>On my honor, I have neither given nor received unauthorized aid on this thesis</b>
+        </div>
+        {# END honor-code div #}
+	<h3 class="chk_box">Submission Agreement</h3>
+        {{ form.submission_agreement.errors }}
+        {# START agreement div #}
+        <div id="agreement">
+	<b>{{ form.submission_agreement }} {{ form.submission_agreement.label }} </b>
+	By checking the agreement box and submitting this form, I (the author and copyright owner) grant {{ default.institution }}
+		the non-exclusive right to reproduce and distribute my thesis/work in print and electronic form. I agree
+	   that {{ default.institution }} may, without changing the content, convert my thesis/work to any medium or format for the 
+	   purpose of historical preservation and to make publically available in open access to a larger community of
+	   scholars. All such copies will retain original notices of authorship and copyright.<br/>
+	<p>I understand that as the author of this work, I shall, without limitation, have the right to use, reproduce,
+	   distribute, update, create derivatives, and make copies of the work (electronically or in print). U.S. Copyright
+	   law protects me against the unauthorized use of this work; the right to use in future works all or part of this
+	   work.</p>
+	<p>I understand that {{ default.institution }} shall have the right to non-commercial use which includes the right to reproduce,
+	   distribute, and make copies of the work (electronically or in print) in connection with digital repositories, 
+	   teaching, and scholarly activities at {{ default.institution }}.</p>
+        {% comment %}
+        <p><strong>{{ form.not_publically_available }} {{ form.not_publically_available.label }}</strong>
+           By checking this box and submitting this form, I (the author and copyright owner) do not want my thesis to be 
+           publically available to a larger community of scholars.  Only {{ default.institution }} faculty will be able 
+           to access the full-text of my thesis.   
+           </p>
+        {% endcomment %}
+        </div>
+   </div>
+ {# END Honor-code and Submission Body DIV #}
+ </div>
+{# END Honor-code and Submission DIV #}
+</div>

@@ -1,0 +1,33 @@
+{# START Thesis Dataset accordion DIV #}
+<div class="accordion-group">
+ {# START Thesis Dataset heading DIV #}
+ <div class="accordion-heading"> 
+   <a href="#thesis-dataset-grp-body"
+      class="accordion-toggle"
+     data-toggle="collapse"
+     data-parent="#thesis-accordion"
+      style="color:gray;">Step 3 (Optional): Upload Dataset and Enter Information</a>
+ {# END Thesis Dataset heading DIV #}
+ </div>
+ {# START Thesis Dataset body DIV #}
+ <div class="accordion-body collapse" id="thesis-dataset-grp-body">
+  <div class="accordion-inner"> 
+      <label><b>{{ dataset_form.dataset_file.label  }}</b> (<i>browse to attach</i>):</label>
+      {{ dataset_form.dataset_file  }}
+	  <br/>
+	  <label>{{ dataset_form.info_note.label }}: (example - Stata version 10, EViews version 7)</label>
+	  <br/>
+	  {{ dataset_form.info_note  }} 
+	  <br/>
+	  <label>{{ dataset_form.abstract.label }}: (briefly describe variables, years, or number of observations, etc.)</label><br/>
+          {{ dataset_form.abstract }}
+	  <br/>
+          {% comment %}
+	  <p><label>If you agree, your dataset will be publically available. </label>
+	  {{ dataset_form.is_publically_available }}&nbsp;<strong> {{ dataset_form.is_publically_available.label }}</strong></p>
+         {% endcomment %}
+  </div>
+ {# END Thesis Dataset body DIV #}
+ </div>
+{# END Thesis Dataset accordion DIV #}
+</div>

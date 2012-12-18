@@ -24,7 +24,6 @@ import settings,mimetypes
 from lxml import etree
 from eulfedora.server import Repository
 from etd.forms import *
-from etd.conf import *
 #import islandoraUtils.xacml.tools as islandora_xacml
 #import islandoraUtils.metadata.fedora_relationships as islandora_rels_ext
 from datasets.forms import ThesisDatasetForm
@@ -219,9 +218,13 @@ def upload(request,workflow=None):
                                request.FILES,
                                prefix='dataset')
     form_list.append(dataset_form)
+
+    media_form = MediaForm(request.POST,
+                           request.FILES,
+                           prefix='media')
+    form_list.append(media_form)
     subjects_form = SubjectsForm(request.POST,
                                 prefix='subject')
-
     form_list.append(subjects_form)
     title_form = ThesisTitleForm(request.POST,
                                  prefix='title')
@@ -230,8 +233,7 @@ def upload(request,workflow=None):
                                           request.FILES,
                                           prefix='thesis')
     if config.has_section('LANGUAGE'):
-        upload_thesis_form.languages = forms.MultipleChoiceField(label="Languages",
-                                                                 required=False,
+        upload_thesis_form.languages = forms.MultipleChoiceField(label="Language(s) of Thesis",
                                                                  choices=config.items('LANGUAGE'))
     form_list.append(upload_thesis_form)
     if all([form.is_valid() for form in form_list]):
@@ -262,6 +264,9 @@ def upload(request,workflow=None):
             language_codes = request.REQUEST.getlist('thesis-languages')
             for code in language_codes:
                 mods_xml.languages.append(mods.Language(terms=[mods.LanguageTerm(text=code),]))
+        else:
+            # Sets a default language for the thesis of 'eng' for English
+            mods.xml.languages.append(mods.Language(terms=[mods.LanguageTerm(text='eng'),]))
         # Connect and save to Fedora repository
         repo = Repository()
         thesis_obj = repo.get_object(type=ThesisDatasetObject)
@@ -271,8 +276,11 @@ def upload(request,workflow=None):
         if request.FILES.has_key('dataset-dataset_file'):
             thesis_obj.dataset.content = request.FILES['dataset-dataset_file']
             thesis_obj.dataset.label = 'Dataset for %s' % thesis_obj.mods.content.title
+        if request.FILES.has_key('media-media_file'):
+            thesis_obj.media.content = request.FILES['media-media_file']
+            thesis_obj.media.label = 'Media for {0}'.format(thesis_obj.mods.content.title)
         thesis_obj.dc.content.title = thesis_obj.mods.content.title
-        thesis_obj.label = '%s' % thesis_obj.mods.content.title
+        thesis_obj.label = '{0} '.format(thesis_obj.mods.content.title)
         thesis_obj.save()
         restrictions = {}
         if not dataset_form.is_empty():
@@ -370,7 +378,7 @@ def workflow(request,workflow='default'):
     if custom.has_option('FORM','dataset'):
         has_dataset = custom.get('FORM','dataset')
     if custom.has_section('LANGUAGE'):
-        upload_thesis_form.fields['languages'] = forms.MultipleChoiceField(label="Languages",
+        upload_thesis_form.fields['languages'] = forms.MultipleChoiceField(label="Language(s) of Thesis",
                                                                            required=False,
                                                                            choices=custom.items('LANGUAGE'))
     return direct_to_template(request,

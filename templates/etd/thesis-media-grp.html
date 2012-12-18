@@ -1,0 +1,31 @@
+{# START Thesis Media accordion DIV #}
+<div class="accordion-group">
+ {# START Thesis Media heading DIV #}
+ <div class="accordion-heading"> 
+   <a href="#thesis-metia-grp-body"
+      class="accordion-toggle"
+     data-toggle="collapse"
+     data-parent="#thesis-accordion"
+      style="color:gray;">Step 4 (Optional): Upload Media and Enter Information</a>
+ {# END Thesis Media heading DIV #}
+ </div>
+ {# START Thesis Media body DIV #}
+ <div class="accordion-body collapse" id="thesis-media-grp-body">
+  <div class="accordion-inner"> 
+      <p>
+       Do you need to attach an audio or video file as part of your Thesis? Save your
+       video as an MP4 or your aduio file asn MP3 and attach it here:
+
+      </p>
+      <label><b>{{ media_form.media_file.label  }}</b> (<i>browse to attach</i>):</label>
+      {{ media_form.media_file  }}
+	  <br/>
+	  <label>{{ media_form.info_note.label }}:</label>
+	  <br/>
+	  {{ media_form.info_note  }} 
+	  <br/>
+  </div>
+ {# END Thesis Media body DIV #}
+ </div>
+{# END Thesis Media accordion DIV #}
+</div>

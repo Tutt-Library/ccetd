@@ -1,187 +1,39 @@
+{% comment %}START Row DIV{% endcomment %}
+<div class="row">
 <form method="POST" action="/etd/{{ workflow }}/upload" enctype="multipart/form-data" class="form-horizontal">
 {% csrf_token %}
-<div style="width: 600px">
-<div id="accordion">
-	<h3><a href="#" style="color:gray;">Step 1: Enter Author Information
-        {% if creator_given.errors or creator_family.errors or form.email.errors %}
-        <span class="error">Error(s), please fix</span>
-        {% endif %}
-        </a>
-        </h3>
-	<div>
-         <p>
-          Please fill out any required fields that are marked with an *.
-         </p>
-    <fieldset>
-      <h3>Your Name:</h3>
-      <div class="control-group">
-       <label class="control-label" for="id_creator-given">{{ creator_form.given.label }}*:</label>
-       <div class="controls">
-        {{ creator_form.given }}{{ creator_form.given.errors }}
-       </div>
-      </div>
-      <div class="control-group">
-       <label class="control-label" for="id_creator-middle">{{ creator_form.middle.label }}:</label>
-       <div class="controls">
-        {{ creator_form.middle }}
-       </div>
-      </div>
-      <div class="control-group">
-      {{ creator_form.family.errors }}
-
-       <label class="control-label" for="id_creator-family">{{ creator_form.family.label }}*:</label>
-       <div class="controls">
-        {{ creator_form.family }}       </div>
-      </div>
-      <div class="control-group">
-       <label class="control-label" for="id_creator-suffix">{{ creator_form.suffix.label }}:</label>
-       <div class="controls">
-        {{ creator_form.suffix }}
-       </div>
-      </div>
-      </fieldset>
-      <div class="control-group">
-      {% if default.email_notices %}
-      {{ form.email.errors }}
-       <label class='control-label' for="id_thesis-email">{{ form.email.label }}</label>
-       <div class="controls">
-       {{ form.email }}
-       <span class="help-block">(<i>To receive a notification e-mail when your thesis is submitted</i>)</span>
-       </div>
-      </div>
-      {% endif %}
-      <div class="control-group">
-       {{ advisor_form.advisors.errors }}
-       <label class='control-label' for='id_advisor-advisors'>{{ advisor_form.advisors.label }}</label>
-       <div class="controls">
-        {{ advisor_form.advisors }}
-        <label>{{ advisor_form.freeform_advisor.label }}</label>
-        {{ advisor_form.freeform_advisor }}
-       </div>
-      </div>
-      <div class="control-group">
-       {{ form.graduation_dates.errors }}
-       <label class='control-label' for='id_grad-date'>Graduation Date*:</label>
-       <div class="controls">
-        {{ form.graduation_dates }}
-       </div>
-      </div>
-     </div>
-	<h3><a href="#" style="color:gray;">Step 2: Upload Thesis and Enter Information
-        {% if form.thesis_file.errors or form.title.errors %}
-        <span class="error">Errors(s), please fix</span>
-        {% endif %}
-        </a></h3>
-	<div>
-	  <label>
-	      <b>Thesis*</b> (<i>Browse to attach thesis</i>):</label>
-       <p>Before uploading, make sure your thesis is saved as a PDF/A.</p>
-
-
-      {{ form.thesis_file }}
-      {{ form.thesis_file.errors }}<br/>
-      <label for="id-title">
-      {{ title_form.title.label }}*
-      </label><br/>
-      {{ title_form.title }}
-      {{ title_form.title.errors }}
-      <br/>
-      <fieldset>
-      <legend for="id-extent">About your thesis:</legend>
-      <ul>
-      <li>Last page number: {{ about_form.page_numbers }}</li>
-      <li>Contains illustrations and/or graphics: {{ about_form.has_illustrations }} {{ about_form.has_illustrations.label}}</li>
-      <li>Contains maps: {{ about_form.has_maps }}{{ about_form.has_maps.label }}</li>
-      {% if form.languages %}
-      <li>{{ form.languages.label }}:<br/> {{ form.languages }}</li>
-      {% endif %} 
-      </ul>
-     </fieldset>
-     <br/>
-	   <label for='id-abstract'>{{ form.abstract.label }}:</label><br/>
-       {{ form.abstract }}
-       <br/>
-       <label for="id-subjects">Tags or Keywords</label><br/>
-       <span id="span-keywords">
-       {{ subjects_form.keyword_1 }}{{ subjects_form.keyword_2 }}{{ subjects_form.keyword_3 }}
-       </span>
-       <a href="#" onclick="AddKeywords();" id="more-a">+ More</a>
-       <br/>
-	</div>
-        {# END Thesis accordion #}
-        {# START Dataset accordion #}
-       {% if has_dataset %}
-	<h3><a href="#" style="color:gray;">Step 3 (Optional): Upload Dataset and Enter Information</a></h3>
-	<div>
-      <label><b>{{ dataset_form.dataset_file.label  }}</b> (<i>browse to attach</i>):</label>
-      {{ dataset_form.dataset_file  }}
-	  <br/>
-	  <label>{{ dataset_form.info_note.label }}: (example - Stata version 10, EViews version 7)</label>
-	  <br/>
-	  {{ dataset_form.info_note  }} 
-	  <br/>
-	  <label>{{ dataset_form.abstract.label }}: (briefly describe variables, years, or number of observations, etc.)</label><br/>
-          {{ dataset_form.abstract }}
-	  <br/>
-          {% comment %}
-	  <p><label>If you agree, your dataset will be publically available. </label>
-	  {{ dataset_form.is_publically_available }}&nbsp;<strong> {{ dataset_form.is_publically_available.label }}</strong></p>
-         {% endcomment %}
-	</div>
-        {% endif %}
-        {# END Dataset accordion #}
-        {# START Honor-code and Submission accordion #}
-	<h3><a href="#" style="color:gray;">Step {% if has_dataset %}4{% else %}3{% endif %}: Honor Code and Submission Agreements
-        {% if form.submission_agreement.errors or form.honor_code.errors %}
-        <span class="error">Error(s), please fix</span>
-        {% endif %}
-        </a></h3>
-        <div>
-        <h3 class="chk_box">Honor Code</h3>
-        {# START honor-code div #}
-        <div id="honor-code">
-        {{ form.honor_code.errors }}
-	{{ form.honor_code }} <b>{{ form.honor_code.label }}</b> By checking this box I indicate agreement with this
-	statement: <b>On my honor, I have neither given nor received unauthorized aid on this thesis</b>
-        </div>
-        {# END honor-code div #}
-	<h3 class="chk_box">Submission Agreement</h3>
-        {{ form.submission_agreement.errors }}
-        {# START agreement div #}
-        <div id="agreement">
-	<b>{{ form.submission_agreement }} {{ form.submission_agreement.label }} </b>
-	By checking the agreement box and submitting this form, I (the author and copyright owner) grant {{ default.institution }}
-		the non-exclusive right to reproduce and distribute my thesis/work in print and electronic form. I agree
-	   that {{ default.institution }} may, without changing the content, convert my thesis/work to any medium or format for the 
-	   purpose of historical preservation and to make publically available in open access to a larger community of
-	   scholars. All such copies will retain original notices of authorship and copyright.<br/>
-	<p>I understand that as the author of this work, I shall, without limitation, have the right to use, reproduce,
-	   distribute, update, create derivatives, and make copies of the work (electronically or in print). U.S. Copyright
-	   law protects me against the unauthorized use of this work; the right to use in future works all or part of this
-	   work.</p>
-	<p>I understand that {{ default.institution }} shall have the right to non-commercial use which includes the right to reproduce,
-	   distribute, and make copies of the work (electronically or in print) in connection with digital repositories, 
-	   teaching, and scholarly activities at {{ default.institution }}.</p>
-        {% comment %}
-        <p><strong>{{ form.not_publically_available }} {{ form.not_publically_available.label }}</strong>
-           By checking this box and submitting this form, I (the author and copyright owner) do not want my thesis to be 
-           publically available to a larger community of scholars.  Only {{ default.institution }} faculty will be able 
-           to access the full-text of my thesis.   
-           </p>
-        {% endcomment %}
-        </div>
-        {# END agreement div #}
-        </div>
-        {# END Honor-code accordion #}
-        {# START submit button div #}
-        <h3><a href="#" style="color:gray;">Final Step: Submit Thesis</a></h3>
-        <div>
+ <div class="span6">
+  {% comment %}START accordion DIV{% endcomment %}
+  <div class="accordion" id="thesis-accordion">
+    {% include 'thesis-author-grp' %}
+    {% include 'thesis-info-grp' %}
+   {% if has_dataset %}
+    {% include 'thesis-dataset-grp' %}
+   {% endif %}
+   {% if has_media %}
+    {% include 'thesis-media-grp' %}
+   {% endif %}
+   {% include 'thesis-honor-grp' %}
+   {# START submit button div #}
+    <div class="accordion-group">
+     <div class="accordion-heading">
+        <a class="accordion-toggle"
+           data-toggle="collapse"
+           data-parent="#thesis-accordion"
+           href="#thesis-submit-grp-body" 
+           style="color:gray;">Final Step: Submit Thesis</a></h3>
+     <div class="accordion-body collapse" id="thesis-submit-grp-body">
+      <div class="accordion-inner">
          Please review before submitting your thesis:<br/> 
          <input type="submit" value="Submit Thesis" />
-        {# END submit button div #} 
-        </div>
-   </div>
-   {# END accordion div #}
-</div>
-</div>
+      </div>
+     </div>
+    {# END submit button div #} 
+    </div>
+
+  {% comment %}END accordion DIV{% endcomment %}
+  </div> 
+ </div>
 </form>
+{% comment %}END Row DIV{% endcomment %}
+</div>

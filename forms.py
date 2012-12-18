@@ -23,6 +23,7 @@ from django import forms
 from models import ThesisDatasetObject
 from django.contrib.formtools.wizard import FormWizard
 from django.core.exceptions import ValidationError
+import lxml.etree.ElementTree as etree
 from eulxml.xmlmap import mods
 from eulxml.forms import XmlObjectForm,SubformField
 
@@ -208,6 +209,37 @@ class InstitutionForm(forms.Form):
                                            text="degree grantor"))
         return institution
 
+class MediaForm(forms.Form):
+    """
+    MediaForm creates a media file upload form along with a note
+    field to be added to the Thesis MODS file.
+    """
+    info_note = forms.CharField(required=False,
+                                label='Description of Content of file',
+                                widget=forms.Textarea(attrs={'class':'span5',
+                                                             'cols':60,
+                                                             'rows':5}))
+    media_file = forms.FileField(required=False,
+                                 label='Dataset')
+
+
+    def clean_media_file(self):
+        if self.cleaned_data.has_key('media_file'):
+            media_uploaded_file = self.cleaned_data['media_file']
+            thesis_mimetype = mimetypes.guess_type(thesis_uploaded_file.name)
+            if thesis_mimetype[0] is not None:
+                if ["video/mp4",
+                    "audio/x-mpg"].count(thesis_mimetype[0]) < 1:
+                    raise ValidationError("Media File must be a mp3, or mp4")
+            return thesis_uploaded_file
+
+
+    def save(self):
+         media_note = mods.Note(text=self.cleaned_data['info_note'],
+                                label='Media File Information')
+         return media_note
+
+
 class OriginInfoForm(forms.Form):
     """OriginInfoForm associates fields with MODS originInfo element
        and child elements.
@@ -231,18 +263,21 @@ class OriginInfoForm(forms.Form):
             # Can't find date, use current year
             year = datetime.datetime.today().year
         if config:
-            place_term = config.get('FORM','location')
+            place_term_text = config.get('FORM','location')
             publisher = config.get('FORM','institution')
         else:
-            place_term = self.cleaned_data['location']
+            place_term_text = self.cleaned_data['location']
             publisher = self.cleaned_data['publisher']
+        place = etree.ElementTree("{http://www.loc.gov/mods/v3}place")
+        place_term = etree.SubElement(place,"{http://www.loc.gov/mods/v3}placeTerm")
+        place_term.text = place_term_text
         date_created = mods.DateCreated(date=year)
         date_issued = mods.DateIssued(date=year,
                                       key_date='yes')
         origin_info = mods.OriginInfo(created=[date_created,],
                                       issued=[date_issued,],
-                                      place=place_term,
                                       publisher=publisher)
+        origin_info.node.append(place)
         return origin_info
 
 class PhysicalDescriptionForm(forms.Form):
@@ -262,20 +297,24 @@ class PhysicalDescriptionForm(forms.Form):
         """
         extent = ''
         if self.cleaned_data.has_key('page_numbers'):
-            extent = '%sp. ' % self.cleaned_data['page_numbers']
+            extent = '{0} pages : ' % self.cleaned_data['page_numbers']
         if self.cleaned_data.has_key('has_illustrations'):
-            extent += 'ill. '
+            extent += 'illustrations'
         if self.cleaned_data.has_key('has_maps'):
+            if self.cleaned_data.has_key('has_illustrations'):
+                extent += ', '
             extent += 'map(s).'
         extent = extent.strip()
         if self.cleaned_data.has_key('digital_origin'):
-            digital_origin = self.cleaned_data['digital_origin']
+            digital_origin_text = self.cleaned_data['digital_origin']
             if len(digital_origin) < 1:
-                digital_origin = 'born digital'
+                digital_origin_text = 'born digital'
         else:
-            digital_origin = 'born digital'
-        physical_description = mods.PhysicalDescription(extent=extent,
-                                                        digital_origin=digital_origin)
+            digital_origin_text = 'born digital'
+        digital_origin = etree.Element("{http://www.loc.gov/mods/v3}digitalOrigin")
+        digital_origin.text = digital_origin_text
+        physical_description = mods.PhysicalDescription(extent=extent)
+        physical_description.node.append(digital_origin)
         return physical_description
 
 class SubjectsForm(forms.Form):
@@ -442,9 +481,9 @@ class UploadThesisForm(forms.Form):
             obj_mods.notes.append(mods.Note(label='Degree Type',
                                             type=note_type,
                                             text=workflow.get('FORM','degree_name')))
-        # Assumes thesis will have bibliography, potentially bad
-        obj_mods.notes.append(mods.Note(type='bibliography',
-                                        text='Includes bibliographical references'))
+        if not workflow.has_option('FORM','exclude_bib_refs'):
+            obj_mods.notes.append(mods.Note(type='bibliography',
+                                            text='Includes bibliographical references'))
         # Default Rights statement
         obj_mods.access_conditions.append(mods.AccessCondition(type="useAndReproduction",
                                                                text="Copyright restrictions apply."))

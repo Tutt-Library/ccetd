@@ -44,4 +44,7 @@ class ThesisDatasetObject(DigitalObject):
     dataset = FileDatastream("DATASET",
                              "Dataset datastream",
                              defaults={'versionable': True})
+    media = FileDatastream("MEDIA",
+                           "Media datastream",
+                           defaults={'versionable': True})
 
