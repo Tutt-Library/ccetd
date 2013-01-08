@@ -23,7 +23,7 @@ from django import forms
 from models import ThesisDatasetObject
 from django.contrib.formtools.wizard import FormWizard
 from django.core.exceptions import ValidationError
-import lxml.etree.ElementTree as etree
+import lxml.etree as etree
 from eulxml.xmlmap import mods
 from eulxml.forms import XmlObjectForm,SubformField
 

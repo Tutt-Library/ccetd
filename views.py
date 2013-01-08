@@ -23,6 +23,7 @@ import os,ConfigParser,logging
 import settings,mimetypes
 from lxml import etree
 from eulfedora.server import Repository
+from etd.conf import *
 from etd.forms import *
 #import islandoraUtils.xacml.tools as islandora_xacml
 #import islandoraUtils.metadata.fedora_relationships as islandora_rels_ext

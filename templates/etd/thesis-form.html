@@ -5,15 +5,15 @@
  <div class="span6">
   {% comment %}START accordion DIV{% endcomment %}
   <div class="accordion" id="thesis-accordion">
-    {% include 'thesis-author-grp' %}
-    {% include 'thesis-info-grp' %}
+    {% include 'thesis-author-grp.html' %}
+    {% include 'thesis-info-grp.html' %}
    {% if has_dataset %}
-    {% include 'thesis-dataset-grp' %}
+    {% include 'thesis-dataset-grp.html' %}
    {% endif %}
    {% if has_media %}
-    {% include 'thesis-media-grp' %}
+    {% include 'thesis-media-grp.html' %}
    {% endif %}
-   {% include 'thesis-honor-grp' %}
+   {% include 'thesis-honor-grp.html' %}
    {# START submit button div #}
     <div class="accordion-group">
      <div class="accordion-heading">
