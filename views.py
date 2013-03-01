@@ -267,7 +267,7 @@ def upload(request,workflow=None):
                 mods_xml.languages.append(mods.Language(terms=[mods.LanguageTerm(text=code),]))
         else:
             # Sets a default language for the thesis of 'eng' for English
-            mods.xml.languages.append(mods.Language(terms=[mods.LanguageTerm(text='eng'),]))
+            mods_xml.languages.append(mods.Language(terms=[mods.LanguageTerm(text='eng'),]))
         # Connect and save to Fedora repository
         repo = Repository()
         thesis_obj = repo.get_object(type=ThesisDatasetObject)

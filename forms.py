@@ -226,7 +226,9 @@ class MediaForm(forms.Form):
     def clean_media_file(self):
         if self.cleaned_data.has_key('media_file'):
             media_uploaded_file = self.cleaned_data['media_file']
-            thesis_mimetype = mimetypes.guess_type(thesis_uploaded_file.name)
+            if media_uploaded_file is None:
+                return
+            thesis_mimetype = mimetypes.guess_type(media_uploaded_file.name)
             if thesis_mimetype[0] is not None:
                 if ["video/mp4",
                     "audio/x-mpg"].count(thesis_mimetype[0]) < 1:
@@ -268,7 +270,7 @@ class OriginInfoForm(forms.Form):
         else:
             place_term_text = self.cleaned_data['location']
             publisher = self.cleaned_data['publisher']
-        place = etree.ElementTree("{http://www.loc.gov/mods/v3}place")
+        place = etree.Element("{http://www.loc.gov/mods/v3}place")
         place_term = etree.SubElement(place,"{http://www.loc.gov/mods/v3}placeTerm")
         place_term.text = place_term_text
         date_created = mods.DateCreated(date=year)
@@ -297,7 +299,7 @@ class PhysicalDescriptionForm(forms.Form):
         """
         extent = ''
         if self.cleaned_data.has_key('page_numbers'):
-            extent = '{0} pages : ' % self.cleaned_data['page_numbers']
+            extent = '{0} pages : '.format(self.cleaned_data['page_numbers'])
         if self.cleaned_data.has_key('has_illustrations'):
             extent += 'illustrations'
         if self.cleaned_data.has_key('has_maps'):
@@ -307,7 +309,7 @@ class PhysicalDescriptionForm(forms.Form):
         extent = extent.strip()
         if self.cleaned_data.has_key('digital_origin'):
             digital_origin_text = self.cleaned_data['digital_origin']
-            if len(digital_origin) < 1:
+            if len(digital_origin_text) < 1:
                 digital_origin_text = 'born digital'
         else:
             digital_origin_text = 'born digital'
