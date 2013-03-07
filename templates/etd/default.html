@@ -4,7 +4,7 @@
 
 {% block head-title %}{% trans "Electronic Thesis Submission for Colorado College" %}{% endblock %}
 {% block more-css %}
- <link href="{{ STATIC_URL }}thesis.css" rel="stylesheet" />
+ <link href="{{ STATIC_URL }}css/thesis.css" rel="stylesheet" />
 {% endblock %}
 
 {% block library-breadcrumb %}
@@ -12,17 +12,19 @@
 
 {% block body %}
 <div class="row-fluid">
- <div id="breadcrumb" class="span8 well well-small">
-  <div class="stage"><a href="http://www.coloradocollege.edu/library">{% trans "Library Home" %}</a>&nbsp;&raquo;&nbsp;<a href="/etd">{% trans "ETD" %}</a>&nbsp;&raquo;&nbsp;
+ <div class="span8 offset1">
+  <ul class="breadcrumb">
+   <li><a href="http://www.coloradocollege.edu/library">{% trans "Library Home" %}</a>&nbsp;&raquo;</li>
+   <li><a href="/etd">{% trans "ETD" %}</a>&nbsp;&raquo;</li>
   {% if workflow %}
-   <a href="#" class="on">{{ config|get_department_name }}</a>
+   <li class="active"><a href="#" >{{ config|get_department_name }}</a></li>
   {% endif %}
-   </div>
+  </ul>
  </div>
 </div>
 
 <div class="row-fluid">
-  {% comment %}START left-column DIV{% endcomment %}
+  {# START left-column DIV #}
   <div class="span3 offset1">
 {% if workflow %}
    <div class="help_steps">
@@ -57,17 +59,14 @@
    </div>
 {% endif %}
   <aside class="aside">
-  <div id="contact-lib-detail" style="background-color: #2D4873">
-   <div id="contact-library">
+   <div>
     <h5><strong>Questions? Need Help?</strong></h5>
     <p>Contact <a href="mailto:llister@coloradocollege.edu">Lisa Lister</a>,
     Digital Archives manager, at 389-6242 or your 
-    <a href="#">Library Liaison</a>. You can also contact the 
+    <a href="">Library Liaison</a>. You can also contact the 
     Tutt Library Reference Desk at 389-6662.</p>
-   </div>
   </div>
   </aside>
-
    {% comment %}END left-column DIV{% endcomment %}
   </div>
   {% comment %}START main-column DIV{% endcomment %}
@@ -83,7 +82,12 @@
       web forms are available below:</p>
    <ul>
    {% for workflow in active %}
-    <li><a href="/etd/{{ workflow.0 }}">{{ workflow.1|get_department_name }}</a></li>
+    <li><a 
+        {% if not user.is_authenticated %}href="#" onclick="$('#login-dlg').modal('show')"
+        {% else %} 
+        href="/apps/etd/{{ workflow.0 }}"
+        {% endif %}>{{ workflow.1|get_department_name }}</a>
+     </li>
    {% endfor %}
    </ul>
  {% endif %}
@@ -96,9 +100,6 @@
 
 {% block more-scripts %}
 <script src="{{ STATIC_URL }}js/jquery.js"></script>
-<script src="{{ STATIC_URL }}js/jquery.ui.core.js"></script>
-<script src="{{ STATIC_URL }}js/jquery.ui.widget.js"></script>
-<script src="{{ STATIC_URL }}js/jquery.ui.accordion.js"></script>
 <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 <script src="{{ STATIC_URL }}thesis.js"></script>
 <script>
@@ -109,9 +110,4 @@
   {% endif %}
   });
 </script>
-{% endblock %}
-{% block dialogs %}
-{% if begin_alert %}
- {% include "begin-alert.html" %}
-{% endif %}
 {% endblock %}
