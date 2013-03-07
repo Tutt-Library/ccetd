@@ -1,27 +1,27 @@
-{% extends 'cc-bootstrap-base.html' %}
+{% extends 'app-base.html' %}
 {% load etd_extras %}
 {% load i18n %}
 
 {% block head-title %}{% trans "Electronic Thesis Submission for Colorado College" %}{% endblock %}
 {% block more-css %}
- <link href="{{ STATIC_URL }}jquery-ui-1.8.13.custom.css" rel="stylesheet" />
- <link href="{{ STATIC_URL }}bootstrap.min.css" rel="stylesheet" />
  <link href="{{ STATIC_URL }}thesis.css" rel="stylesheet" />
-
 {% endblock %}
 
 {% block library-breadcrumb %}
- <div id="breadcrumb">
+{% endblock %}
+
+{% block body %}
+<div class="row-fluid">
+ <div id="breadcrumb" class="span8 well well-small">
   <div class="stage"><a href="http://www.coloradocollege.edu/library">{% trans "Library Home" %}</a>&nbsp;&raquo;&nbsp;<a href="/etd">{% trans "ETD" %}</a>&nbsp;&raquo;&nbsp;
   {% if workflow %}
    <a href="#" class="on">{{ config|get_department_name }}</a>
   {% endif %}
    </div>
  </div>
-{% endblock %}
+</div>
 
-{% block container %}
-<div class="row">
+<div class="row-fluid">
   {% comment %}START left-column DIV{% endcomment %}
   <div class="span3 offset1">
 {% if workflow %}
@@ -71,7 +71,7 @@
    {% comment %}END left-column DIV{% endcomment %}
   </div>
   {% comment %}START main-column DIV{% endcomment %}
-  <div class="span8 main">
+  <div class="span8 well">
  {% if workflow %}
     <h1>{{ config|get_department_name }} Thesis Submission</h1>
    {% include 'thesis-form.html' %}

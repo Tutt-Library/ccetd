@@ -20,14 +20,14 @@
 __author__ = 'Jeremy Nelson'
 
 import os,ConfigParser,logging
-import settings,mimetypes
+import aristotle.settings as settings
+import mimetypes
 from lxml import etree
 from eulfedora.server import Repository
 from etd.conf import *
 from etd.forms import *
 #import islandoraUtils.xacml.tools as islandora_xacml
 #import islandoraUtils.metadata.fedora_relationships as islandora_rels_ext
-from datasets.forms import ThesisDatasetForm
 from etd.models import ThesisDatasetObject
 from operator import itemgetter
 from django import forms
@@ -37,7 +37,6 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse,Http404,HttpResponseRedirect
 from django.template import Context,Library,Template,loader,RequestContext
 from eulxml.xmlmap import load_xmlobject_from_string,mods
-from vendors.iii.bots.iiibots import PatronBot
 
 
 # Sets workflows dict
