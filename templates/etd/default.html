@@ -7,6 +7,20 @@
  <link href="{{ STATIC_URL }}css/thesis.css" rel="stylesheet" />
 {% endblock %}
 
+{% block navbar %}
+ <div class="row-fluid">
+  <div class="span8">IN CUSTOM navbar </div>
+ </div>
+{% endblock %}
+
+{% block action-view-subtitle %}
+Should show subtitle
+{% if workflow %}
+{{ config|get_department_name }} 
+{% endif %}
+{% endblock %}
+
+
 {% block library-breadcrumb %}
 {% endblock %}
 
@@ -34,7 +48,7 @@
         <li>Make sure you have the FINAL version of your thesis</li>
         <li>Make sure your thesis is saved as a PDF/A. This is an "archival" version 
             of PDF.  For instructions, please see this 
-           <a href="{{ STATIC_URL}}pdfaInstructions.pdf" target="pdfa">document</a></li>
+           <a href="{{ STATIC_URL}}pdf/pdfaInstructions.pdf" target="pdfa">document</a></li>
      
       </ul>
     <p>Then proceed to the electronic thesis submission form:</p>
@@ -83,7 +97,7 @@
    <ul>
    {% for workflow in active %}
     <li><a 
-        {% if not user.is_authenticated %}href="#" onclick="$('#login-dlg').modal('show')"
+        {% if not user.is_authenticated %}href="/accounts/login?next=/apps/etd/{{ workflow.0 }}"
         {% else %} 
         href="/apps/etd/{{ workflow.0 }}"
         {% endif %}>{{ workflow.1|get_department_name }}</a>

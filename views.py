@@ -19,8 +19,11 @@
 
 __author__ = 'Jeremy Nelson'
 
-import os,ConfigParser,logging
+import os
+import ConfigParser
+import logging
 import aristotle.settings as settings
+from aristotle.settings import INSTITUTION
 import mimetypes
 from lxml import etree
 from eulfedora.server import Repository
@@ -29,6 +32,7 @@ from etd.forms import *
 #import islandoraUtils.xacml.tools as islandora_xacml
 #import islandoraUtils.metadata.fedora_relationships as islandora_rels_ext
 from etd.models import ThesisDatasetObject
+from app_settings import APP
 from operator import itemgetter
 from django import forms
 from django.core.mail import send_mail
@@ -92,7 +96,9 @@ def default(request):
     """
     return direct_to_template(request,
                               'etd/default.html',
-                              {'active':sorted(workflows.items())})
+                              {'active':sorted(workflows.items()),
+                               'app': APP,
+                               'institution': INSTITUTION})
 
 def success(request):
     """
@@ -190,7 +196,7 @@ def save_xacml_policy(repository,
                                  content=xacml.getXmlString())
 
 
-def upload(request,workflow=None):
+def upload(request, workflow=None):
     """
     Creates MODS and other metadata along with the file uploads to Fedora.
 
@@ -345,10 +351,8 @@ def workflow(request,workflow='default'):
                      displays default view.
     """
     if not request.user.is_authenticated():
-         return HttpResponseRedirect("/vendors/iii/patron_login?next=%s" % request.path)
+         return HttpResponseRedirect("/accounts/login?next=%s" % request.path)
                                    
-    if request.method == 'POST':
-        logging.error("IN WORKFLOW POST")
     if workflow is None:
         workflow = 'default'
     if workflows.has_key(workflow):
@@ -382,8 +386,10 @@ def workflow(request,workflow='default'):
                                                                            required=False,
                                                                            choices=custom.items('LANGUAGE'))
     return direct_to_template(request,
-                              'etd/%s' % template_name,
-                              {'default':default,
+                              'etd/{0}'.format(template_name),
+                              {'app': APP,
+                               'institution': INSTITUTION,
+                               'default':default,
                                'about_form':about_form,
                                'advisor_form':advisor_form,
                                'begin_alert':custom.has_option('FORM','begin_alert'),
