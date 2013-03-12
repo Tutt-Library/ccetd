@@ -5,16 +5,22 @@
 {% block head-title %}{% trans "Electronic Thesis Submission for Colorado College" %}{% endblock %}
 {% block more-css %}
  <link href="{{ STATIC_URL }}css/thesis.css" rel="stylesheet" />
+ 
 {% endblock %}
 
 {% block navbar %}
  <div class="row-fluid">
-  <div class="span8">IN CUSTOM navbar </div>
+  {% if website %}
+  <div class="span12">
+   <iframe src="/apps/website-header" class="website" scrolling="no"></iframe>
+  </div>
+  {% else %}
+   {% include 'snippets/navigation-action-bar.html' %}
+  {% endif %}
  </div>
 {% endblock %}
 
 {% block action-view-subtitle %}
-Should show subtitle
 {% if workflow %}
 {{ config|get_department_name }} 
 {% endif %}
@@ -111,6 +117,16 @@ Should show subtitle
 </div>
 {% endblock %}
 
+{% block footer %}
+<div class="row-fluid">
+  {% if website %}
+  <div class="span12">
+   <iframe src="/apps/website-footer" class="website" scrolling="no"></iframe>
+  </div>
+  {% else %}
+   {% include  'snippets/footer-action-bar.html' %}
+  {% endif %}
+{% endblock %} 
 
 {% block more-scripts %}
 <script src="{{ STATIC_URL }}js/jquery.js"></script>

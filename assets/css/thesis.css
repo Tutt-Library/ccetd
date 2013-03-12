@@ -11,6 +11,13 @@ aside.aside h5 {
  font-size: 1.2em;
 }
 
+iframe.website {
+  margin: 0;
+  padding: 0;
+  border: none;
+  width: 1020px;
+}
+
  h1 {
   color: #594738 !important;
   font-size: 1.5em !important;

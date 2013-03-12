@@ -94,11 +94,16 @@ def default(request):
     Displays home-page of Django ETD app along with a list of active
     workflows.
     """
+    if request.get_full_path().startswith('/etd/'):
+        website_view = True
+    else:
+        website_view = False
     return direct_to_template(request,
                               'etd/default.html',
                               {'active':sorted(workflows.items()),
                                'app': APP,
-                               'institution': INSTITUTION})
+                               'institution': INSTITUTION,
+                               'website':website_view})
 
 def success(request):
     """
