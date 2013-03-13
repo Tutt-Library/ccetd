@@ -355,6 +355,11 @@ def workflow(request,workflow='default'):
     :param workflow: Specific workflow for individual departments, blank value 
                      displays default view.
     """
+    if request.get_full_path().startswith('/etd/'):
+        website_view = True
+    else:
+        website_view = False
+
     if not request.user.is_authenticated():
          return HttpResponseRedirect("/accounts/login?next=%s" % request.path)
                                    
@@ -405,4 +410,5 @@ def workflow(request,workflow='default'):
                                'subjects_form':subject_form,
                                'title_form':title_form,
                                'form':upload_thesis_form,
+                               'website': website_view,
                                'workflow':workflow})

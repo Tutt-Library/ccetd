@@ -11,8 +11,8 @@
 {% block navbar %}
  <div class="row-fluid">
   {% if website %}
-  <div class="span12">
-   <iframe src="/apps/website-header" class="website" scrolling="no"></iframe>
+  <div class="span12 offset1">
+   <iframe src="/apps/website-header" class="website-header" scrolling="no"></iframe>
   </div>
   {% else %}
    {% include 'snippets/navigation-action-bar.html' %}
@@ -31,9 +31,9 @@
 {% endblock %}
 
 {% block body %}
-<div class="row-fluid">
- <div class="span8 offset1">
-  <ul class="breadcrumb">
+<div class="row-fluid" >
+ <div class="span8 offset1" style=" margin-top: 0px">
+  <ul class="breadcrumb" >
    <li><a href="http://www.coloradocollege.edu/library">{% trans "Library Home" %}</a>&nbsp;&raquo;</li>
    <li><a href="/etd">{% trans "ETD" %}</a>&nbsp;&raquo;</li>
   {% if workflow %}
@@ -105,7 +105,7 @@
     <li><a 
         {% if not user.is_authenticated %}href="/accounts/login?next=/apps/etd/{{ workflow.0 }}"
         {% else %} 
-        href="/apps/etd/{{ workflow.0 }}"
+        href="{{ request.get_full_path }}{{ workflow.0 }}"
         {% endif %}>{{ workflow.1|get_department_name }}</a>
      </li>
    {% endfor %}
@@ -120,8 +120,8 @@
 {% block footer %}
 <div class="row-fluid">
   {% if website %}
-  <div class="span12">
-   <iframe src="/apps/website-footer" class="website" scrolling="no"></iframe>
+  <div class="span12 offset1">
+   <iframe src="/apps/website-footer" class="website-footer" scrolling="no"></iframe>
   </div>
   {% else %}
    {% include  'snippets/footer-action-bar.html' %}

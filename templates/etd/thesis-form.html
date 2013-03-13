@@ -1,8 +1,8 @@
 {% comment %}START Row DIV{% endcomment %}
-<div class="row">
+<div class="row-fluid">
 <form method="POST" action="/etd/{{ workflow }}/upload" enctype="multipart/form-data" class="form-horizontal">
 {% csrf_token %}
- <div class="span6">
+ <div class="span8">
   {% comment %}START accordion DIV{% endcomment %}
   <div class="accordion" id="thesis-accordion">
     {% include 'thesis-author-grp.html' %}
@@ -17,11 +17,11 @@
    {# START submit button div #}
     <div class="accordion-group">
      <div class="accordion-heading">
-        <a class="accordion-toggle"
+        <a class="accordion-toggle form-step-label"
            data-toggle="collapse"
            data-parent="#thesis-accordion"
            href="#thesis-submit-grp-body" 
-           style="color:gray;">Final Step: Submit Thesis</a></h3>
+           >Final Step: Submit Thesis</a></h3>
      <div class="accordion-body collapse" id="thesis-submit-grp-body">
       <div class="accordion-inner">
          Please review before submitting your thesis:<br/> 

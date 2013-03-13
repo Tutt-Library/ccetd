@@ -5,7 +5,7 @@
   <a href="#thesis-honor-grp-body" 
      data-toggle="collapse"
      data-parent="#thesis-accordion"
-     style="color:gray;">Step {% if has_dataset %}4{% else %}3{% endif %}: Honor Code and Submission Agreements
+     class="accordion-toggle form-step-label">Step {% if has_dataset %}4{% else %}3{% endif %}: Honor Code and Submission Agreements
         {% if form.submission_agreement.errors or form.honor_code.errors %}
         <span class="error">Error(s), please fix</span>
         {% endif %}
@@ -14,7 +14,8 @@
  </div>
  {# START Honor-code and Submission Body DIV #}
  <div class="accordion-body collapse" id="thesis-honor-grp-body">
-  <div class="accordion-inner">
+ {# START accordion-inner DIV #}
+  <div class="accordion-inner" style="background-color: white">
     <h3 class="chk_box">Honor Code</h3>
         {# START honor-code div #}
         <div id="honor-code">
@@ -46,8 +47,10 @@
            publically available to a larger community of scholars.  Only {{ default.institution }} faculty will be able 
            to access the full-text of my thesis.   
            </p>
-        {% endcomment %}
+       {% endcomment %}
+       {# END agreement DIV #}
         </div>
+   {# END accordion-inner DIV #}
    </div>
  {# END Honor-code and Submission Body DIV #}
  </div>

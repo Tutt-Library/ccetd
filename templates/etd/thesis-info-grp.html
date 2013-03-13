@@ -5,7 +5,7 @@
   <a href="#thesis-info-grp-body" 
      data-toggle="collapse"
      data-parent="#thesis-accordion"
-     style="color:gray;">Step 2: Upload Thesis and Enter Information
+     class="accordion-toggle form-step-label">Step 2: Upload Thesis and Enter Information
         {% if form.thesis_file.errors or form.title.errors %}
         <span class="error">Errors(s), please fix</span>
         {% endif %}
@@ -14,7 +14,8 @@
  </div>
  {# START Thesis Info Body DIV #}
  <div class="accordion-body collapse" id="thesis-info-grp-body">
-   <div class="accordion-inner">
+   {# START Thesis Info Inner Body #}
+   <div class="accordion-inner" style="background-color: white" >
      <label>
        <b>Thesis*</b> (<i>Browse to attach thesis</i>):</label>
        <p>Before uploading, make sure your thesis is saved as a PDF/A.</p>
@@ -47,6 +48,8 @@
        {{ subjects_form.keyword_1 }}{{ subjects_form.keyword_2 }}{{ subjects_form.keyword_3 }}
        </span>
        <a href="#" onclick="AddKeywords();" id="more-a">+ More</a>
+   {# END Thesis Info Inner Body #}
+   </div>
  {# END Thesis Info Body DIV #}
  </div>
 {# END Thesis Info Group DIV #}
