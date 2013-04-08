@@ -291,7 +291,7 @@ def upload(request, workflow=None):
             thesis_obj.media.content = request.FILES['media-media_file']
             thesis_obj.media.label = 'Media for {0}'.format(thesis_obj.mods.content.title)
         thesis_obj.dc.content.title = thesis_obj.mods.content.title
-        thesis_obj.label = '{0} '.format(thesis_obj.mods.content.title)
+        thesis_obj.label = thesis_obj.mods.content.title
         thesis_obj.save()
         restrictions = {}
         if not dataset_form.is_empty():
