@@ -12,10 +12,11 @@ function AddKeywords()
 
   for(i=0;i<=2;i++)
   {
+
      var input = document.createElement('input');
      input.type = 'text';
      input.size = 20;
-     input.name = "keyword_" + (name_seed+i);
+     input.name = "subject-keyword_" + (name_seed+i);
      span_kw.appendChild(input);
   }
  }

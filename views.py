@@ -225,7 +225,7 @@ def upload(request,workflow=None):
                            prefix='media')
     form_list.append(media_form)
     subjects_form = SubjectsForm(request.POST,
-                                prefix='subject')
+                                 prefix='subject')
     form_list.append(subjects_form)
     title_form = ThesisTitleForm(request.POST,
                                  prefix='title')
@@ -249,6 +249,13 @@ def upload(request,workflow=None):
         subjects = subjects_form.save()
         for subject_keyword in subjects:
             mods_xml.subjects.append(subject_keyword)
+        # Now checks and adds additional subject form keywords
+        for i in range(4, 10):
+            subject_name = "subject-keyword_{0}".format(i)
+            if request.POST.has_key(subject_name):
+                topic = request.POST.get(subject_name)
+                if len(topic) > 1:
+                    mods_xml.subjects.append(mods.Subject(topic=topic))
         mods_xml.title = title_form.save()
         # Generate workflow constant metadata 
         year_result = re.search(r'(\d+)',
@@ -266,8 +273,8 @@ def upload(request,workflow=None):
             for code in language_codes:
                 mods_xml.languages.append(mods.Language(terms=[mods.LanguageTerm(text=code),]))
         else:
-            # Sets a default language for the thesis of 'eng' for English
-            mods_xml.languages.append(mods.Language(terms=[mods.LanguageTerm(text='eng'),]))
+            # Sets a default language for the thesis as English
+            mods_xml.languages.append(mods.Language(terms=[mods.LanguageTerm(text='English'),]))
         # Connect and save to Fedora repository
         repo = Repository()
         thesis_obj = repo.get_object(type=ThesisDatasetObject)
@@ -281,7 +288,7 @@ def upload(request,workflow=None):
             thesis_obj.media.content = request.FILES['media-media_file']
             thesis_obj.media.label = 'Media for {0}'.format(thesis_obj.mods.content.title)
         thesis_obj.dc.content.title = thesis_obj.mods.content.title
-        thesis_obj.label = '{0} '.format(thesis_obj.mods.content.title)
+        thesis_obj.label = thesis_obj.mods.content.title
         thesis_obj.save()
         restrictions = {}
         if not dataset_form.is_empty():
