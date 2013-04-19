@@ -462,7 +462,7 @@ class UploadThesisForm(forms.Form):
                                            text="Colorado College Honor Code upheld."))
         if self.cleaned_data.has_key('languages'):
             for code in self.cleaned_data.get('languages'):
-                obj_mods.languages.append(mods.Language(terms=[LanguageTerm(text=code),]))
+                obj_mods.languages.append(mods.Language(terms=[LanguageTerm(text=code.title()),]))
         if workflow:
       
             if workflow.has_option('FORM','genre'):
