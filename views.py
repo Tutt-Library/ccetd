@@ -19,11 +19,8 @@
 
 __author__ = 'Jeremy Nelson'
 
-import os
-import ConfigParser
-import logging
-import aristotle.settings as settings
-from aristotle.settings import INSTITUTION
+import os,ConfigParser,logging
+import settings
 import mimetypes
 from lxml import etree
 from eulfedora.server import Repository
@@ -31,8 +28,8 @@ from etd.conf import *
 from etd.forms import *
 #import islandoraUtils.xacml.tools as islandora_xacml
 #import islandoraUtils.metadata.fedora_relationships as islandora_rels_ext
+from datasets.forms import ThesisDatasetForm
 from etd.models import ThesisDatasetObject
-from app_settings import APP
 from operator import itemgetter
 from django import forms
 from django.core.mail import send_mail
@@ -41,7 +38,9 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse,Http404,HttpResponseRedirect
 from django.template import Context,Library,Template,loader,RequestContext
 from eulxml.xmlmap import load_xmlobject_from_string,mods
+from vendors.iii.bots.iiibots import PatronBot
 
+logger = logging.getLogger(__name__)
 
 # Sets workflows dict
 workflows = dict()
@@ -94,16 +93,9 @@ def default(request):
     Displays home-page of Django ETD app along with a list of active
     workflows.
     """
-    if request.get_full_path().startswith('/etd/'):
-        website_view = True
-    else:
-        website_view = False
     return direct_to_template(request,
                               'etd/default.html',
-                              {'active':sorted(workflows.items()),
-                               'app': APP,
-                               'institution': INSTITUTION,
-                               'website':website_view})
+                              {'active':sorted(workflows.items())})
 
 def success(request):
     """
@@ -201,7 +193,7 @@ def save_xacml_policy(repository,
                                  content=xacml.getXmlString())
 
 
-def upload(request, workflow=None):
+def upload(request,workflow=None):
     """
     Creates MODS and other metadata along with the file uploads to Fedora.
 
@@ -235,7 +227,7 @@ def upload(request, workflow=None):
                            prefix='media')
     form_list.append(media_form)
     subjects_form = SubjectsForm(request.POST,
-                                prefix='subject')
+                                 prefix='subject')
     form_list.append(subjects_form)
     title_form = ThesisTitleForm(request.POST,
                                  prefix='title')
@@ -259,6 +251,17 @@ def upload(request, workflow=None):
         subjects = subjects_form.save()
         for subject_keyword in subjects:
             mods_xml.subjects.append(subject_keyword)
+        # Now checks and adds additional subject form keywords
+        for i in range(4, 10):
+            subject_name = "subject-keyword_{0}".format(i)
+            alt_name = "keyword_{0}".format(i)
+            topic = ''
+            if request.POST.has_key(subject_name):
+                topic = request.POST.get(subject_name)
+            elif request.POST.has_key(alt_name):
+                topic = request.POST.get(alt_name)
+            if topic is not None and len(topic) > 1:
+                mods_xml.subjects.append(mods.Subject(topic=topic))
         mods_xml.title = title_form.save()
         # Generate workflow constant metadata 
         year_result = re.search(r'(\d+)',
@@ -276,8 +279,8 @@ def upload(request, workflow=None):
             for code in language_codes:
                 mods_xml.languages.append(mods.Language(terms=[mods.LanguageTerm(text=code),]))
         else:
-            # Sets a default language for the thesis of 'eng' for English
-            mods_xml.languages.append(mods.Language(terms=[mods.LanguageTerm(text='eng'),]))
+            # Sets a default language for the thesis as English
+            mods_xml.languages.append(mods.Language(terms=[mods.LanguageTerm(text='English'),]))
         # Connect and save to Fedora repository
         repo = Repository()
         thesis_obj = repo.get_object(type=ThesisDatasetObject)
@@ -291,7 +294,7 @@ def upload(request, workflow=None):
             thesis_obj.media.content = request.FILES['media-media_file']
             thesis_obj.media.label = 'Media for {0}'.format(thesis_obj.mods.content.title)
         thesis_obj.dc.content.title = thesis_obj.mods.content.title
-        thesis_obj.label = '{0} '.format(thesis_obj.mods.content.title)
+        thesis_obj.label = thesis_obj.mods.content.title
         thesis_obj.save()
         restrictions = {}
         if not dataset_form.is_empty():
@@ -355,14 +358,11 @@ def workflow(request,workflow='default'):
     :param workflow: Specific workflow for individual departments, blank value 
                      displays default view.
     """
-    if request.get_full_path().startswith('/etd/'):
-        website_view = True
-    else:
-        website_view = False
-
     if not request.user.is_authenticated():
-         return HttpResponseRedirect("/accounts/login?next=%s" % request.path)
+         return HttpResponseRedirect("/vendors/iii/patron_login?next=%s" % request.path)
                                    
+    if request.method == 'POST':
+        logging.error("IN WORKFLOW POST")
     if workflow is None:
         workflow = 'default'
     if workflows.has_key(workflow):
@@ -396,10 +396,8 @@ def workflow(request,workflow='default'):
                                                                            required=False,
                                                                            choices=custom.items('LANGUAGE'))
     return direct_to_template(request,
-                              'etd/{0}'.format(template_name),
-                              {'app': APP,
-                               'institution': INSTITUTION,
-                               'default':default,
+                              'etd/%s' % template_name,
+                              {'default':default,
                                'about_form':about_form,
                                'advisor_form':advisor_form,
                                'begin_alert':custom.has_option('FORM','begin_alert'),
@@ -410,5 +408,4 @@ def workflow(request,workflow='default'):
                                'subjects_form':subject_form,
                                'title_form':title_form,
                                'form':upload_thesis_form,
-                               'website': website_view,
                                'workflow':workflow})
