@@ -22,7 +22,8 @@ __author__ = 'Jeremy Nelson'
 from django.db import models
 from eulfedora.models import DigitalObject,FileDatastream,XmlDatastream,FileDatastreamObject
 from eulxml.xmlmap import mods
-import settings
+import aristotle.settings as settings
+import app_settings
 
 
 class ThesisDatasetObject(DigitalObject):
@@ -30,7 +31,7 @@ class ThesisDatasetObject(DigitalObject):
     `ThesisObject` models the Electronic Thesis and Dataset datastreams
      and assocated MODS Xml datastream for ingestion into a Fedora Repository.
     """
-    ETD_CONTENT_MODEL = 'info:fedora/%s' % settings.FEDORA_ETDCMODEL
+    ETD_CONTENT_MODEL = 'info:fedora/{0}'.format(app_settings.FEDORA_ETDCMODEL)
     CONTENT_MODELS = [ ETD_CONTENT_MODEL ]
     mods = XmlDatastream("MODS",
                          "MODS XML datastream",

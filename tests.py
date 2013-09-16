@@ -21,8 +21,8 @@ import os,logging
 import unittest
 from eulfedora.server import Repository
 from eulxml.xmlmap import mods
-from etd.models import ThesisDatasetObject
-from settings import FEDORA_ROOT, FEDORA_USER, FEDORA_PASSWORD, FEDORA_PIDSPACE
+from ccetd.models import ThesisDatasetObject
+from aristotle.settings import FEDORA_ROOT, FEDORA_USER, FEDORA_PASSWORD, FEDORA_PIDSPACE
 
 FIXTURE_ROOT =  os.path.join(os.path.dirname(__file__),'fixures')
 

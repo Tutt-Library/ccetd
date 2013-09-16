@@ -3,15 +3,15 @@
  {# START Thesis Dataset heading DIV #}
  <div class="accordion-heading"> 
    <a href="#thesis-dataset-grp-body"
-      class="accordion-toggle"
+     class="accordion-toggle form-step-label"
      data-toggle="collapse"
      data-parent="#thesis-accordion"
-      style="color:gray;">Step 3 (Optional): Upload Dataset and Enter Information</a>
+      >Step 3 (Optional): Upload Dataset and Enter Information</a>
  {# END Thesis Dataset heading DIV #}
  </div>
  {# START Thesis Dataset body DIV #}
  <div class="accordion-body collapse" id="thesis-dataset-grp-body">
-  <div class="accordion-inner"> 
+  <div class="accordion-inner" style="background-color: white"> 
       <label><b>{{ dataset_form.dataset_file.label  }}</b> (<i>browse to attach</i>):</label>
       {{ dataset_form.dataset_file  }}
 	  <br/>

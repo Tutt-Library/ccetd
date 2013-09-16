@@ -19,31 +19,35 @@
 
 __author__ = 'Jeremy Nelson'
 
-import os,ConfigParser,logging
-import settings,mimetypes
+import os
+import ConfigParser
+import logging
+import aristotle.settings as settings
+from aristotle.settings import INSTITUTION
+import mimetypes
 from lxml import etree
 from eulfedora.server import Repository
-from etd.conf import *
-from etd.forms import *
+from ccetd.conf import *
+from ccetd.forms import *
 #import islandoraUtils.xacml.tools as islandora_xacml
 #import islandoraUtils.metadata.fedora_relationships as islandora_rels_ext
-from datasets.forms import ThesisDatasetForm
-from etd.models import ThesisDatasetObject
+from ccetd.models import ThesisDatasetObject
+from app_settings import APP
 from operator import itemgetter
 from django import forms
 from django.core.mail import send_mail
-from django.views.generic.simple import direct_to_template
+from django.shortcuts import render as direct_to_template # quick hack to get running under django 1.5
+from django.shortcuts import render
 from django.shortcuts import render_to_response
 from django.http import HttpResponse,Http404,HttpResponseRedirect
 from django.template import Context,Library,Template,loader,RequestContext
 from eulxml.xmlmap import load_xmlobject_from_string,mods
-from vendors.iii.bots.iiibots import PatronBot
 
 
 # Sets workflows dict
 workflows = dict()
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-workflow_dir = os.path.join(root,'etd/workflows')
+workflow_dir = os.path.join(root,'ccetd/workflows')
 for filename in os.listdir(workflow_dir):
     fileinfo = os.path.splitext(filename)
     if fileinfo[1] == '.ini':
@@ -91,9 +95,16 @@ def default(request):
     Displays home-page of Django ETD app along with a list of active
     workflows.
     """
+    if request.get_full_path().startswith('/etd/'):
+        website_view = True
+    else:
+        website_view = False
     return direct_to_template(request,
                               'etd/default.html',
-                              {'active':sorted(workflows.items())})
+                              {'active':sorted(workflows.items()),
+                               'app': APP,
+                               'institution': INSTITUTION,
+                               'website':website_view})
 
 def success(request):
     """
@@ -191,7 +202,7 @@ def save_xacml_policy(repository,
                                  content=xacml.getXmlString())
 
 
-def upload(request,workflow=None):
+def upload(request, workflow=None):
     """
     Creates MODS and other metadata along with the file uploads to Fedora.
 
@@ -352,11 +363,14 @@ def workflow(request,workflow='default'):
     :param workflow: Specific workflow for individual departments, blank value 
                      displays default view.
     """
+    if request.get_full_path().startswith('/etd/'):
+        website_view = True
+    else:
+        website_view = False
+
     if not request.user.is_authenticated():
-         return HttpResponseRedirect("/vendors/iii/patron_login?next=%s" % request.path)
+         return HttpResponseRedirect("/accounts/login?next=%s" % request.path)
                                    
-    if request.method == 'POST':
-        logging.error("IN WORKFLOW POST")
     if workflow is None:
         workflow = 'default'
     if workflows.has_key(workflow):
@@ -390,8 +404,10 @@ def workflow(request,workflow='default'):
                                                                            required=False,
                                                                            choices=custom.items('LANGUAGE'))
     return direct_to_template(request,
-                              'etd/%s' % template_name,
-                              {'default':default,
+                              'etd/{0}'.format(template_name),
+                              {'app': APP,
+                               'institution': INSTITUTION,
+                               'default':default,
                                'about_form':about_form,
                                'advisor_form':advisor_form,
                                'begin_alert':custom.has_option('FORM','begin_alert'),
@@ -402,4 +418,5 @@ def workflow(request,workflow='default'):
                                'subjects_form':subject_form,
                                'title_form':title_form,
                                'form':upload_thesis_form,
+                               'website': website_view,
                                'workflow':workflow})

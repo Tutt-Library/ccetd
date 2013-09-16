@@ -1,11 +1,12 @@
-{% comment %}START Thesis Author DIV{% endcomment %}
+{# START Thesis Author DIV #}
 <div class="accordion-group">
- {% comment %}START Thesis Author Heading DIV{% endcomment %}
+ {# START Thesis Author Heading DIV #}
  <div class="accordion-heading">
+  
   <a href="#thesis-author-grp-body" 
      data-toggle="collapse"
      data-parent="#thesis-accordion"
-     style="color:gray;">Step 1: Enter Author Information
+     class="accordion-toggle form-step-label">Step 1: Enter Author Information
         {% if creator_given.errors or creator_family.errors or form.email.errors %}
         <span class="error">Error(s), please fix</span>
         {% endif %}
@@ -15,7 +16,7 @@
  {% comment %}START Thesis Author body DIV{% endcomment %}
  <div class="accordion-body collapse in" id="thesis-author-grp-body">
   {% comment %}END Thesis Author body inner DIV{% endcomment %}
-  <div class="accordion-inner">
+  <div class="accordion-inner" style="background-color: white">
    <p>
      Please fill out any required fields that are marked with an *.
    </p>
@@ -77,6 +78,5 @@
   </div>
  {% comment %}END Thesis Author body DIV{% endcomment %}
  </div>
-{% comment %}END Thesis Author DIV{% endcomment %}
+{# END Thesis Author DIV #}
 </div>
-<div 

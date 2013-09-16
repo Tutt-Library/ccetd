@@ -1,28 +1,50 @@
-{% extends 'cc-bootstrap-base.html' %}
+{% extends 'app-base.html' %}
 {% load etd_extras %}
 {% load i18n %}
 
 {% block head-title %}{% trans "Electronic Thesis Submission for Colorado College" %}{% endblock %}
 {% block more-css %}
- <link href="{{ STATIC_URL }}jquery-ui-1.8.13.custom.css" rel="stylesheet" />
- <link href="{{ STATIC_URL }}bootstrap.min.css" rel="stylesheet" />
- <link href="{{ STATIC_URL }}thesis.css" rel="stylesheet" />
-
+ <link href="{{ STATIC_URL }}css/thesis.css" rel="stylesheet" />
+ 
 {% endblock %}
 
-{% block library-breadcrumb %}
- <div id="breadcrumb">
-  <div class="stage"><a href="http://www.coloradocollege.edu/library">{% trans "Library Home" %}</a>&nbsp;&raquo;&nbsp;<a href="/etd">{% trans "ETD" %}</a>&nbsp;&raquo;&nbsp;
-  {% if workflow %}
-   <a href="#" class="on">{{ config|get_department_name }}</a>
+{% block navbar %}
+ <div class="row-fluid">
+  {% if website %}
+  <div class="span12 offset1">
+   <iframe src="/apps/website-header" class="website-header" scrolling="no"></iframe>
+  </div>
+  {% else %}
+   {% include 'snippets/navigation-action-bar.html' %}
   {% endif %}
-   </div>
  </div>
 {% endblock %}
 
-{% block container %}
-<div class="row">
-  {% comment %}START left-column DIV{% endcomment %}
+{% block action-view-subtitle %}
+{% if workflow %}
+{{ config|get_department_name }} 
+{% endif %}
+{% endblock %}
+
+
+{% block library-breadcrumb %}
+{% endblock %}
+
+{% block body %}
+<div class="row-fluid" >
+ <div class="span8 offset1" style=" margin-top: 0px">
+  <ul class="breadcrumb" >
+   <li><a href="http://www.coloradocollege.edu/library">{% trans "Library Home" %}</a>&nbsp;&raquo;</li>
+   <li><a href="/etd">{% trans "ETD" %}</a>&nbsp;&raquo;</li>
+  {% if workflow %}
+   <li class="active"><a href="#" >{{ config|get_department_name }}</a></li>
+  {% endif %}
+  </ul>
+ </div>
+</div>
+
+<div class="row-fluid">
+  {# START left-column DIV #}
   <div class="span3 offset1">
 {% if workflow %}
    <div class="help_steps">
@@ -32,7 +54,7 @@
         <li>Make sure you have the FINAL version of your thesis</li>
         <li>Make sure your thesis is saved as a PDF/A. This is an "archival" version 
             of PDF.  For instructions, please see this 
-           <a href="{{ STATIC_URL}}pdfaInstructions.pdf" target="pdfa">document</a></li>
+           <a href="{{ STATIC_URL}}pdf/pdfaInstructions.pdf" target="pdfa">document</a></li>
      
       </ul>
     <p>Then proceed to the electronic thesis submission form:</p>
@@ -57,21 +79,18 @@
    </div>
 {% endif %}
   <aside class="aside">
-  <div id="contact-lib-detail" style="background-color: #2D4873">
-   <div id="contact-library">
+   <div>
     <h5><strong>Questions? Need Help?</strong></h5>
     <p>Contact <a href="mailto:llister@coloradocollege.edu">Lisa Lister</a>,
     Digital Archives manager, at 389-6242 or your 
-    <a href="#">Library Liaison</a>. You can also contact the 
+    <a href="">Library Liaison</a>. You can also contact the 
     Tutt Library Reference Desk at 389-6662.</p>
-   </div>
   </div>
   </aside>
-
    {% comment %}END left-column DIV{% endcomment %}
   </div>
   {% comment %}START main-column DIV{% endcomment %}
-  <div class="span8 main">
+  <div class="span8 well">
  {% if workflow %}
     <h1>{{ config|get_department_name }} Thesis Submission</h1>
    {% include 'thesis-form.html' %}
@@ -83,7 +102,12 @@
       web forms are available below:</p>
    <ul>
    {% for workflow in active %}
-    <li><a href="/etd/{{ workflow.0 }}">{{ workflow.1|get_department_name }}</a></li>
+    <li><a 
+        {% if not user.is_authenticated %}href="/accounts/login?next=/apps/etd/{{ workflow.0 }}"
+        {% else %} 
+        href="{{ request.get_full_path }}{{ workflow.0 }}"
+        {% endif %}>{{ workflow.1|get_department_name }}</a>
+     </li>
    {% endfor %}
    </ul>
  {% endif %}
@@ -93,25 +117,26 @@
 </div>
 {% endblock %}
 
+{% block footer %}
+<div class="row-fluid">
+  {% if website %}
+  <div class="span12 offset1">
+   <iframe src="/apps/website-footer" class="website-footer" scrolling="no"></iframe>
+  </div>
+  {% else %}
+   {% include  'snippets/footer-action-bar.html' %}
+  {% endif %}
+{% endblock %} 
 
 {% block more-scripts %}
 <script src="{{ STATIC_URL }}js/jquery.js"></script>
-<script src="{{ STATIC_URL }}js/jquery.ui.core.js"></script>
-<script src="{{ STATIC_URL }}js/jquery.ui.widget.js"></script>
-<script src="{{ STATIC_URL }}js/jquery.ui.accordion.js"></script>
 <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 <script src="{{ STATIC_URL }}thesis.js"></script>
 <script>
  $(function() {
-   $("#accordion" ).accordion();
   {% if begin_alert %}
     $('#begin_alert').modal('show');    
   {% endif %}
   });
 </script>
-{% endblock %}
-{% block dialogs %}
-{% if begin_alert %}
- {% include "begin-alert.html" %}
-{% endif %}
 {% endblock %}
