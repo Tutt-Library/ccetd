@@ -1,56 +1,92 @@
 {# START Thesis Info Group DIV #}
-<div class="accordion-group">
- {# START Thesis Info Heading DIV #}
- <div class="accordion-heading">
-  <a href="#thesis-info-grp-body" 
-     data-toggle="collapse"
-     data-parent="#thesis-accordion"
-     class="accordion-toggle form-step-label">Step 2: Upload Thesis and Enter Information
+<div data-bind="visible: showUploadThesis">
+ <h3 class="form-step-label">
+   Step 2: Upload Thesis and Enter Information
         {% if form.thesis_file.errors or form.title.errors %}
         <span class="error">Errors(s), please fix</span>
         {% endif %}
-        </a>
- {# END Thesis Info Heading DIV #}
- </div>
- {# START Thesis Info Body DIV #}
- <div class="accordion-body collapse" id="thesis-info-grp-body">
-   {# START Thesis Info Inner Body #}
-   <div class="accordion-inner" style="background-color: white" >
-     <label>
-       <b>Thesis*</b> (<i>Browse to attach thesis</i>):</label>
-       <p>Before uploading, make sure your thesis is saved as a PDF/A.</p>
-      {{ form.thesis_file }}
+ </h3>
+ <div class="form-group">
+   <label for="id_thesis_file" class="col-lg-3 control-label">
+     <b>Thesis*</b> (<i>Browse to attach thesis</i>):
+   </label>
+   <div class="col-lg-3">
+     {{ form.thesis_file }}
       {{ form.thesis_file.errors }}<br/>
-      <label for="id-title">
-      {{ title_form.title.label }}*
-      </label><br/>
+   </div>
+ </div>
+ <div class="form-group">
+  <label for="id-title" class="col-lg-3 control-label">
+   {{ title_form.title.label }}*
+  </label>
+  <div class="col-lg-5">
       {{ title_form.title }}
       {{ title_form.title.errors }}
-      <br/>
-      <fieldset>
-      <legend for="id-extent">About your thesis:</legend>
-      <ul>
-      <li>Last page number: {{ about_form.page_numbers }}</li>
-      <li>Contains illustrations and/or graphics: {{ about_form.has_illustrations }} {{ about_form.has_illustrations.label}}</li>
-      <li>Contains maps: {{ about_form.has_maps }}{{ about_form.has_maps.label }}</li>
-      {% if form.languages %}
-      <li>{{ form.languages.errors }}<br/>
-      {{ form.languages.label }}*:<br/> {{ form.languages }}</li>
-      {% endif %} 
-      </ul>
-     </fieldset>
-     <br/>
-	   <label for='id-abstract'>{{ form.abstract.label }}:</label><br/>
-       {{ form.abstract }}
-       <br/>
-       <label for="id-subjects">Tags or Keywords</label><br/>
-       <span id="span-keywords">
-       {{ subjects_form.keyword_1 }}{{ subjects_form.keyword_2 }}{{ subjects_form.keyword_3 }}
-       </span>
-       <a href="#" onclick="AddKeywords();" id="more-a">+ More</a>
-   {# END Thesis Info Inner Body #}
-   </div>
- {# END Thesis Info Body DIV #}
+  </div>
  </div>
+ <div class="form-group">
+   <label for="id_about-page_numbers" 
+          class="col-lg-3 control-label">Last page number:</label>
+   <div class="col-lg-2"> 
+    {{ about_form.page_numbers }}
+   </div>
+ </div>
+ <div class="form-group">
+  <label for="id_about-has_illustrations"
+         class="col-lg-3 control-label">
+      Contains illustrations and/or graphics:
+  </label> 
+  <div class="col-lg-2">
+   <div class="checkbox">
+    <label>
+    {{ about_form.has_illustrations }}  {{ about_form.has_illustrations.label }}  
+    </label>
+   </div>
+  </div>
+ </div>
+ <div class="form-group">
+  <label for="id_about-has_maps"
+         class="control-label col-lg-3">Contains maps:</label>
+
+  <div class="col-lg-2">
+   <div class="checkbox">
+    {{ about_form.has_maps }}{{ about_form.has_maps.label }}
+   </div>
+  </div>
+</div>
+{% if form.languages %}
+<div class="form-group">
+ <label for="id-languages"
+        class="col-lg-3 control-label">
+ {{ form.languages.label }}*:
+ </label>
+ <div class="col-lg-3">
+   {{ form.languages }}
+ </div>
+</div>
+{% endif %} 
+<div class="form-group">
+ <label for='id-abstract'
+        class="col-lg-3 control-label">
+  {{ form.abstract.label }}:
+ </label>
+ <div class="col-lg-4">
+  {{ form.abstract }}
+ </div>
+</div>
+<div class="form-group">
+  <label for="id-subjects"
+         class="col-lg-3 control-label">
+   Tags or Keywords</label>>
+  <div class="col-lg-6">
+   {{ subjects_form.keyword_1 }}{{ subjects_form.keyword_2 }}{{ subjects_form.keyword_3 }}
+   <a href="#" onclick="AddKeywords();" id="more-a">+ More</a>
+  </div>
+</div>
+<div class="form-group">
+  <div class="col-lg-4 col-lg-offset-2">
+   <a href="#" data-bind="click: validateSaveThesis" class="btn btn-primary btn-lg">Save and Continue</a>
+  </div>
+</div>
 {# END Thesis Info Group DIV #}
 </div>

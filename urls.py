@@ -20,7 +20,7 @@ __author__ = 'Jeremy Nelson'
 import ccetd.views
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('etd.views',
+urlpatterns = patterns('ccetd.views',
     (r'^$','default'),
     (r'success$','success'),
     (r'(?P<workflow>.*)/upload','upload'),

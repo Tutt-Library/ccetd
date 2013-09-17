@@ -1,13 +1,29 @@
 {% comment %}START Row DIV{% endcomment %}
-<div class="row-fluid">
-<form method="POST" action="/etd/{{ workflow }}/upload" enctype="multipart/form-data" class="form-horizontal">
+<form method="POST" role="form" {# action="/etd/{{ workflow }}/upload" #} 
+     enctype="multipart/form-data" 
+     class="form-horizontal">
 {% csrf_token %}
- <div class="span8">
-  {% comment %}START accordion DIV{% endcomment %}
-  <div class="accordion" id="thesis-accordion">
-    {% include 'thesis-author-grp.html' %}
-    {% include 'thesis-info-grp.html' %}
-   {% if has_dataset %}
+{# START Progress Row #}
+<div class="row">
+ <div class="col-sm-8 col-md-8">
+   <h4>Your progress:</h4>
+   <div class="progress">   
+     <div class="progress-bar progress-bar-info"
+          role="progressbar"
+          aria-valuenow="0"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          style="width: 0%">
+       <span class="sr-only">0% Complete</span>
+     </div> 
+   </div>
+ </div>
+{# END Progress Row #}
+</div>
+<div class="row">
+  {% include 'thesis-author-grp.html' %}
+  {% include 'thesis-info-grp.html' %}
+ {% if has_dataset %}
     {% include 'thesis-dataset-grp.html' %}
    {% endif %}
    {% if has_media %}

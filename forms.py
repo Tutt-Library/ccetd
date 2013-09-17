@@ -44,14 +44,18 @@ class AdvisorForm(forms.Form):
     """AdvisorForm associates form fields with its MODS name and supporting
        XML elements.
     """
-    advisors = AdvisorsField(label='Advisors',
-                             required=False)
+    advisors = AdvisorsField(label='Thesis Advisors',
+                             required=False,
+                             widget=forms.SelectMultiple(
+                                 {'class': 'form-control'}))
     freeform_advisor = forms.CharField(max_length=50,
                                        label='Other faculty not listed above',
                                        required=False,
-                                       help_text='Please enter last name, first name of advisor')
+                                       help_text='Please enter last name, first name of advisor',
+                                       widget=forms.TextInput(
+                                           {'class': 'form-control'}))
     freeform_2nd_advisor = forms.CharField(max_length=50,
-                                           label='Second Advisor',
+                                           label='Second Thesis Advisor',
                                            required=False,
                                            help_text='Please enter last name, first name of advisor')
 
@@ -121,14 +125,23 @@ class CreatorForm(forms.Form):
     """
     family = forms.CharField(max_length=50,
                              label='Last name',
-                             help_text='Creator of thesis family or last name')
+                             help_text='Creator of thesis family or last name',
+                             widget=forms.TextInput(
+                                attrs={'class': 'form-control',
+                                       'data-bind': 'value: familyValue'}))
     given = forms.CharField(max_length=50,
                             label='First name',
-                            help_text='Creator of thesis given or first name')
+                            help_text='Creator of thesis given or first name',
+                            widget=forms.TextInput(
+                                attrs={'class': 'form-control',
+                                       'data-bind': 'value: givenValue'}))
     middle = forms.CharField(max_length=50,
                              required=False,
                              label='Middle name',
-                             help_text='Creator of thesis middle name')
+                             help_text='Creator of thesis middle name',
+                             widget=forms.TextInput(
+                                attrs={'class': 'form-control',
+                                       'data-bind': 'value: middleValue'}))
     suffix = forms.ChoiceField(required=False,
                                label='Suffix',
                                choices=[("None",""),
@@ -136,7 +149,9 @@ class CreatorForm(forms.Form):
                                         ("Sr.","Sr."),
                                         ("II","II"),
                                         ("III","III"),
-                                        ("IV","IV")])
+                                        ("IV","IV")],
+                               widget=forms.Select(
+                                   attrs={'class': 'form-control'}))
 
     def save(self):
         """
@@ -289,9 +304,13 @@ class PhysicalDescriptionForm(forms.Form):
     digital_origin = forms.CharField(label='Digital Origin',
                                      max_length=60,
                                      required=False)
-    has_illustrations = forms.BooleanField(required=False,label='Yes')
+    has_illustrations = forms.BooleanField(required=False,
+                                           label='Yes')
     has_maps = forms.BooleanField(required=False,label='Yes')
-    page_numbers = forms.IntegerField(required=False)
+    page_numbers = forms.IntegerField(required=False,
+                                      widget=forms.TextInput(
+                                          attrs={'class': 'form-control',
+                                                 'data-bind': 'value: pageNumberValue'}))
   
     def save(self):
         """Method creates a MODS physicalDescription and child elements
@@ -404,8 +423,9 @@ class ThesisTitleForm(forms.Form):
     """
     title = forms.CharField(max_length=225,
                             label='Thesis Title',
-                            widget=forms.TextInput(attrs={'class':'span5',
-                                                          'size':60}))
+                            widget=forms.TextInput(
+                                attrs={'class':'form-control',
+                                       'data-bind': 'value: titleValue'}))
 
     def save(self):
         """Save method creates a MODS titleInfo and child element from field
@@ -420,15 +440,20 @@ class UploadThesisForm(forms.Form):
     """
     abstract = forms.CharField(label='Abstract',
                                required=False,
-                               widget=forms.Textarea(attrs={'class':'span5',
+                               widget=forms.Textarea(attrs={'class':'form-control',
                                                             'cols':60,
                                                             'rows':5}))
     email = forms.EmailField(required=False,
                              label='Your Email:',
-                             widget=forms.TextInput(attrs={'class':'span4',
-                                                           'size':60}))
-    graduation_dates = GradDatesField(required=False,
-                                      label='Graduation Date')
+                             widget=forms.TextInput(
+                                 attrs={'class':'form-control',
+                                        'data-bind': 'value: emailValue',
+                                        'type': 'email'}))
+    graduation_dates = GradDatesField(required=True,
+                                      label='Graduation Date',
+                                      widget=forms.Select(
+                                          attrs={'class':'form-control',
+                                                 'data-bind': 'value: gradDateValue'}))
     #languages = forms.CharField(widget=forms.HiddenInput,
     #                            required=False)
     honor_code = forms.BooleanField(label='I agree')
@@ -440,7 +465,9 @@ class UploadThesisForm(forms.Form):
     thesis_label = forms.CharField(max_length=255,
                                    required=False,
                                    help_text='Label for thesis object, 255 characters max')
-    thesis_file = forms.FileField()
+    thesis_file = forms.FileField(
+        widget=forms.FileInput(
+            attrs={'class': 'btn btn-default'}))
   
     def clean_graduation_dates(self):
         grad_dates = self.cleaned_data['graduation_dates']

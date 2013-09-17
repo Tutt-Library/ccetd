@@ -20,3 +20,33 @@ function AddKeywords()
      span_kw.appendChild(input);
   }
  }
+
+// Thesis Knockout.js View Models
+function ThesisViewModel() {
+   var self = this;
+   // Creator 
+   self.showAuthorView = ko.observable(true);
+      self.emailValue = ko.observable();
+   self.familyValue  = ko.observable();
+   self.givenValue  = ko.observable();
+   self.gradDateValue  = ko.observable();
+   self.middleValue  = ko.observable();
+
+   // Upload Thesis
+   self.showUploadThesis = ko.observable(false);
+   self.pageNumberValue = ko.observable();
+   self.titleValue = ko.observable();
+
+   // Event Handlers for Thesis
+   self.validateSaveCreator  = function() {
+     self.showAuthorView(false);
+     self.showUploadThesis(true);
+   }
+   
+   self.validateSaveThesis = function() {
+     self.showUploadThesis(false);
+   }
+
+
+}
+

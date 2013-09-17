@@ -1,82 +1,69 @@
 {# START Thesis Author DIV #}
-<div class="accordion-group">
- {# START Thesis Author Heading DIV #}
- <div class="accordion-heading">
-  
-  <a href="#thesis-author-grp-body" 
-     data-toggle="collapse"
-     data-parent="#thesis-accordion"
-     class="accordion-toggle form-step-label">Step 1: Enter Author Information
+<div  data-bind="visible: showAuthorView">
+  <h3 class="form-step-label">Step 1: Enter Author Information
         {% if creator_given.errors or creator_family.errors or form.email.errors %}
         <span class="error">Error(s), please fix</span>
         {% endif %}
-   </a>
- {% comment %}END Thesis Author Heading DIV{% endcomment %}
- </div>
- {% comment %}START Thesis Author body DIV{% endcomment %}
- <div class="accordion-body collapse in" id="thesis-author-grp-body">
-  {% comment %}END Thesis Author body inner DIV{% endcomment %}
-  <div class="accordion-inner" style="background-color: white">
-   <p>
-     Please fill out any required fields that are marked with an *.
-   </p>
-    <fieldset>
-      <h3>Your Name:</h3>
-      <div class="control-group">
-       <label class="control-label" for="id_creator-given">{{ creator_form.given.label }}*:</label>
-       <div class="controls">
-        {{ creator_form.given }}{{ creator_form.given.errors }}
-       </div>
-      </div>
-      <div class="control-group">
-       <label class="control-label" for="id_creator-middle">{{ creator_form.middle.label }}:</label>
-       <div class="controls">
-        {{ creator_form.middle }}
-       </div>
-      </div>
-      <div class="control-group">
-      {{ creator_form.family.errors }}
-
-       <label class="control-label" for="id_creator-family">{{ creator_form.family.label }}*:</label>
-       <div class="controls">
-        {{ creator_form.family }}       </div>
-      </div>
-      <div class="control-group">
-       <label class="control-label" for="id_creator-suffix">{{ creator_form.suffix.label }}:</label>
-       <div class="controls">
+   </h3>
+  <p>
+    Please fill out any required fields that are marked with an *.
+ </p>
+  <h3>Your Name:</h3>
+  <div class="form-group">
+   <label class="control-label col-lg-2" for="id_creator-given">{{ creator_form.given.label }}*:</label>
+   <div class="col-lg-4">
+     {{ creator_form.given }}{{ creator_form.given.errors }}
+   </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-lg-2" for="id_creator-middle">{{ creator_form.middle.label }}:</label>
+    <div class="col-lg-4">
+      {{ creator_form.middle }}
+     </div>
+  </div>
+  <div class="form-group">
+     {{ creator_form.family.errors }}
+   <label class="control-label col-lg-2" for="id_creator-family">{{ creator_form.family.label }}*:</label>
+   <div class="col-lg-4">
+    {{ creator_form.family }}       
+   </div>
+  </div>
+      <div class="form-group">
+       <label class="control-label col-lg-2" for="id_creator-suffix">{{ creator_form.suffix.label }}:</label>
+       <div class="col-lg-2">
         {{ creator_form.suffix }}
        </div>
       </div>
-      </fieldset>
-      <div class="control-group">
-      {% if default.email_notices %}
-      {{ form.email.errors }}
-       <label class='control-label' for="id_thesis-email">{{ form.email.label }}</label>
-       <div class="controls">
+{% if default.email_notices %}
+ <div class="form-group">
+  {{ form.email.errors }}
+  <label class='control-label col-lg-2' for="id_thesis-email">{{ form.email.label }}</label>
+   <div class="col-lg-6">
        {{ form.email }}
-       <span class="help-block">(<i>To receive a notification e-mail when your thesis is submitted</i>)</span>
-       </div>
-      </div>
-      {% endif %}
-      <div class="control-group">
-       {{ advisor_form.advisors.errors }}
-       <label class='control-label' for='id_advisor-advisors'>{{ advisor_form.advisors.label }}</label>
-       <div class="controls">
-        {{ advisor_form.advisors }}
-        <label>{{ advisor_form.freeform_advisor.label }}</label>
-        {{ advisor_form.freeform_advisor }}
-       </div>
-      </div>
-      <div class="control-group">
-       {{ form.graduation_dates.errors }}
-       <label class='control-label' for='id_grad-date'>Graduation Date*:</label>
-       <div class="controls">
-        {{ form.graduation_dates }}
-       </div>
-     </div>
-  {% comment %}END Thesis Author body inner DIV{% endcomment %}
-  </div>
- {% comment %}END Thesis Author body DIV{% endcomment %}
+     <span class="help-block">(<i>To receive a notification e-mail when your thesis is submitted</i>)</span>
+   </div>
  </div>
+{% endif %}
+<div class="form-group">
+  {{ advisor_form.advisors.errors }}
+   <label class='control-label col-lg-2' for='id_advisor-advisors'>{{ advisor_form.advisors.label }}</label>
+   <div class="col-lg-4">
+     {{ advisor_form.advisors }}
+    <label>{{ advisor_form.freeform_advisor.label }}</label>
+        {{ advisor_form.freeform_advisor }}
+   </div>
+</div>
+<div class="form-group">
+   {{ form.graduation_dates.errors }}
+  <label class='control-label col-lg-2' for='id_grad-date'>Graduation Date*:</label>
+  <div class="col-lg-3">
+     {{ form.graduation_dates }}
+  </div>
+</div>
+<div class="form-group">
+  <div class="col-lg-3 col-lg-offset-2">
+   <a href="#" data-bind="click: validateSaveCreator" class="btn btn-primary btn-lg">Save and Continue</a>
+  </div>
+</div>
 {# END Thesis Author DIV #}
 </div>
