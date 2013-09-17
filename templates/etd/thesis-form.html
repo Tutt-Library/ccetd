@@ -9,13 +9,18 @@
    <h4>Your progress:</h4>
    <div class="progress">   
      <div class="progress-bar progress-bar-info"
+          data-bind="attr: { 'aria-valuenow': thesisProgressValue,
+                             style: thesisProgressWidth}" 
           role="progressbar"
-          aria-valuenow="0"
           aria-valuemin="0"
-          aria-valuemax="100"
-          style="width: 0%">
+          aria-valuemax="100">
+         
        <span class="sr-only">0% Complete</span>
      </div> 
+   </div>
+   <div class="alert alert-danger alert-dismissable" data-bind="visible: formError">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <strong>WARNING!</strong> You have errors in your thesis form.
    </div>
  </div>
 {# END Progress Row #}
@@ -23,37 +28,10 @@
 <div class="row">
   {% include 'thesis-author-grp.html' %}
   {% include 'thesis-info-grp.html' %}
- {% if has_dataset %}
-    {% include 'thesis-dataset-grp.html' %}
-   {% endif %}
-   {% if has_media %}
-    {% include 'thesis-media-grp.html' %}
-   {% endif %}
-   {% include 'thesis-honor-grp.html' %}
-   {# START submit button div #}
-    <div class="accordion-group">
-     {# START submit heading DIV #}
-     <div class="accordion-heading">
-        <a class="accordion-toggle form-step-label"
-           data-toggle="collapse"
-           data-parent="#thesis-accordion"
-           href="#thesis-submit-grp-body" 
-           >Final Step: Submit Thesis</a></h3>
-     {# END submit heading DIV #}
-     </div>
-
-     <div class="accordion-body collapse" id="thesis-submit-grp-body">
-      <div class="accordion-inner">
-         Please review before submitting your thesis:<br/> 
-         <input type="submit" value="Submit Thesis" />
-      </div>
-     </div>
-    {# END submit button div #} 
-    </div>
-
-  {% comment %}END accordion DIV{% endcomment %}
-  </div> 
- </div>
+  {% include 'thesis-support-grp.html' %}
+  {% include 'thesis-honor-grp.html' %}
+  {% include 'thesis-review-submit.html' %}
+</div>
 </form>
 {% comment %}END Row DIV{% endcomment %}
 </div>

@@ -47,13 +47,15 @@ class AdvisorForm(forms.Form):
     advisors = AdvisorsField(label='Thesis Advisors',
                              required=False,
                              widget=forms.SelectMultiple(
-                                 {'class': 'form-control'}))
+                                 {'class': 'form-control',
+                                  'data-bind': 'selectedOptions: advisorList'}))
     freeform_advisor = forms.CharField(max_length=50,
                                        label='Other faculty not listed above',
                                        required=False,
                                        help_text='Please enter last name, first name of advisor',
                                        widget=forms.TextInput(
-                                           {'class': 'form-control'}))
+                                           {'class': 'form-control',
+                                            'data-bind': 'value: advisorFreeFormValue'}))
     freeform_2nd_advisor = forms.CharField(max_length=50,
                                            label='Second Thesis Advisor',
                                            required=False,
@@ -151,7 +153,8 @@ class CreatorForm(forms.Form):
                                         ("III","III"),
                                         ("IV","IV")],
                                widget=forms.Select(
-                                   attrs={'class': 'form-control'}))
+                                   attrs={'class': 'form-control',
+                                          'data-bind': 'value: suffixValue'}))
 
     def save(self):
         """
@@ -456,12 +459,18 @@ class UploadThesisForm(forms.Form):
                                                  'data-bind': 'value: gradDateValue'}))
     #languages = forms.CharField(widget=forms.HiddenInput,
     #                            required=False)
-    honor_code = forms.BooleanField(label='I agree')
+    honor_code = forms.BooleanField(label='I agree',
+                                    widget=forms.CheckboxInput(
+                                                  attrs={'class':'form-control',
+                                                         'data-bind': 'checked: hasSubmissionAgreement'}))
     not_publically_available = forms.BooleanField(required=False,
                                                   label='I do not agree')
 
     submission_agreement = forms.BooleanField(required=False,
-                                              label='I agree')
+                                              label='I agree',
+                                              widget=forms.CheckboxInput(
+                                                  attrs={'class':'form-control',
+                                                         'data-bind': 'checked: hasHonorCode'}))
     thesis_label = forms.CharField(max_length=255,
                                    required=False,
                                    help_text='Label for thesis object, 255 characters max')

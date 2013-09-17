@@ -131,11 +131,6 @@
 {% block more-js %}
 <script src="{{ STATIC_URL }}js/thesis.js"></script>
 <script>
- $(function() {
-  {% if begin_alert %}
-    $('#begin_alert').modal('show');    
-  {% endif %}
-  });
  ko.applyBindings(new ThesisViewModel());
 </script>
 {% endblock %}

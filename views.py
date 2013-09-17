@@ -23,6 +23,7 @@ import os
 import ConfigParser
 import logging
 import aristotle.settings as settings
+from aristotle.views import json_view
 from aristotle.settings import INSTITUTION
 import mimetypes
 from lxml import etree
@@ -201,6 +202,12 @@ def save_xacml_policy(repository,
                                  mimeType="application/rdf+xml",
                                  content=xacml.getXmlString())
 
+
+@json_view
+def update(request):
+    "JSON View for AJAX Thesis Submission"
+    creator_form = CreatorForm(request)
+    return {'message': 'Updated Thesis'}
 
 def upload(request, workflow=None):
     """

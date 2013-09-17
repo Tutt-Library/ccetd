@@ -1,0 +1,20 @@
+<div data-bind="visible: showReviewSubmit">
+ {# START Review Panel #}
+ <div class="panel panel-primary">
+  <div class="panel-heading">
+   <h3 class="panel-title">Review Thesis Info</h3>
+  </div>
+  <div class="panel-body">
+   <dl>
+     <dt>Creator given name</dt>
+     <dd><span data-bind="value: givenValue"></span></dd>
+   </dl>
+  </div>
+ {# END Review Panel #}
+ </div>
+ <div class="form-control">
+  <div class="col-lg-4 col-lg-offset-2">
+   <a href="#" data-bind="click: submitThesis" class="btn btn-primary btn-lg">Submit Thesis to Repository</a>
+  </div>
+ </div>
+</div>

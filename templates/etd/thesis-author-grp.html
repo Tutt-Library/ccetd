@@ -1,39 +1,39 @@
 {# START Thesis Author DIV #}
-<div  data-bind="visible: showAuthorView">
-  <h3 class="form-step-label">Step 1: Enter Author Information
+<div data-bind="visible: showAuthorView">
+  <h2>Step 1: Enter Author Information
         {% if creator_given.errors or creator_family.errors or form.email.errors %}
         <span class="error">Error(s), please fix</span>
         {% endif %}
-   </h3>
+   </h2>
   <p>
     Please fill out any required fields that are marked with an *.
  </p>
   <h3>Your Name:</h3>
-  <div class="form-group">
+  <div class="form-group" data-bind="css: givenNameStatus"> 
    <label class="control-label col-lg-2" for="id_creator-given">{{ creator_form.given.label }}*:</label>
    <div class="col-lg-4">
      {{ creator_form.given }}{{ creator_form.given.errors }}
    </div>
   </div>
-  <div class="form-group">
+  <div class="form-group" >
     <label class="control-label col-lg-2" for="id_creator-middle">{{ creator_form.middle.label }}:</label>
     <div class="col-lg-4">
       {{ creator_form.middle }}
      </div>
   </div>
-  <div class="form-group">
+  <div class="form-group" data-bind="css: familyNameStatus">
      {{ creator_form.family.errors }}
    <label class="control-label col-lg-2" for="id_creator-family">{{ creator_form.family.label }}*:</label>
    <div class="col-lg-4">
     {{ creator_form.family }}       
    </div>
   </div>
-      <div class="form-group">
-       <label class="control-label col-lg-2" for="id_creator-suffix">{{ creator_form.suffix.label }}:</label>
-       <div class="col-lg-2">
-        {{ creator_form.suffix }}
-       </div>
-      </div>
+  <div class="form-group">
+    <label class="control-label col-lg-2" for="id_creator-suffix">{{ creator_form.suffix.label }}:</label>
+     <div class="col-lg-2">
+      {{ creator_form.suffix }}
+    </div>
+ </div>
 {% if default.email_notices %}
  <div class="form-group">
   {{ form.email.errors }}
@@ -44,9 +44,9 @@
    </div>
  </div>
 {% endif %}
-<div class="form-group">
+<div class="form-group" data-bind="css: advisorsStatus">
   {{ advisor_form.advisors.errors }}
-   <label class='control-label col-lg-2' for='id_advisor-advisors'>{{ advisor_form.advisors.label }}</label>
+   <label class='control-label col-lg-2' for='id_advisor-advisors'>{{ advisor_form.advisors.label }}*</label>
    <div class="col-lg-4">
      {{ advisor_form.advisors }}
     <label>{{ advisor_form.freeform_advisor.label }}</label>
