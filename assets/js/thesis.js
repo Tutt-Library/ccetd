@@ -116,8 +116,8 @@ function ThesisViewModel() {
        url: 'update',
        success: function(response) {
          self.resetViews();
-        self.showUploadThesis(true);
-        self.setProgressBar(20);
+         self.showUploadThesis(true);
+         self.setProgressBar(20);
         }
        });
  
