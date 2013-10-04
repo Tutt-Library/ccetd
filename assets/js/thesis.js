@@ -27,6 +27,7 @@ function ThesisViewModel() {
    self.formError = ko.observable(false);
    self.thesisProgressValue = ko.observable(0);
    self.thesisProgressWidth = ko.observable('width: 0%');
+   self.thesisPID = ko.observable("");
 
    // Creator 
    self.showAuthorView = ko.observable(true);
@@ -104,10 +105,14 @@ function ThesisViewModel() {
      var csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
      var data = {
        csrfmiddlewaretoken: csrf_token,
+       step: 1,
+       advisors: self.advisorList(),
+       freeform_advisor: self.advisorFreeFormValue(),
        family: self.familyValue(),
        given: self.givenValue(),
        middle: self.middleValue(),
-       suffix: self.suffixValue()
+       suffix: self.suffixValue(),
+       workflow: $('#workflow').val()
      }
      $.ajax({
        data: data,
@@ -115,6 +120,9 @@ function ThesisViewModel() {
        type: 'POST', 
        url: 'update',
        success: function(response) {
+         var pid = response['pid'];
+         alert("PID is " + pid);
+         self.thesisPID(pid);
          self.resetViews();
          self.showUploadThesis(true);
          self.setProgressBar(20);

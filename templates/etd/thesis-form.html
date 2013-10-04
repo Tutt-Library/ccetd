@@ -2,6 +2,8 @@
 <form method="POST" role="form" {# action="/etd/{{ workflow }}/upload" #} 
      enctype="multipart/form-data" 
      class="form-horizontal">
+ <input type="hidden" data-bind="value: thesisPID">
+ <input type="hidden" value="{{ workflow }}" id="workflow">
 {% csrf_token %}
 {# START Progress Row #}
 <div class="row">
@@ -16,11 +18,11 @@
           aria-valuemax="100">
          
        <span class="sr-only">0% Complete</span>
-     </div> 
+    </div> 
    </div>
    <div class="alert alert-danger alert-dismissable" data-bind="visible: formError">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-    <strong>WARNING!</strong> You have errors in your thesis form.
+    <span style="color: rgb(255,0,0) !important;"><strong>WARNING!</strong> You have errors in your thesis form.</span>
    </div>
  </div>
 {# END Progress Row #}

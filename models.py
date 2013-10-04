@@ -49,3 +49,10 @@ class ThesisDatasetObject(DigitalObject):
                            "Media datastream",
                            defaults={'versionable': True})
 
+class ThesisRawMODS(models.Model):
+    "Stores Raw MODS from AJAX calls into Thesis app"
+    email = models.EmailField(blank=True)
+    mods = models.TextField()
+    pid = models.CharField(max_length=50)
+    
+

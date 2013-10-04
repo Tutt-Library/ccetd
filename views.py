@@ -1,20 +1,20 @@
 """
  views.py -- Views for ETD application.
-"""
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-# Copyright: 2011 Colorado College
 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+  Copyright: 2011, 2013 Jeremy Nelson, Colorado College
+"""
 
 
 __author__ = 'Jeremy Nelson'
@@ -32,17 +32,18 @@ from ccetd.conf import *
 from ccetd.forms import *
 #import islandoraUtils.xacml.tools as islandora_xacml
 #import islandoraUtils.metadata.fedora_relationships as islandora_rels_ext
-from ccetd.models import ThesisDatasetObject
+from ccetd.models import ThesisDatasetObject, ThesisRawMODS
 from app_settings import APP
 from operator import itemgetter
 from django import forms
+from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.shortcuts import render as direct_to_template # quick hack to get running under django 1.5
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 from django.http import HttpResponse,Http404,HttpResponseRedirect
 from django.template import Context,Library,Template,loader,RequestContext
-from eulxml.xmlmap import load_xmlobject_from_string,mods
+from eulxml.xmlmap import load_xmlobject_from_string, mods
 
 
 # Sets workflows dict
@@ -203,17 +204,77 @@ def save_xacml_policy(repository,
                                  content=xacml.getXmlString())
 
 
+def step_one(request, mods_db):
+    "Updates creator form and saves info to session"
+    creator_form = CreatorForm(request.POST)
+    advisor_form = AdvisorForm(request.POST)
+    
+    if creator_form.is_valid() and advisor_form.is_valid():
+        creator_mods = creator_form.save()
+        mods = etree.XML(mods_db.mods)
+        mods.append(
+            etree.XML(creator_mods.serialize()))
+        
+        advisor_list = advisor_form.save(
+            workflows.get(request.POST.get('workflow')))
+        for advisor in advisor_list:
+            mods.append(
+                etree.XML(advisor.serialize()))
+        mods_db.mods = etree.tostring(mods)
+        mods_db.save()
+        return {'message': 'Creator Form is Valid'}
+    else:
+        return {'message': 'Creator Form is invalid',
+                'errors': creator_form.errors}
+
+@login_required
 @json_view
 def update(request):
     "JSON View for AJAX Thesis Submission"
-    creator_form = CreatorForm(request.POST,
-                               prefix='creator')
-    if creator_form.is_valid():
-        return {'message': 'Creator Form is Valid'}
+    step = int(request.POST.get('step', 0))
+    output = {}
+    pid = request.POST.get('pid', None)
+    if pid is None:
+        # Retrieves next available PID from repository and
+        # saves MODS stub to database
+        repo = Repository()
+        pid = repo.get_next_pid()
+        mods = etree.XML('''<mods xmlns="http://www.loc.gov/mods/v3"
+xmlns:mods="http://www.loc.gov/mods/v3"
+xmlns:xlink="http://www.w3.org/1999/xlink"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></mods>''')
+        thesis_mod = ThesisRawMODS(pid=pid,
+                                   mods=etree.tostring(mods))
+        thesis_mod.save()
     else:
-        print(creator_form.errors)
-        return {'message': 'Creator Form is invalid',
-                'errors': creator_form.errors}
+        thesis_mod = ThesisRawMODS.objects.get(pid=pid)
+    if step == 1:
+        output = step_one(request, thesis_mod)
+    elif step ==  2:
+        output = update_thesis(request,
+                               thesis_mod)
+    elif step == 3:
+        output = update_honor_code_submission_agreement(request,
+                                                        thesis_mod)
+    output['pid'] = pid
+    return output
+    
+    
+
+@json_view
+def upload_file(request):
+    """
+    AJAX view for uploading files
+
+    Parameters:
+    request -- HTTP request, required
+    """
+    if request.method != 'POST':
+        return Http404
+    pid = request.POST.get('pid')
+    fedora_repo = Repository()
+    
+    
 
 def upload(request, workflow=None):
     """
