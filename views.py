@@ -206,8 +206,14 @@ def save_xacml_policy(repository,
 @json_view
 def update(request):
     "JSON View for AJAX Thesis Submission"
-    creator_form = CreatorForm(request)
-    return {'message': 'Updated Thesis'}
+    creator_form = CreatorForm(request.POST,
+                               prefix='creator')
+    if creator_form.is_valid():
+        return {'message': 'Creator Form is Valid'}
+    else:
+        print(creator_form.errors)
+        return {'message': 'Creator Form is invalid',
+                'errors': creator_form.errors}
 
 def upload(request, workflow=None):
     """
