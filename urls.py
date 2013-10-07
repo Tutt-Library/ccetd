@@ -24,6 +24,7 @@ urlpatterns = patterns('ccetd.views',
     (r'^$','default'),
     (r'success$','success'),
     (r'update$', 'update'),
+    (r'uploadFile', 'upload_file'),
     (r'(?P<workflow>.*)/upload','upload'),
     (r'(.*)$','workflow'),
 )

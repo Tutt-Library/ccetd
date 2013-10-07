@@ -19,9 +19,11 @@
 
 __author__ = 'Jeremy Nelson'
 
+import datetime
 import os
 import ConfigParser
 import logging
+
 import aristotle.settings as settings
 from aristotle.views import json_view
 from aristotle.settings import INSTITUTION
@@ -41,6 +43,7 @@ from django.core.mail import send_mail
 from django.shortcuts import render as direct_to_template # quick hack to get running under django 1.5
 from django.shortcuts import render
 from django.shortcuts import render_to_response
+from django.template.defaultfilters import slugify
 from django.http import HttpResponse,Http404,HttpResponseRedirect
 from django.template import Context,Library,Template,loader,RequestContext
 from eulxml.xmlmap import load_xmlobject_from_string, mods
@@ -208,24 +211,36 @@ def step_one(request, mods_db):
     "Updates creator form and saves info to session"
     creator_form = CreatorForm(request.POST)
     advisor_form = AdvisorForm(request.POST)
-    
+    origin_info_form = OriginInfoForm(request.POST)
     if creator_form.is_valid() and advisor_form.is_valid():
         creator_mods = creator_form.save()
         mods = etree.XML(mods_db.mods)
         mods.append(
             etree.XML(creator_mods.serialize()))
-        
         advisor_list = advisor_form.save(
             workflows.get(request.POST.get('workflow')))
         for advisor in advisor_list:
             mods.append(
                 etree.XML(advisor.serialize()))
+        origin_info = origin_info_form.save(
+            workflows.get(request.POST.get('workflow')))
+        mods.append(
+            etree.XML(origin_info.serialize()))
         mods_db.mods = etree.tostring(mods)
         mods_db.save()
-        return {'message': 'Creator Form is Valid'}
+        return {'message': 'Form is Valid'}
     else:
-        return {'message': 'Creator Form is invalid',
-                'errors': creator_form.errors}
+        return {'message': 'Form is invalid',
+                'errors': [creator_form.errors,
+                           advisor_form.errors]}
+
+
+def step_two(request, mods_db):
+    "Updates creator form and saves thesis metadata to session"
+    thesis_form = UploadThesisForm(request.POST,
+                                   request.FILES)
+    
+    
 
 @login_required
 @json_view
@@ -238,7 +253,7 @@ def update(request):
         # Retrieves next available PID from repository and
         # saves MODS stub to database
         repo = Repository()
-        pid = repo.get_next_pid()
+        pid = repo.api.ingest(text=None)
         mods = etree.XML('''<mods xmlns="http://www.loc.gov/mods/v3"
 xmlns:mods="http://www.loc.gov/mods/v3"
 xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -251,8 +266,9 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></mods>''')
     if step == 1:
         output = step_one(request, thesis_mod)
     elif step ==  2:
-        output = update_thesis(request,
-                               thesis_mod)
+        output = step_two(request, thesis_mod)
+##        output = update_thesis(request,
+##                               thesis_mod)
     elif step == 3:
         output = update_honor_code_submission_agreement(request,
                                                         thesis_mod)
@@ -260,7 +276,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></mods>''')
     return output
     
     
-
+@login_required
 @json_view
 def upload_file(request):
     """
@@ -271,9 +287,20 @@ def upload_file(request):
     """
     if request.method != 'POST':
         return Http404
-    pid = request.POST.get('pid')
     fedora_repo = Repository()
-    
+    pid = request.POST.get('pid')
+    for file_name in request.FILES.keys():
+        file_object = request.FILES.get(file_name)
+        mime_type = mimetypes.guess_type(file_object.name)[0]
+        ds_id = slugify(file_object.name)
+        result = fedora_repo.api.addDatastream(
+            pid=pid,
+            controlGroup="M",
+            dsID=ds_id,
+            dsLabel=file_object.name,
+            mimeType=mime_type,
+            content=file_object)    
+    return {'pid': pid}
     
 
 def upload(request, workflow=None):

@@ -18,6 +18,7 @@
 """
 __author__ = 'Jeremy Nelson'
 
+import datetime
 import logging,re,mimetypes
 from django import forms
 from models import ThesisDatasetObject
@@ -347,7 +348,10 @@ class SubjectsForm(forms.Form):
     keyword_1 = forms.CharField(max_length=30,
                                 required=False,
                                 label='Keyword 1',
-                                help_text = 'Keyword for thesis')
+                                help_text = 'Keyword for thesis',
+                                widget=forms.TextInput(
+                                    attrs={'class': 'form-control',
+                                           'data-bind': 'value: keywordValue1'}))
     keyword_2 = forms.CharField(max_length=30,
                                 required=False,
                                 label='Keyword 2',
@@ -476,7 +480,8 @@ class UploadThesisForm(forms.Form):
                                    help_text='Label for thesis object, 255 characters max')
     thesis_file = forms.FileField(
         widget=forms.FileInput(
-            attrs={'class': 'btn btn-default'}))
+            attrs={'class': 'btn btn-default',
+                   'onchange': 'uploadFile()' }))
   
     def clean_graduation_dates(self):
         grad_dates = self.cleaned_data['graduation_dates']
@@ -521,6 +526,25 @@ class UploadThesisForm(forms.Form):
     
 
 
+    def new_save(self,
+             etree_mods,
+             workflow):
+        if self.cleaned_data.has_key('abstract'):
+            etree_mods.append(
+                etree.XML(
+                    mods.Abstract(text=self.cleaned_data['abstract']).serialize()))
+        
+        if self.cleaned_data.has_key('honor_code'):
+            etree_mods.append(
+                etree.XML(
+                    mods.Note(type="admin",
+                              text="Colorado College Honor Code upheld.").serialize()))
+        
+        
+        
+        
+        
+    
     def save(self,
              workflow=None):
         """
@@ -529,7 +553,8 @@ class UploadThesisForm(forms.Form):
 
         :param workflow: Workflow configuration
         """
-        obj_mods = mods.MODS()
+        if etree_mods is None:
+            obj_mods = mods.MODS()
         if self.cleaned_data.has_key('abstract'):
             obj_mods.abstract = mods.Abstract(text=self.cleaned_data['abstract'])
         # Create and set default genre for thesis

@@ -47,6 +47,11 @@ function ThesisViewModel() {
    self.showUploadThesis = ko.observable(false);
    self.pageNumberValue = ko.observable();
    self.titleValue = ko.observable();
+   self.thesisKeywords = ko.observableArray([
+     { name: 'keyword1' },
+     { name: 'keyword2' },
+     { name: 'keyword3' }
+   ]);
 
    // Thesis Support Files
    self.showThesisSupport = ko.observable(false);
@@ -85,7 +90,18 @@ function ThesisViewModel() {
      self.setProgressBar(100);
    }
 
-   self.validateSaveCreator = function()  {
+   self.uploadFile = function() {
+     alert("IN UPLOAD FILE");
+     var file = this.files[0];
+     name = file.name;
+     size = file.size;
+     type = file.type;
+     alert("In uploadFile " + name + " " + size + "\n" + type);
+
+   }
+
+
+   self.validateStepOne = function()  {
      if(!self.givenValue()) {
        self.givenNameStatus('has-error');
        self.formError(true);
@@ -130,6 +146,33 @@ function ThesisViewModel() {
        });
  
    }
+
+   self.validateStepTwo = function() {
+     self.resetViews();
+     var csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+     var data = {
+       csrfmiddlewaretoken: csrf_token,
+       step: 2,
+       pid: self.thesisPID()
+     }
+
+     $.ajax({
+       data: data,
+       dataType: 'json',
+       type: 'POST',
+       url: 'update',
+       success: function(response) {
+         if(response['response'] == 'error') {
+          self.formError(true);
+          return;
+         }
+       }
+      });
+
+     self.showThesisSupport(true);
+     self.setProgressBar(40);
+   }
+
  
    self.validateHonorCode = function() {
      self.resetViews();
@@ -137,16 +180,24 @@ function ThesisViewModel() {
      self.setProgressBar(80);
    }
  
-   self.validateSaveThesis = function() {
-     self.resetViews();
-     self.showThesisSupport(true);
-     self.setProgressBar(40);
-   }
-
-   self.validateThesisSupport = function() {
+      self.validateThesisSupport = function() {
      self.resetViews();
      self.showHonorCode(true);
      self.setProgressBar(60);
    }
 }
 
+
+function uploadFile() {
+  var formData = new FormData(this);
+  var fileLoadReq = new XMLHttpRequest();
+  fileLoadReq.open('POST', 'uploadFile', true);
+  fileLoadReq.onload = function(oEvent) {
+    if(fileLoadReq.status == 200) {
+      alert("File uploaded");
+    } else {
+      alert("Error " + fileLoadReq.status + " occurred uploading your file");
+    }
+  }
+   fileLoadReq.send(formData);
+}

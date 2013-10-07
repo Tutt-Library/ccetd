@@ -1,8 +1,10 @@
 {% comment %}START Row DIV{% endcomment %}
 <form method="POST" role="form" {# action="/etd/{{ workflow }}/upload" #} 
      enctype="multipart/form-data" 
-     class="form-horizontal">
- <input type="hidden" data-bind="value: thesisPID">
+     class="form-horizontal"
+     id="thesis-base-form"
+     target="submit-iframe">
+ <input type="hidden" data-bind="value: thesisPID" name="pid">
  <input type="hidden" value="{{ workflow }}" id="workflow">
 {% csrf_token %}
 {# START Progress Row #}
