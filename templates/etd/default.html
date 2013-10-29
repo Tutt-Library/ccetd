@@ -129,6 +129,12 @@
 {% endblock %} 
 
 {% block more-js %}
+{% comment %}
+<script src="{{ STATIC_URL}}js/jquery.ui.widget.js"></script>
+<script src="{{ STATIC_URL}}js/jquery.fileupload.js"></script>
+<script src="{{ STATIC_URL}}js/jquery.iframe-transport.js"></script>
+{% endcomment %}
+<script src="{{ STATIC_URL }}js/knockout.validation.min.js"></script>
 <script src="{{ STATIC_URL }}js/thesis.js"></script>
 <script>
  ko.applyBindings(new ThesisViewModel());

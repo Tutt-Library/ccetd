@@ -209,26 +209,15 @@ def save_xacml_policy(repository,
 
 def step_one(request, mods_db):
     "Updates creator form and saves info to session"
-    creator_form = CreatorForm(request.POST)
-    advisor_form = AdvisorForm(request.POST)
-    origin_info_form = OriginInfoForm(request.POST)
-    if creator_form.is_valid() and advisor_form.is_valid():
-        creator_mods = creator_form.save()
-        mods = etree.XML(mods_db.mods)
-        mods.append(
-            etree.XML(creator_mods.serialize()))
-        advisor_list = advisor_form.save(
-            workflows.get(request.POST.get('workflow')))
-        for advisor in advisor_list:
-            mods.append(
-                etree.XML(advisor.serialize()))
-        origin_info = origin_info_form.save(
-            workflows.get(request.POST.get('workflow')))
-        mods.append(
-            etree.XML(origin_info.serialize()))
-        mods_db.mods = etree.tostring(mods)
+    step_one_form = StepOneForm(request.POST)
+    if step_one_form.is_valid():
+        workflow = workflows.get(request.POST.get('workflow'))
+        etree_mods = etree.XML(mods_db.mods)
+        etree_mods = step_one_form.save(etree_mods,
+                                        workflow)
+        mods_db.mods = etree.tostring(etree_mods)
         mods_db.save()
-        return {'message': 'Form is Valid'}
+        return {'message': 'Step one complete'}
     else:
         return {'message': 'Form is invalid',
                 'errors': [creator_form.errors,
@@ -237,11 +226,18 @@ def step_one(request, mods_db):
 
 def step_two(request, mods_db):
     "Updates creator form and saves thesis metadata to session"
-    thesis_form = UploadThesisForm(request.POST,
-                                   request.FILES)
+    step_two_form = StepTwoForm(request.POST,
+                                request.FILES)
+    if step_two_form.is_valid():
+        etree_mods = step_two_form.save(
+            etree.XML(mods_db.mods))
+        
+            
+        
+        
     
     
-
+    
 @login_required
 @json_view
 def update(request):
@@ -285,8 +281,8 @@ def upload_file(request):
     Parameters:
     request -- HTTP request, required
     """
-    if request.method != 'POST':
-        return Http404
+##    if request.method != 'POST':
+##        return Http404
     fedora_repo = Repository()
     pid = request.POST.get('pid')
     for file_name in request.FILES.keys():
@@ -303,7 +299,7 @@ def upload_file(request):
     return {'pid': pid}
     
 
-def upload(request, workflow=None):
+def old_upload(request, workflow=None):
     """
     Creates MODS and other metadata along with the file uploads to Fedora.
 
@@ -455,8 +451,45 @@ def upload(request, workflow=None):
                               'form':upload_thesis_form,
                               'workflow':workflow},
                               context_instance=RequestContext(request))
+
+
+def router(request,
+           workflow=default,
+           step=1):
+    step = int(step)
+    if step == 1:
+        return render(request,
+                      'etd/index.html',
+                      {'app': APP,
+                       'institution': INSTITUTION,
+                       'default': default,
+                       'form': StepOneForm(),
+                       'workflow': workflow})
+                       
+                      
     
-def workflow(request,workflow='default'):
+    
+
+def workflow(request, workflow='default'):
+    step_one_form = StepOneForm()       
+    if workflows.has_key(workflow):
+        custom = workflows[workflow]
+        step_one_form.fields['advisors'].choices = get_advisors(custom)
+    step_one_form.fields['graduation_dates'].choices = get_grad_dates(custom)
+    step_two_form = StepTwoForm()
+    return render(request,
+                  'etd/default.html',
+                  {'app': APP,
+                   'config': custom,
+                   'institution': INSTITUTION,
+                   'default':default,
+                   'step_one_form': step_one_form,
+                   'step_two_form': step_two_form,
+                   'step_three_form': StepThreeForm(),
+                   'workflow':workflow})
+    
+    
+def old_workflow(request,workflow='default'):
     """
     Displays thesis entry form to end user.
 

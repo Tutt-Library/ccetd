@@ -1,0 +1,69 @@
+{# START Thesis Author DIV #}
+<div data-bind="visible: showStepOne">
+  <h2>Step 1: Enter Author Information
+        {% if creator_given.errors or creator_family.errors or step_one_form.email.errors %}
+        <span class="error">Error(s), please fix</span>
+        {% endif %}
+   </h2>
+  <p>
+    Please fill out any required fields that are marked with an *.
+ </p>
+  <h3>Your Name:</h3>
+  <div class="form-group" data-bind="css: givenNameStatus"> 
+   <label class="control-label col-lg-2" for="id_creator-given">{{ step_one_form.given.label }}*:</label>
+   <div class="col-lg-4">
+     {{ step_one_form.given }}{{ step_one_form.given.errors }}
+   </div>
+  </div>
+  <div class="form-group" >
+    <label class="control-label col-lg-2" for="id_creator-middle">{{ step_one_form.middle.label }}:</label>
+    <div class="col-lg-4">
+      {{ step_one_form.middle }}
+     </div>
+  </div>
+  <div class="form-group" data-bind="css: familyNameStatus">
+     {{ step_one_form.family.errors }}
+   <label class="control-label col-lg-2" for="id_creator-family">{{ step_one_form.family.label }}*:</label>
+   <div class="col-lg-4">
+    {{ step_one_form.family }}       
+   </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-lg-2" for="id_creator-suffix">{{ step_one_form.suffix.label }}:</label>
+     <div class="col-lg-2">
+      {{ step_one_form.suffix }}
+    </div>
+ </div>
+{% if default.email_notices %}
+ <div class="form-group">
+  {{ step_one_form.email.errors }}
+  <label class='control-label col-lg-2' for="id_thesis-email">{{ step_one_form.email.label }}</label>
+   <div class="col-lg-6">
+       {{ step_one_form.email }}
+     <span class="help-block">(<i>To receive a notification e-mail when your thesis is submitted</i>)</span>
+   </div>
+ </div>
+{% endif %}
+<div class="form-group" data-bind="css: advisorsStatus">
+  {{ step_one_form.advisors.errors }}
+   <label class='control-label col-lg-2' for='id_advisor-advisors'>{{ step_one_form.advisors.label }}*</label>
+   <div class="col-lg-4">
+     {{ step_one_form.advisors }}
+    <label>{{ step_one_form.freeform_advisor.label }}</label>
+        {{ step_one_form.freeform_advisor }}
+   </div>
+</div>
+<div class="form-group">
+   {{ step_one_form.graduation_dates.errors }}
+  <label class='control-label col-lg-2' for='id_grad-date'>Graduation Date*:</label>
+  <div class="col-lg-3">
+     {{ step_one_form.graduation_dates }}
+  </div>
+</div>
+<div class="form-group">
+  <div class="col-lg-3 col-lg-offset-2">
+   <a href="#" data-bind="click: validateStepOne" class="btn btn-primary btn-lg">Save and Continue</a>
+  </div>
+</div>
+{# END Thesis Author DIV #}
+</div>

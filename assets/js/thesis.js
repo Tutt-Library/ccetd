@@ -1,3 +1,15 @@
+$(function () {
+    $('#fileupload').fileupload({
+        dataType: 'json',
+        done: function (e, data) {
+            alert("Finished upload");
+            $.each(data.result.files, function (index, file) {
+                $('<p/>').text(file.name).appendTo(document.body);
+            });
+        }
+    });
+});
+
 // Thesis Javascript file
 function AddKeywords()
  {
@@ -30,34 +42,55 @@ function ThesisViewModel() {
    self.thesisPID = ko.observable("");
 
    // Creator 
-   self.showAuthorView = ko.observable(true);
+   // Step One
+   self.showStepOne = ko.observable(true);
    self.advisorList = ko.observableArray();
    self.advisorFreeFormValue = ko.observable();
    self.advisorsStatus = ko.observable();
    self.emailValue = ko.observable();
-   self.familyValue  = ko.observable();
+   self.familyValue  = ko.observable().extend({ required: true });
    self.familyNameStatus = ko.observable();
-   self.givenValue  = ko.observable();
+   self.givenValue  = ko.observable().extend({ required: true });
    self.givenNameStatus = ko.observable();
    self.gradDateValue  = ko.observable();
    self.middleValue = ko.observable();
    self.suffixValue = ko.observable();
 
-   // Upload Thesis
-   self.showUploadThesis = ko.observable(false);
+   self.stepOneViewModel = ko.validatedObservable({
+       given: self.givenValue,
+       family: self.familyValue
+   });
+
+   // Step Two
+   self.showStepTwo = ko.observable(false);
+   self.thesisFileStatus = ko.observable();
+   self.thesisKeywordsStatus = ko.observable();
+   self.titleValueStatus = ko.observable();
+   self.hasIllustrations = ko.observable();
+   self.hasMaps = ko.observable();
    self.pageNumberValue = ko.observable();
-   self.titleValue = ko.observable();
+   self.thesisAbstract = ko.observable();
+   self.thesisFile = ko.observable().extend({ required: true });
+   self.titleValue = ko.observable().extend({ required: true });
    self.thesisKeywords = ko.observableArray([
      { name: 'keyword1' },
      { name: 'keyword2' },
      { name: 'keyword3' }
-   ]);
+   ]).extend({ minLength: 1 });
+
+   self.stepTwoViewModel = ko.validatedObservable({
+     keyword: self.thesisKeywords,
+     thesisFile: self.thesisFile,
+     title: self.titleValue
+   });
 
    // Thesis Support Files
-   self.showThesisSupport = ko.observable(false);
+   // Step Three
+   self.showStepThree = ko.observable(false);
 
    // Thesis Honor Code
-   self.showHonorCode = ko.observable(false);
+   // Step Four
+   self.showStepFour = ko.observable(false);
    self.hasHonorCode = ko.observable();
    self.hasSubmissionAgreement = ko.observable();
    self.ContinueHonorCodeBtn = ko.observable(false);
@@ -73,11 +106,16 @@ function ThesisViewModel() {
    }
 
    self.resetViews = function() {
-     self.showAuthorView(false);
-     self.showUploadThesis(false);
-     self.showThesisSupport(false);
-     self.showHonorCode(false);
-     self.showReviewSubmit(false);
+     self.showStepOne(false);
+     self.showStepTwo(false);
+     self.showStepThree(false);
+     self.showStepFour(false);
+   }
+
+   self.addKeyword = function() {
+     var last_field = $('#keywords > li').prev();
+     last_field.last().after("<li><input name='keyword' type='text' class='form-control' maxlength='255'></input></li>");
+
    }
 
    self.setProgressBar = function(value) {
@@ -90,88 +128,69 @@ function ThesisViewModel() {
      self.setProgressBar(100);
    }
 
-   self.uploadFile = function() {
-     alert("IN UPLOAD FILE");
-     var file = this.files[0];
-     name = file.name;
-     size = file.size;
-     type = file.type;
-     alert("In uploadFile " + name + " " + size + "\n" + type);
-
-   }
-
 
    self.validateStepOne = function()  {
      if(!self.givenValue()) {
        self.givenNameStatus('has-error');
-       self.formError(true);
+     } else {
+       self.givenNameStatus();
      }
      
      if(!self.familyValue()) {
        self.familyNameStatus('has-error');
-       self.formError(true);
-     }
+     } else {
+       self.familyNameStatus();
+     }     
+
      if(self.advisorList().length < 1 && !self.advisorFreeFormValue())  {
        self.advisorsStatus('has-error'); 
-       self.formError(true);
-     }
-     if(self.formError()) {
-       return;
-     }
-     var csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-     var data = {
-       csrfmiddlewaretoken: csrf_token,
-       step: 1,
-       advisors: self.advisorList(),
-       freeform_advisor: self.advisorFreeFormValue(),
-       family: self.familyValue(),
-       given: self.givenValue(),
-       middle: self.middleValue(),
-       suffix: self.suffixValue(),
-       workflow: $('#workflow').val()
-     }
-     $.ajax({
-       data: data,
-       dataType: 'json',
-       type: 'POST', 
-       url: 'update',
-       success: function(response) {
-         var pid = response['pid'];
-         alert("PID is " + pid);
-         self.thesisPID(pid);
-         self.resetViews();
-         self.showUploadThesis(true);
-         self.setProgressBar(20);
-        }
-       });
- 
+     } else {
+       self.advisorsStatus(); 
+    }
+
+     if(!self.stepOneViewModel.isValid()) {
+       return
+     }  
+     
+     self.resetViews();
+     self.showStepTwo(true);
+     self.setProgressBar(20);
+
    }
 
    self.validateStepTwo = function() {
-     self.resetViews();
-     var csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-     var data = {
-       csrfmiddlewaretoken: csrf_token,
-       step: 2,
-       pid: self.thesisPID()
+     if(!self.titleValue()) {
+       self.titleValueStatus('has-error');
+     } else {
+       self.titleValueStatus();
      }
 
-     $.ajax({
-       data: data,
-       dataType: 'json',
-       type: 'POST',
-       url: 'update',
-       success: function(response) {
-         if(response['response'] == 'error') {
-          self.formError(true);
-          return;
-         }
-       }
-      });
+     if(!self.thesisFile()) {
+       self.thesisFileStatus('has-error');
+     } else {
+       self.thesisFileStatus();
+     }
 
-     self.showThesisSupport(true);
+     if(self.thesisKeywords.length < 1) {
+       self.thesisKeywordsStatus('has-error');
+     } else {
+       self.thesisKeywordsStatus();
+     }
+
+     if(!self.stepTwoViewModel().isValid()) {
+       return;
+     }
+     self.resetViews();
+     self.showStepThree(true);
      self.setProgressBar(40);
    }
+
+  self.validateStepThree = function() {
+    self.resetViews();
+    self.setProgressBar(60);
+    self.showStepFour(true);
+
+  }
 
  
    self.validateHonorCode = function() {

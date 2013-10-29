@@ -40,6 +40,181 @@ class GradDatesField(forms.ChoiceField):
         return values
 
 
+class StepOneForm(forms.Form):
+    advisors = AdvisorsField(label='Thesis Advisors',
+                             required=False,
+                             widget=forms.SelectMultiple(
+                                 {'class': 'form-control',
+                                  'data-bind': 'selectedOptions: advisorList'}))
+    email = forms.EmailField(required=False,
+                             label='Your Email:',
+                             widget=forms.TextInput(
+                                 attrs={'class':'form-control',
+                                        'data-bind': 'value: emailValue',
+                                        'type': 'email'}))
+    family = forms.CharField(max_length=50,
+                             label='Last name',
+                             help_text='Creator of thesis family or last name',
+                             widget=forms.TextInput(
+                                attrs={'class': 'form-control',
+                                       'data-bind': 'value: familyValue'}))
+    freeform_advisor = forms.CharField(max_length=50,
+                                       label='Other faculty not listed above',
+                                       required=False,
+                                       help_text='Please enter last name, first name of advisor',
+                                       widget=forms.TextInput(
+                                           {'class': 'form-control',
+                                            'data-bind': 'value: advisorFreeFormValue'}))
+    given = forms.CharField(max_length=50,
+                            label='First name',
+                            help_text='Creator of thesis given or first name',
+                            widget=forms.TextInput(
+                                attrs={'class': 'form-control',
+                                       'data-bind': 'value: givenValue'}))
+    graduation_dates = GradDatesField(required=True,
+                                      label='Graduation Date',
+                                      widget=forms.Select(
+                                          attrs={'class':'form-control',
+                                                 'data-bind': 'value: gradDateValue'}))
+    middle = forms.CharField(max_length=50,
+                             required=False,
+                             label='Middle name',
+                             help_text='Creator of thesis middle name',
+                             widget=forms.TextInput(
+                                attrs={'class': 'form-control',
+                                       'data-bind': 'value: middleValue'}))
+    suffix = forms.ChoiceField(required=False,
+                               label='Suffix',
+                               choices=[("None",""),
+                                        ('Jr.',"Jr."),
+                                        ("Sr.","Sr."),
+                                        ("II","II"),
+                                        ("III","III"),
+                                        ("IV","IV")],
+                               widget=forms.Select(
+                                   attrs={'class': 'form-control',
+                                          'data-bind': 'value: suffixValue'}))
+
+    def save(self,
+             etree_mods,
+             config):
+        """Creates MODS from fields and appends to etree_mods 
+
+        """
+        advisor_role = mods.Role(authority='marcrelator',
+                                 type='text',
+                                 text='thesis advisor')
+        if step_one_form.has_key('advisors'):
+            advisor_dict = dict(iter(config.items('FACULTY')))
+            advisor_emails = self.cleaned_data['advisors']
+            if len(advisor_emails) > 0:
+                for email in advisor_emails:
+                    advisor = mods.Name(type="personal")
+                    advisor.roles.append(advisor_role)
+                    name = advisor_dict[email]
+                    advisor.name_parts.append(mods.NamePart(text=name))
+                    etree_mods.append(etree.XML(advisor.serialize()))
+        if self.cleaned_data.has_key('freeform_advisor'):
+            raw_name = self.cleaned_data['freeform_advisor']
+            if len(raw_name) > 0:
+                advisor = mods.Name(type="personal")
+                advisor.roles.append(advisor_role)
+                advisor.name_parts.append(mods.NamePart(text=raw_name))
+                etree_mods.append(etree.XML(advisor.serialize()))
+        creator_role = mods.Role(authority='marcrelator',
+                                 type='text',
+                                 text='creator')
+        creator = mods.Name(type="personal",
+                            roles=[creator_role,])
+        name_part = self.cleaned_data['family']
+        if self.cleaned_data.has_key('suffix'):
+            if len(self.cleaned_data['suffix']) > 0 and self.cleaned_data['suffix'] != 'None':
+                name_part = name_part + ' %s' % self.cleaned_data['suffix']
+        name_part = '%s, %s' % (name_part,self.cleaned_data['given'])
+        if self.cleaned_data.has_key('middle'):
+            if len(self.cleaned_data['middle']) > 0:
+                name_part = '%s %s' % (name_part,self.cleaned_data['middle'])
+        creator.name_parts.append(mods.NamePart(text=name_part))
+        etree_mods.append(etree.XML(creator.serialize()))
+        year_result = re.search(r'(\d+)',
+                                self.cleaned_data['graduation_dates'])
+        if year_result:
+            year = year_result.groups()[0]
+        else:
+            year = datetime.datetime.today().year
+        date_created = mods.DateCreated(date=year)
+        date_issued = mods.DateIssued(date=year,
+                                      key_date='yes')
+        origin_info = mods.OriginInfo(created=[date_created,],
+                                      issued=[date_issued,])
+        etree_mods.append(etree.XML(origin_info.serialize()))
+        return etree_mods
+
+class StepTwoForm(forms.Form):
+    abstract = forms.CharField(label='Abstract',
+                               required=False,
+                               widget=forms.Textarea(attrs={'class':'form-control',
+                                                            'cols':60,
+                                                            'rows':5}))    
+    has_illustrations = forms.BooleanField(required=False,
+                                           label='Yes')
+    has_maps = forms.BooleanField(required=False,
+                                  label='Yes')
+    page_numbers = forms.IntegerField(required=False,
+                                      widget=forms.TextInput(
+                                          attrs={'class': 'form-control',
+                                                 'data-bind': 'value: pageNumberValue'}))    
+    thesis_file = forms.FileField(
+        widget=forms.FileInput(
+            attrs={'class': 'btn btn-default',
+                   'data-bind': 'value: thesisFile' }))
+    title = forms.CharField(max_length=225,
+                            label='Thesis Title',
+                            widget=forms.TextInput(
+                                attrs={'class':'form-control',
+                                       'data-bind': 'value: titleValue'}))
+
+    def save(self,
+             etree_mods):
+        if self.cleaned_data.has_key('abstract'):
+            etree_mods.append(
+                    mods.Abstract(
+                        text=self.cleaned_data['abstract']).node)
+        extent = ''
+        if self.cleaned_data.has_key('page_numbers'):
+            extent = '{0} pages : '.format(self.cleaned_data['page_numbers'])
+        if self.cleaned_data.has_key('has_illustrations'):
+            extent += 'illustrations'
+        if self.cleaned_data.has_key('has_maps'):
+            if self.cleaned_data.has_key('has_illustrations'):
+                extent += ', '
+            extent += 'map(s).'
+        extent = extent.strip()
+        physical_description = mods.PhysicalDescription(extent=extent)
+        digital_origin = etree.Element("{http://www.loc.gov/mods/v3}digitalOrigin")
+        digital_origin.text = 'born digital'
+        physical_description.node.append(digital_origin)
+        etree_mods.append(physical_description.node)
+        etree_mods.append(mods.TitleInfo(title=self.cleaned_data['title']).node)
+        return etree_mods
+
+class StepThreeForm(forms.Form):
+    file_one = forms.FileField(required=False)
+    file_two = forms.FileField(required=False)
+    file_three = forms.FileField(required=False)
+    file_four = forms.FileField(required=False)
+    file_five = forms.FileField(required=False)
+
+class StepFourForm(forms.Form):
+    pass
+            
+        
+        
+            
+        
+
+    
+
 # Custom Forms for Electronic Thesis and Dataset 
 class AdvisorForm(forms.Form):
     """AdvisorForm associates form fields with its MODS name and supporting
@@ -481,7 +656,7 @@ class UploadThesisForm(forms.Form):
     thesis_file = forms.FileField(
         widget=forms.FileInput(
             attrs={'class': 'btn btn-default',
-                   'onchange': 'uploadFile()' }))
+                   'data-url': '/apps/etd/uploadFile' }))
   
     def clean_graduation_dates(self):
         grad_dates = self.cleaned_data['graduation_dates']
