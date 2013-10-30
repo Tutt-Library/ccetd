@@ -486,6 +486,7 @@ def workflow(request, workflow='default'):
                    'step_one_form': step_one_form,
                    'step_two_form': step_two_form,
                    'step_three_form': StepThreeForm(),
+                   'step_four_form': StepFourForm(),
                    'workflow':workflow})
     
     

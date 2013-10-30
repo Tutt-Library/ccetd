@@ -91,12 +91,15 @@ function ThesisViewModel() {
    // Thesis Honor Code
    // Step Four
    self.showStepFour = ko.observable(false);
-   self.hasHonorCode = ko.observable();
-   self.hasSubmissionAgreement = ko.observable();
-   self.ContinueHonorCodeBtn = ko.observable(false);
+   self.honorCodeError = ko.observable(false);
+   self.hasHonorCode = ko.observable().extend({ required: true });
+   self.hasSubmissionAgreement = ko.observable().extend({ required: true });
+   self.submissionAgreementError = ko.observable(false);
 
-   // Thesis Review and Submit
-   self.showReviewSubmit = ko.observable(false);
+   self.stepFourViewModel = ko.validatedObservable({
+     honorCode: self.hasHonorCode,
+     submissionAgreement: self.hasSubmissionAgreement
+   });
 
    // Event Handlers for Thesis
    self.enableContinueHonorBtn = function() {
@@ -121,11 +124,6 @@ function ThesisViewModel() {
    self.setProgressBar = function(value) {
      self.thesisProgressValue(value);
      self.thesisProgressWidth('width: ' + value + '%');
-   }
-
-   self.submitThesis = function() {
-     self.resetViews();
-     self.setProgressBar(100);
    }
 
 
@@ -192,18 +190,24 @@ function ThesisViewModel() {
 
   }
 
- 
-   self.validateHonorCode = function() {
+   self.validateStepFour = function() {
+     if(!self.hasHonorCode()) {
+      self.honorCodeError(true);
+     } else {
+       self.honorCodeError(false);
+     }
+     if(!self.hasSubmissionAgreement()) {
+       self.submissionAgreementError(true);
+     } else {
+       self.submissionAgreementError(true);
+     }
+     if(!self.stepFourViewModel().isValid()) {
+       return;
+     }
      self.resetViews();
-     self.showReviewSubmit(true);
      self.setProgressBar(80);
    }
  
-      self.validateThesisSupport = function() {
-     self.resetViews();
-     self.showHonorCode(true);
-     self.setProgressBar(60);
-   }
 }
 
 

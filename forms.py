@@ -206,7 +206,15 @@ class StepThreeForm(forms.Form):
     file_five = forms.FileField(required=False)
 
 class StepFourForm(forms.Form):
-    pass
+    honor_code = forms.BooleanField(label='I agree',
+                                    widget=forms.CheckboxInput(
+                                    attrs={'data-bind': 'checked: hasSubmissionAgreement'}))    
+    not_publically_available = forms.BooleanField(required=False,
+                                                  label='I do not agree')
+    submission_agreement = forms.BooleanField(required=False,
+                                              label='I agree',
+                                              widget=forms.CheckboxInput(
+                                                  attrs={'data-bind': 'checked: hasHonorCode'}))
             
         
         
@@ -296,87 +304,6 @@ def pretty_name_generator(name_parts):
         else:
             yield ''
          
-
-class CreatorForm(forms.Form):
-    """CreatorForm associates form fields with its MODS name and supporting
-       XML elements.
-    """
-    family = forms.CharField(max_length=50,
-                             label='Last name',
-                             help_text='Creator of thesis family or last name',
-                             widget=forms.TextInput(
-                                attrs={'class': 'form-control',
-                                       'data-bind': 'value: familyValue'}))
-    given = forms.CharField(max_length=50,
-                            label='First name',
-                            help_text='Creator of thesis given or first name',
-                            widget=forms.TextInput(
-                                attrs={'class': 'form-control',
-                                       'data-bind': 'value: givenValue'}))
-    middle = forms.CharField(max_length=50,
-                             required=False,
-                             label='Middle name',
-                             help_text='Creator of thesis middle name',
-                             widget=forms.TextInput(
-                                attrs={'class': 'form-control',
-                                       'data-bind': 'value: middleValue'}))
-    suffix = forms.ChoiceField(required=False,
-                               label='Suffix',
-                               choices=[("None",""),
-                                        ('Jr.',"Jr."),
-                                        ("Sr.","Sr."),
-                                        ("II","II"),
-                                        ("III","III"),
-                                        ("IV","IV")],
-                               widget=forms.Select(
-                                   attrs={'class': 'form-control',
-                                          'data-bind': 'value: suffixValue'}))
-
-    def save(self):
-        """
-        Method save method for creating MODS name with creator role
-        for MODS datastream in Fedora Commons server.
-        """
-        creator_role = mods.Role(authority='marcrelator',
-                                 type='text',
-                                 text='creator')
-        creator = mods.Name(type="personal",
-                            roles=[creator_role,])
-        name_part = self.cleaned_data['family']
-        if self.cleaned_data.has_key('suffix'):
-            if len(self.cleaned_data['suffix']) > 0 and self.cleaned_data['suffix'] != 'None':
-                name_part = name_part + ' %s' % self.cleaned_data['suffix']
-        name_part = '%s, %s' % (name_part,self.cleaned_data['given'])
-        if self.cleaned_data.has_key('middle'):
-            if len(self.cleaned_data['middle']) > 0:
-                name_part = '%s %s' % (name_part,self.cleaned_data['middle'])
-        creator.name_parts.append(mods.NamePart(text=name_part))
-        return creator
-         
-class DepartmentForm(forms.Form):
-    """DepartmentForm associates name MODS field with the sponsoring organization, 
-       can use form values or passed in Config object to set MODS namePart value.
-    """
-    name = forms.CharField(label='Department name',
-                           max_length=60,
-                           required=False)
-
-    def save(self,
-             config=None):
-        """
-        Method uses either form name field or passed in config value to create
-        a MODS name and child elements with a sponsor role.
-        """
-        if config:
-            name = config.get('FORM','department')
-        else:
-            name = self.cleaned_data['name']
-        department = mods.Name(type="corporate")
-        department.roles.append(mods.Role(authority='marcrt',
-                                          type="text",
-                                          text="sponsor"))
-        department.name_parts.append(mods.NamePart(text=name))
-        return department
 
 class InstitutionForm(forms.Form):
     """InstitutionForm name MODS field with the degree granting institution 
