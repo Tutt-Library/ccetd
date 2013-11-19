@@ -239,37 +239,28 @@ def step_two(request, mods_db):
     
     
 @login_required
-@json_view
 def update(request):
     "JSON View for AJAX Thesis Submission"
-    step = int(request.POST.get('step', 0))
-    output = {}
-    pid = request.POST.get('pid', None)
-    if pid is None:
-        # Retrieves next available PID from repository and
-        # saves MODS stub to database
-        repo = Repository()
-        pid = repo.api.ingest(text=None)
-        mods = etree.XML('''<mods xmlns="http://www.loc.gov/mods/v3"
-xmlns:mods="http://www.loc.gov/mods/v3"
-xmlns:xlink="http://www.w3.org/1999/xlink"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></mods>''')
-        thesis_mod = ThesisRawMODS(pid=pid,
-                                   mods=etree.tostring(mods))
-        thesis_mod.save()
-    else:
-        thesis_mod = ThesisRawMODS.objects.get(pid=pid)
-    if step == 1:
-        output = step_one(request, thesis_mod)
-    elif step ==  2:
-        output = step_two(request, thesis_mod)
-##        output = update_thesis(request,
-##                               thesis_mod)
-    elif step == 3:
-        output = update_honor_code_submission_agreement(request,
-                                                        thesis_mod)
-    output['pid'] = pid
-    return output
+##    pid = repo.api.ingest(text=None)
+    print(request.POST)
+    mods = render(request,
+                  'etd/mods.xml',
+                  request.POST)
+##    for file_name in request.FILES.keys():
+##        file_object = request.FILES.get(file_name)
+##        mime_type = mimetypes.guess_type(file_object.name)[0]
+##        result = fedora_repo.api.addDatastream(
+##            pid=pid,
+##            controlGroup="M",
+##            dsID=ds_id,
+##            dsLabel=file_object.name,
+##            mimeType=mime_type,
+##            content=file_object)  
+    print("Keys={0}, path={1}".format(
+        request.POST.keys(),
+        request.get_full_path()))
+    return mods
+
     
     
 @login_required

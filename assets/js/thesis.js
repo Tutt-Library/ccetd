@@ -204,8 +204,19 @@ function ThesisViewModel() {
      if(!self.stepFourViewModel().isValid()) {
        return;
      }
+     alert("Submitting your thesis to the Digital Archives means that your scholarly work will be shared on the open web");
      self.resetViews();
      self.setProgressBar(80);
+
+     $("#thesis-base-form").bind('ajax:complete', function() {
+         self.setProgressBar(100);
+     });     
+
+     $("#thesis-base-form").submit();
+
+
+       
+     
    }
  
 }

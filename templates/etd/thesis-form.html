@@ -1,9 +1,8 @@
 {% comment %}START Row DIV{% endcomment %}
-<form method="POST" role="form" {# action="/etd/{{ workflow }}/upload" #} 
+<form method="POST" role="form" action="/apps/etd/{{ workflow }}/update"  
      enctype="multipart/form-data" 
      class="form-horizontal"
-     id="thesis-base-form"
-     target="submit-iframe">
+     id="thesis-base-form">
  <input type="hidden" data-bind="value: thesisPID" name="pid">
  <input type="hidden" value="{{ workflow }}" id="workflow">
 {% csrf_token %}

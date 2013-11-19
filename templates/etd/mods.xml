@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<mods:mods xmlns:mods="http://www.loc.gov/mods/v3" 
+           xmlns="http://www.loc.gov/mods/v3" 
+           xmlns:xlink="http://www.w3.org/1999/xlink" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  {% if abstract %}
+  <mods:abstract>
+   {{ abstract }}
+  </mods:abstract>
+  {% endif %}
+  {% if honor_code %}
+  <mods:note type="admin">Colorado College Honor Code upheld.</mods:note>
+  {% endif %}
+  <mods:note type="thesis">Senior Thesis -- Colorado College</mods:note>
+  <mods:note type="thesis" displayLabel="Degree Name">bachelor</mods:note>
+  <mods:note type="thesis" displayLabel="Degree Type">Bachelor of Arts</mods:note>
+  <mods:genre authority="marcgt">thesis</mods:genre>
+  <mods:accessCondition type="useAndReproduction">Copyright restrictions apply.</mods:accessCondition>
+  <mods:physicalDescription>
+    {% if extent %}
+    <mods:extent>{{ extent }}</mods:extent>
+    {% endif %}
+    <mods:digitalOrigin>born digital</mods:digitalOrigin>
+  </mods:physicalDescription>
+  {% if family %}
+  <mods:name type="personal">
+    <mods:role>
+      <mods:roleTerm type="text" authority="marcrelator">creator</mods:roleTerm>
+    </mods:role>
+    <mods:namePart>{{ family }}{% if suffix %} {{ suffix}} {% endif %}, {{ given }}</mods:namePart>
+  </mods:name>
+  {% endif %}
+  {% for advisor in advisors %}
+  <mods:name type="personal">
+    <mods:role>
+      <mods:roleTerm type="text" authority="marcrelator">thesis advisor</mods:roleTerm>
+    </mods:role>
+    <mods:namePart>{{ advisor }}</mods:namePart>
+  </mods:name>
+  {% endfor %}
+  {% if freeform_advisor %}
+  <mods:name type="personal">
+    <mods:role>
+      <mods:roleTerm type="text" authority="marcrelator">thesis advisor</mods:roleTerm>
+    </mods:role>
+    <mods:namePart>{{ freeform_advisor }}</mods:namePart>
+  </mods:name>
+  {% endif %}
+  {% if department %}
+  <mods:name type="corporate">
+    <mods:role>
+      <mods:roleTerm type="text" authority="marcrt">sponsor</mods:roleTerm>
+    </mods:role>
+    <mods:namePart>{{ department }}</mods:namePart>
+  </mods:name>
+  {% endif %}
+  <mods:name type="corporate">
+    <mods:namePart>Colorado College</mods:namePart>
+    <mods:role>
+      <mods:roleTerm type="text" authority="marcrt">degree grantor</mods:roleTerm>
+    </mods:role>
+  </mods:name>
+  {% for keyword in topics %}
+  <mods:subject>
+    <mods:topic>{{ keyword }}</mods:topic>
+  </mods:subject>
+  {% endfor %}
+  {% if title %}
+  <mods:titleInfo>
+    <mods:title>{{ title }}</mods:title>
+  </mods:titleInfo>
+  {% endif %}
+  <mods:originInfo>
+    <mods:publisher>Colorado College</mods:publisher>
+    {% if year %}
+    <mods:dateIssued keyDate="yes">{{ year }}</mods:dateIssued>
+    <mods:dateCreated>{{ year }}</mods:dateCreated>
+    {% endif %}
+    <mods:place>
+      <mods:placeTerm>Colorado Springs, Colo</mods:placeTerm>
+    </mods:place>
+  {% if languages %}
+  {% for language in languages %}
+  <mods:language>
+    <mods:languageTerm>{{ language }}</mods:languageTerm>
+  </mods:language>
+  {% endfor %}
+  {% else %}
+  <mods:language>
+    <mods:languageTerm>English</mods:languageTerm>
+  </mods:language>
+  {% endif %}
+  <mods:location>
+    <mods:url usage="primary display">http://hdl.handle.net/10176/{{ pid }}"></mods:url>
+  </mods:location>
+</mods:mods>
