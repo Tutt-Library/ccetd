@@ -30,7 +30,6 @@ from aristotle.settings import INSTITUTION
 import mimetypes
 from lxml import etree
 from eulfedora.server import Repository
-from ccetd.conf import *
 from ccetd.forms import *
 #import islandoraUtils.xacml.tools as islandora_xacml
 #import islandoraUtils.metadata.fedora_relationships as islandora_rels_ext
@@ -43,6 +42,8 @@ from django.core.mail import send_mail
 from django.shortcuts import render as direct_to_template # quick hack to get running under django 1.5
 from django.shortcuts import render
 from django.shortcuts import render_to_response
+from django.template import Context, Template
+from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
 from django.http import HttpResponse,Http404,HttpResponseRedirect
 from django.template import Context,Library,Template,loader,RequestContext
@@ -59,8 +60,11 @@ for filename in os.listdir(workflow_dir):
         workflow_config = ConfigParser.RawConfigParser()
         workflow_config.read(os.path.join(workflow_dir,filename))
         # Add universal constants to config object
-        workflow_config.set('FORM','institution',INSTITUTION)
-        workflow_config.set('FORM','location',LOCATION)
+        workflow_config.set('FORM','institution', INSTITUTION.get('name'))
+        address = INSTITUTION.get('address')
+        location = "{0}, {1}".format(address.get('addressLocality'),
+                                     address.get('addressRegion'))
+        workflow_config.set('FORM','location', location)
         workflows[fileinfo[0].lower()] = workflow_config
 
 # Helper functions 
@@ -206,46 +210,78 @@ def save_xacml_policy(repository,
                                  mimeType="application/rdf+xml",
                                  content=xacml.getXmlString())
 
-
-def step_one(request, mods_db):
-    "Updates creator form and saves info to session"
-    step_one_form = StepOneForm(request.POST)
-    if step_one_form.is_valid():
-        workflow = workflows.get(request.POST.get('workflow'))
-        etree_mods = etree.XML(mods_db.mods)
-        etree_mods = step_one_form.save(etree_mods,
-                                        workflow)
-        mods_db.mods = etree.tostring(etree_mods)
-        mods_db.save()
-        return {'message': 'Step one complete'}
-    else:
-        return {'message': 'Form is invalid',
-                'errors': [creator_form.errors,
-                           advisor_form.errors]}
-
-
-def step_two(request, mods_db):
-    "Updates creator form and saves thesis metadata to session"
-    step_two_form = StepTwoForm(request.POST,
-                                request.FILES)
-    if step_two_form.is_valid():
-        etree_mods = step_two_form.save(
-            etree.XML(mods_db.mods))
-        
             
         
-        
+def create_mods(post):
+    """
+    Helper function generates a thesis MODS record from posted form
+    contents and workflow config
+
+    :param post: A request.POST object
+    :rtype: String 
+    """
+    creator_name = post.get('family')
+    suffix = post.get('suffix')
+    if suffix and suffix != 'None':
+        creator_name = "{0} {1}".format(
+            creator_name,
+            suffix)
+    creator_name = "{0}, {1}".format(creator_name,
+                                     post.get('given'))
+    config = workflows.get(post.get('workflow'))
+    extent = ''
+    page_numbers = post.get('page_numbers', '')
+    if len(page_numbers) > 0:
+        extent += '{0} pages : '.format(page_numbers)
+    if post.has_key('has_illustrations'):
+        extent += 'illustrations'
+    if post.has_key('has_maps'):
+        if extent.endswith('illustrations'):
+            extent += ', '
+        extent += 'map(s)'
+    extent = extent.strip()
+    if len(extent) < 1:
+        extent = None
+    template_vars = {'advisors': [],
+                     'config': config,
+                     'creator': creator_name,
+                     'degree': {'type': config.get('FORM',
+                                                   'degree_type'),
+                                'name': config.get('FORM',
+                                                   'degree_name')},
+                     'department': config.get('FORM',
+                                              'department'),
+                     'extent': extent,
+                     'thesis_note': config.get('FORM',
+                                               'thesis_note'),
+                     'topics': []}
+    if 'member' in INSTITUTION:
+        template_vars['institution'] = INSTITUTION['member']['name']
+        address = INSTITUTION['member']['address']
+    else:
+        template_vars['institution'] = INSTITUTION['name']
+        address = INSTITUTION['address']    
+    template_vars['location'] = '{0}, {1}'.format(
+            address.get('addressLocality'),
+            address.get('addressRegion'))
+            
+    for advisor in post.getlist('advisors'):
+        template_vars['advisors'].append(config.get('FACULTY',
+                                                    advisor))
     
+    for word in post.getlist('keyword'):
+        if len(word) > 0:
+            template_vars['topics'].append(word)
+        
+    return render_to_string('etd/mods.xml' , template_vars)
     
     
 @login_required
 def update(request):
     "JSON View for AJAX Thesis Submission"
 ##    pid = repo.api.ingest(text=None)
-    print(request.POST)
-    mods = render(request,
-                  'etd/mods.xml',
-                  request.POST)
+    
+    mods = create_mods(request.POST)
 ##    for file_name in request.FILES.keys():
 ##        file_object = request.FILES.get(file_name)
 ##        mime_type = mimetypes.guess_type(file_object.name)[0]
@@ -255,11 +291,9 @@ def update(request):
 ##            dsID=ds_id,
 ##            dsLabel=file_object.name,
 ##            mimeType=mime_type,
-##            content=file_object)  
-    print("Keys={0}, path={1}".format(
-        request.POST.keys(),
-        request.get_full_path()))
-    return mods
+##            content=file_object)
+    mods_xml = etree.XML(mods)
+    return HttpResponse(etree.tostring(mods_xml))
 
     
     

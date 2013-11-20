@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+{% autoescape off %}
 <mods:mods xmlns:mods="http://www.loc.gov/mods/v3" 
            xmlns="http://www.loc.gov/mods/v3" 
            xmlns:xlink="http://www.w3.org/1999/xlink" 
@@ -12,8 +12,10 @@
   <mods:note type="admin">Colorado College Honor Code upheld.</mods:note>
   {% endif %}
   <mods:note type="thesis">Senior Thesis -- Colorado College</mods:note>
-  <mods:note type="thesis" displayLabel="Degree Name">bachelor</mods:note>
-  <mods:note type="thesis" displayLabel="Degree Type">Bachelor of Arts</mods:note>
+  {% if degree %}
+  <mods:note type="thesis" displayLabel="Degree Name">{{ degree.name }}</mods:note>
+  <mods:note type="thesis" displayLabel="Degree Type">{{ degree.type }}</mods:note>
+  {% endif %}
   <mods:genre authority="marcgt">thesis</mods:genre>
   <mods:accessCondition type="useAndReproduction">Copyright restrictions apply.</mods:accessCondition>
   <mods:physicalDescription>
@@ -22,12 +24,12 @@
     {% endif %}
     <mods:digitalOrigin>born digital</mods:digitalOrigin>
   </mods:physicalDescription>
-  {% if family %}
+  {% if creator %}
   <mods:name type="personal">
     <mods:role>
       <mods:roleTerm type="text" authority="marcrelator">creator</mods:roleTerm>
     </mods:role>
-    <mods:namePart>{{ family }}{% if suffix %} {{ suffix}} {% endif %}, {{ given }}</mods:namePart>
+    <mods:namePart>{{ creator }}</mods:namePart>
   </mods:name>
   {% endif %}
   {% for advisor in advisors %}
@@ -54,12 +56,14 @@
     <mods:namePart>{{ department }}</mods:namePart>
   </mods:name>
   {% endif %}
+  {% if institution %}
   <mods:name type="corporate">
-    <mods:namePart>Colorado College</mods:namePart>
+    <mods:namePart>{{ institution }}</mods:namePart>
     <mods:role>
       <mods:roleTerm type="text" authority="marcrt">degree grantor</mods:roleTerm>
     </mods:role>
   </mods:name>
+  {% endif %}
   {% for keyword in topics %}
   <mods:subject>
     <mods:topic>{{ keyword }}</mods:topic>
@@ -71,14 +75,19 @@
   </mods:titleInfo>
   {% endif %}
   <mods:originInfo>
-    <mods:publisher>Colorado College</mods:publisher>
+    {% if institution %}
+    <mods:publisher>{{ institution }}</mods:publisher>
+    {% endif %}
     {% if year %}
     <mods:dateIssued keyDate="yes">{{ year }}</mods:dateIssued>
     <mods:dateCreated>{{ year }}</mods:dateCreated>
     {% endif %}
+    {% if location %}
     <mods:place>
-      <mods:placeTerm>Colorado Springs, Colo</mods:placeTerm>
+      <mods:placeTerm>{{ location }}</mods:placeTerm>
     </mods:place>
+    {% endif %}
+  </mods:originInfo>
   {% if languages %}
   {% for language in languages %}
   <mods:language>
@@ -94,3 +103,4 @@
     <mods:url usage="primary display">http://hdl.handle.net/10176/{{ pid }}"></mods:url>
   </mods:location>
 </mods:mods>
+{% endautoescape %}
