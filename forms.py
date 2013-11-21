@@ -21,7 +21,7 @@ __author__ = 'Jeremy Nelson'
 import datetime
 import logging,re,mimetypes
 from django import forms
-from models import ThesisDatasetObject
+##from models import ThesisDatasetObject
 from django.contrib.formtools.wizard import FormWizard
 from django.core.exceptions import ValidationError
 import lxml.etree as etree
@@ -200,10 +200,30 @@ class StepTwoForm(forms.Form):
 
 class StepThreeForm(forms.Form):
     file_one = forms.FileField(required=False)
+    file_one_title = forms.CharField(max_length=255,
+                                     required=False,
+                                     widget=forms.TextInput(
+                                         attrs={'class':'form-control'}))
     file_two = forms.FileField(required=False)
+    file_two_title = forms.CharField(max_length=255,
+                                     required=False,
+                                     widget=forms.TextInput(
+                                         attrs={'class':'form-control'}))
     file_three = forms.FileField(required=False)
+    file_three_title = forms.CharField(max_length=255,
+                                       required=False,
+                                       widget=forms.TextInput(
+                                         attrs={'class':'form-control'}))
     file_four = forms.FileField(required=False)
+    file_four_title = forms.CharField(max_length=255,
+                                      required=False,
+                                      widget=forms.TextInput(
+                                         attrs={'class':'form-control'}))
     file_five = forms.FileField(required=False)
+    file_five_title = forms.CharField(max_length=255,
+                                      required=False,
+                                      widget=forms.TextInput(
+                                         attrs={'class':'form-control'}))
 
 class StepFourForm(forms.Form):
     honor_code = forms.BooleanField(label='I agree',

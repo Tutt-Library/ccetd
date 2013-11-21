@@ -33,7 +33,7 @@ from eulfedora.server import Repository
 from ccetd.forms import *
 #import islandoraUtils.xacml.tools as islandora_xacml
 #import islandoraUtils.metadata.fedora_relationships as islandora_rels_ext
-from ccetd.models import ThesisDatasetObject, ThesisRawMODS
+##from ccetd.models import ThesisDatasetObject, ThesisRawMODS
 from app_settings import APP
 from operator import itemgetter
 from django import forms
@@ -254,6 +254,7 @@ def create_mods(post):
                      'extent': extent,
                      'thesis_note': config.get('FORM',
                                                'thesis_note'),
+                     'title': post.get('title'),
                      'topics': []}
     if 'member' in INSTITUTION:
         template_vars['institution'] = INSTITUTION['member']['name']
@@ -279,21 +280,39 @@ def create_mods(post):
 @login_required
 def update(request):
     "JSON View for AJAX Thesis Submission"
-##    pid = repo.api.ingest(text=None)
-    
+    new_pid = repo.api.ingest(text=None)    
     mods = create_mods(request.POST)
-##    for file_name in request.FILES.keys():
-##        file_object = request.FILES.get(file_name)
-##        mime_type = mimetypes.guess_type(file_object.name)[0]
-##        result = fedora_repo.api.addDatastream(
-##            pid=pid,
-##            controlGroup="M",
-##            dsID=ds_id,
-##            dsLabel=file_object.name,
-##            mimeType=mime_type,
-##            content=file_object)
     mods_xml = etree.XML(mods)
-    return HttpResponse(etree.tostring(mods_xml))
+    title = request.POST.get('title')
+    # Sets Stub Thesis Object Title
+    repository.api.modifyObject(pid=new_pid,
+                                label=title,
+                                ownerId=settings.FEDORA_USER,
+                                state="A")
+    # Adds MODS to Thesis Object
+    repository.api.addDatastream(pid=new_pid,
+                                 dsID="MODS",
+                                 dsLabel="MODS",
+                                 mimeType="text/xml",
+                                 content=etree.tostring(mods_xml))
+    
+    for file_name in request.FILES.keys():
+        file_object = request.FILES.get(file_name)
+        title = file_object.name
+        file_title = request.POST.get("{0}_title".format(title))
+        if file_title is None:
+            file_title = file_object.name
+        
+        mime_type = mimetypes.guess_type(file_object.name)[0]
+        result = fedora_repo.api.addDatastream(
+            pid=pid,
+            controlGroup="M",
+            dsID=ds_id,
+            dsLabel=file_object.name,
+            mimeType=mime_type,
+            content=file_object)
+    
+    return HttpResponse()
 
     
     

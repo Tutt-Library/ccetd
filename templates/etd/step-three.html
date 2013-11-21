@@ -3,37 +3,48 @@
 <h2>Supporting Files</h2>
 <p>
  You can attach up to 5 files, such as datasets, audio and video files, that support
- your thesis or senior capstone project.
+ your thesis or senior capstone project. If you do not provide a title for each file,
+ the title will be the name of the file.
 </p>
 <div class="form-group">
- <div class="col-lg-4 col-lg-offset-2">
+ <div class="col-lg-6 col-lg-offset-2">
+   <label>File One Title</label>
+   {{ step_three_form.file_one_title }}
    {{ step_three_form.file_one }}
  </div> 
 </div>
 <div class="form-group">
- <div class="col-lg-4 col-lg-offset-2">
+ <div class="col-lg-6 col-lg-offset-2">
+   <label>File Two Title</label>
+   {{ step_three_form.file_two_title }}
    {{ step_three_form.file_two }}
  </div> 
 </div>
 <div class="form-group">
- <div class="col-lg-4 col-lg-offset-2">
+ <div class="col-lg-6 col-lg-offset-2">
+   <label>File Three Title</label>
+   {{ step_three_form.file_three_title }}
    {{ step_three_form.file_three }}
  </div> 
 </div>
 <div class="form-group">
- <div class="col-lg-4 col-lg-offset-2">
+ <div class="col-lg-6 col-lg-offset-2">
+   <label>File Four Title</label>
+   {{ step_three_form.file_four_title }}
    {{ step_three_form.file_four }}
  </div> 
 </div>
 <div class="form-group">
- <div class="col-lg-4 col-lg-offset-2">
+ <div class="col-lg-6 col-lg-offset-2">
+   <label>File Five Title</label>
+   {{ step_three_form.file_five_title }}
    {{ step_three_form.file_five }}
  </div> 
 </div>
 
 {% comment %}
 <div class="form-group">
- <div class="col-lg-4 col-lg-offset-2">
+ <div class="col-lg-6 col-lg-offset-2">
   <input id="fileupload" class="btn btn-default" type="file" name="files[]" data-url="/apps/etd/uploadFile" multiple="multiple">
  
  </div> 

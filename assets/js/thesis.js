@@ -1,14 +1,24 @@
-$(function () {
-    $('#fileupload').fileupload({
-        dataType: 'json',
-        done: function (e, data) {
-            alert("Finished upload");
-            $.each(data.result.files, function (index, file) {
-                $('<p/>').text(file.name).appendTo(document.body);
-            });
-        }
-    });
-});
+ko.validation.rules['pdfOnly'] = {
+    validator: function (val, validate) {
+        return val.match(/\\([^\\]+).pdf$/);
+    },
+    message: 'Must be empty or an integer value'
+};
+
+
+
+//ko.validation.rules['pdfOnly'] = {
+//   validator: function (element, bool) {
+//        function isPDF(str) {
+//         return str.split(".")[0] === 'pdf'; 
+//        }
+   
+//        return isPDF(element);
+//    },
+//     message: "Thesis MUST be a PDF"
+//};
+ko.validation.registerExtenders();
+
 
 // Thesis Javascript file
 function AddKeywords()
@@ -37,6 +47,7 @@ function AddKeywords()
 function ThesisViewModel() {
    var self = this;
    self.formError = ko.observable(false);
+   self.formErrors = ko.observableArray();
    self.thesisProgressValue = ko.observable(0);
    self.thesisProgressWidth = ko.observable('width: 0%');
    self.thesisPID = ko.observable("");
@@ -70,7 +81,9 @@ function ThesisViewModel() {
    self.hasMaps = ko.observable();
    self.pageNumberValue = ko.observable();
    self.thesisAbstract = ko.observable();
+   // PDF only custom validation rule
    self.thesisFile = ko.observable().extend({ required: true });
+      
    self.titleValue = ko.observable().extend({ required: true });
    self.thesisKeywords = ko.observableArray([
      { name: 'keyword1' },
@@ -147,6 +160,7 @@ function ThesisViewModel() {
     }
 
      if(!self.stepOneViewModel.isValid()) {
+       self.formError(true);
        return
      }  
      
@@ -157,27 +171,42 @@ function ThesisViewModel() {
    }
 
    self.validateStepTwo = function() {
+     self.formError(false);
+     self.formErrors.removeAll();
      if(!self.titleValue()) {
        self.titleValueStatus('has-error');
+       self.formErrors.push({'error': 'Title is required'});
      } else {
        self.titleValueStatus();
      }
 
      if(!self.thesisFile()) {
        self.thesisFileStatus('has-error');
+       self.formErrors.push({'error': 'Thesis File is required'});
+       var filename = $('#id_thesis_file').val().replace(/.*(\/|\\)/, '');
+       var ext = filename.split(".")[1];
+       if(ext != 'pdf') {
+          self.thesisFileStatus('has-error');
+          self.formErrors.push({'error': 'File must be a PDF'});
+        }
      } else {
        self.thesisFileStatus();
      }
 
+
+
      if(self.thesisKeywords.length < 1) {
        self.thesisKeywordsStatus('has-error');
+       self.formErrors.push({'error': 'At least one keyword is required'});
      } else {
        self.thesisKeywordsStatus();
      }
 
-     if(!self.stepTwoViewModel().isValid()) {
+     if(!self.stepTwoViewModel().isValid() || self.formErrors().length > 0) {
+       self.formError(true);
        return;
-     }
+     } 
+
      self.resetViews();
      self.showStepThree(true);
      self.setProgressBar(40);
