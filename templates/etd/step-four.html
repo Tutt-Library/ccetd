@@ -1,6 +1,6 @@
 {# START Honor-code and Submission DIV #}
 <div data-bind="visible: showStepFour">
- <h2>Honor Code and Submission Agreements</h2>
+ <h2>Step 4: Honor Code and Submission Agreements</h2>
  <h3 class="chk_box">Honor Code</h3>
   {# START honor-code div #}
     <div id="honor-code">
@@ -22,18 +22,25 @@
       </div>
 	<h3 class="chk_box">Submission Agreement</h3>
 	<b>{{ step_four_form.submission_agreement }} {{ step_four_form.submission_agreement.label }} </b>
-	By checking the agreement box and submitting this form, I (the author and copyright owner) grant {{ institution }}
-		the non-exclusive right to reproduce and distribute my thesis/work in print and electronic form. I agree
-	   that {{ institution }} may, without changing the content, convert my thesis/work to any medium or step_four_format for the 
+       	   By checking the agreement box and submitting this form, I (the author and copyright owner) grant 
+           {% if institution.member %}{{ institution.member.name }}{% else %}{{ institution.name }}{% endif %}
+           the non-exclusive right to reproduce and distribute my thesis/work in print and electronic form. I agree
+	   that {% if institution.member %}{{ institution.member.name }}{% else %}{{ institution.name }}{% endif %}
+           may, without changing the content, convert my thesis/work to any medium or step_four_format for the 
 	   purpose of historical preservation and to make publically available in open access to a larger community of
 	   scholars. All such copies will retain original notices of authorship and copyright.<br/>
 	<p>I understand that as the author of this work, I shall, without limitation, have the right to use, reproduce,
 	   distribute, update, create derivatives, and make copies of the work (electronically or in print). U.S. Copyright
 	   law protects me against the unauthorized use of this work; the right to use in future works all or part of this
 	   work.</p>
-	<p>I understand that {{ nstitution }} shall have the right to non-commercial use which includes the right to reproduce,
+	<p>I understand that 
+          {% if institution.member %}{{ institution.member.name }}{% else %}{{ institution.name }}{% endif %}
+           shall have the right to non-commercial use which includes the right to reproduce,
 	   distribute, and make copies of the work (electronically or in print) in connection with digital repositories, 
-	   teaching, and scholarly activities at {{ institution }}.</p>
+	   teaching, and scholarly activities at 
+
+          {% if institution.member %}{{ institution.member.name }}{% else %} {{ institution.name }}{% endif %}.
+        </p>
         {% comment %}
         <p><strong>{{ step_four_form.not_publically_available }} {{ step_four_form.not_publically_available.label }}</strong>
            By checking this box and submitting this form, I (the author and copyright owner) do not want my thesis to be 
@@ -45,9 +52,13 @@
     </div>
   <div class="step_four_form-group">
   
-  <div class="col-lg-4 col-lg-offset-2">
+  <div class="col-lg-7 col-lg-offset-1">
+   <div class="btn-group">
+    <a href="#" class="btn btn-success btn-lg" 
+       data-bind="click: backStepThree">
+      <span class="glyphicon glyphicon-chevron-left"></span> Previous Step</a> 
    <a href="#" data-bind="click: validateStepFour" 
-      class="btn btn-primary btn-lg">Submit to Repository</a>
+      class="btn btn-primary btn-lg">Submit to Repository <span class="glyphicon glyphicon-chevron-right"></span></a>
   </div>
  </div>
 {# END Honor-code and Submission DIV #}

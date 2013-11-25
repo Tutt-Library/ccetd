@@ -92,8 +92,14 @@
   </div>
 </div>
 <div class="form-group">
-  <div class="col-lg-4 col-lg-offset-2">
-   <a href="#" data-bind="click: validateStepTwo" class="btn btn-primary btn-lg">Next Step</a>
+  <div class="col-lg-6 col-lg-offset-1">
+   <div class="btn-group">
+    <a href="#" class="btn btn-success btn-lg" 
+       data-bind="click: backStepOne">
+      <span class="glyphicon glyphicon-chevron-left"></span> Previous Step</a>
+    <a href="#" data-bind="click: validateStepTwo" class="btn btn-primary btn-lg">
+      Next Step <span class="glyphicon glyphicon-chevron-right"></span></a>
+   </div>
   </div>
 </div>
 {# END Thesis Info Group DIV #}

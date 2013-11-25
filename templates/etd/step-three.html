@@ -51,9 +51,14 @@
 </div>
 {% endcomment %}
 <div class="form-group">
-  <div class="col-lg-4 col-lg-offset-2">
-      
-   <a href="#" data-bind="click: validateStepThree" class="btn btn-primary btn-lg">Save and Continue</a>
+  <div class="col-lg-6 col-lg-offset-1">
+   <div class="btn-group">
+    <a href="#" class="btn btn-success btn-lg" 
+       data-bind="click: backStepTwo">
+      <span class="glyphicon glyphicon-chevron-left"></span> Previous Step</a> 
+    <a href="#" data-bind="click: validateStepThree" class="btn btn-primary btn-lg">Next Step 
+       <span class="glyphicon glyphicon-chevron-right"></span></a>
+   </div>   
   </div>
 </div>
 {# END Thesis Supporting DIV #}

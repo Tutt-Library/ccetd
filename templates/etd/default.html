@@ -140,3 +140,27 @@
  ko.applyBindings(new ThesisViewModel());
 </script>
 {% endblock %}
+
+
+{% block more-dialogs %}
+<div class="modal fade" id="open-web-alert-dlg">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">NOTE!</h4>
+      </div>
+      <div class="modal-body">
+        <p>
+          Submitting your thesis to the Digital Archives means that your scholarly work will be shared on the open web.
+          If you have any questions about this policy or if your thesis contains material that should NOT be on available
+          on the open web, please contact <a href="mailto: llister@coloradocollege.edu">Lisa Lister</a>.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+{% endblock %}  

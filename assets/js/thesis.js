@@ -115,6 +115,21 @@ function ThesisViewModel() {
    });
 
    // Event Handlers for Thesis
+   self.backStepOne = function() {
+     self.resetViews();
+     self.showStepOne(true);
+
+   }
+   self.backStepTwo = function() {
+     self.resetViews();
+     self.showStepTwo(true);
+   }
+
+   self.backStepThree = function() {
+     self.resetViews();
+     self.showStepThree(true);
+   }
+ 
    self.enableContinueHonorBtn = function() {
      if(self.hasHonorCode() == true && self.hasSubmissionAgreement()) {
         self.ContinueHonorCodeBtn(true);
@@ -179,23 +194,22 @@ function ThesisViewModel() {
      } else {
        self.titleValueStatus();
      }
-
+     var filename = $('#id_thesis_file').val().replace(/.*(\/|\\)/, '');
+     var ext = filename.split(".")[1];
+     if(ext != 'pdf') {
+       self.formError(true);
+       self.thesisFileStatus('has-error');
+       self.formErrors.push({'error': 'File must be a PDF/A'});
+       return
+     } 
      if(!self.thesisFile()) {
        self.thesisFileStatus('has-error');
        self.formErrors.push({'error': 'Thesis File is required'});
-       var filename = $('#id_thesis_file').val().replace(/.*(\/|\\)/, '');
-       var ext = filename.split(".")[1];
-       if(ext != 'pdf') {
-          self.thesisFileStatus('has-error');
-          self.formErrors.push({'error': 'File must be a PDF'});
-        }
      } else {
        self.thesisFileStatus();
      }
 
-
-
-     if(self.thesisKeywords.length < 1) {
+    if(self.thesisKeywords().length < 1) {
        self.thesisKeywordsStatus('has-error');
        self.formErrors.push({'error': 'At least one keyword is required'});
      } else {
@@ -233,7 +247,7 @@ function ThesisViewModel() {
      if(!self.stepFourViewModel().isValid()) {
        return;
      }
-     alert("Submitting your thesis to the Digital Archives means that your scholarly work will be shared on the open web");
+     $('#open-web-alert-dlg').modal('show');
      self.resetViews();
      self.setProgressBar(80);
 

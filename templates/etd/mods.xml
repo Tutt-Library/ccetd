@@ -100,7 +100,7 @@
   </mods:language>
   {% endif %}
   <mods:location>
-    <mods:url usage="primary display">http://hdl.handle.net/10176/{{ pid }}"></mods:url>
+    <mods:url usage="primary display">http://hdl.handle.net/10176/{{ pid }}</mods:url>
   </mods:location>
 </mods:mods>
 {% endautoescape %}

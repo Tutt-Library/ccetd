@@ -211,13 +211,15 @@ def save_xacml_policy(repository,
                                  content=xacml.getXmlString())
 
             
+
         
-def create_mods(post):
+def create_mods(post, pid):
     """
     Helper function generates a thesis MODS record from posted form
     contents and workflow config
 
     :param post: A request.POST object
+    :param pid: New PID for object
     :rtype: String 
     """
     creator_name = post.get('family')
@@ -226,8 +228,13 @@ def create_mods(post):
         creator_name = "{0} {1}".format(
             creator_name,
             suffix)
+    
     creator_name = "{0}, {1}".format(creator_name,
                                      post.get('given'))
+    middle = post.get('middle')
+    if middle and middle != 'None':
+        creator_name = "{0} {1}".format(creator_name,
+                                        middle)
     config = workflows.get(post.get('workflow'))
     extent = ''
     page_numbers = post.get('page_numbers', '')
@@ -252,6 +259,7 @@ def create_mods(post):
                      'department': config.get('FORM',
                                               'department'),
                      'extent': extent,
+                     'pid': pid,
                      'thesis_note': config.get('FORM',
                                                'thesis_note'),
                      'title': post.get('title'),
@@ -275,44 +283,68 @@ def create_mods(post):
             template_vars['topics'].append(word)
         
     return render_to_string('etd/mods.xml' , template_vars)
-    
-    
+
+def send_emails(config, info):
+    pass
+
 @login_required
 def update(request):
     "JSON View for AJAX Thesis Submission"
-    new_pid = repo.api.ingest(text=None)    
-    mods = create_mods(request.POST)
+    repo = Repository()
+    new_pid = repo.api.ingest(text=None)
+    config = workflows.get(request.POST.get('workflow'))
+    mods = create_mods(request.POST, pid=new_pid)
     mods_xml = etree.XML(mods)
     title = request.POST.get('title')
-    # Sets Stub Thesis Object Title
-    repository.api.modifyObject(pid=new_pid,
-                                label=title,
-                                ownerId=settings.FEDORA_USER,
-                                state="A")
+    thesis_pdf = request.FILES.pop('thesis_file')[0]
+    # Sets Thesis Object Title
+    repo.api.modifyObject(pid=new_pid,
+                          label=title,
+                          ownerId=settings.FEDORA_USER,
+                          state='A')
+    # Adds Thesis PDF Datastream
+    repo.api.addDatastream(pid=new_pid,
+                           dsID="THESIS",
+                           controlGroup="M",
+                           dsLabel=title,
+                           mimeType="application/pdf",
+                           content=thesis_pdf)
     # Adds MODS to Thesis Object
-    repository.api.addDatastream(pid=new_pid,
-                                 dsID="MODS",
-                                 dsLabel="MODS",
-                                 mimeType="text/xml",
-                                 content=etree.tostring(mods_xml))
-    
+    repo.api.addDatastream(pid=new_pid,
+                           dsID="MODS",
+                           controlGroup="M",
+                           dsLabel="MODS",
+                           mimeType="text/xml",
+                           content=etree.tostring(mods_xml))
+    # Iterate through remaining files and add as supporting datastreams
     for file_name in request.FILES.keys():
         file_object = request.FILES.get(file_name)
-        title = file_object.name
-        file_title = request.POST.get("{0}_title".format(title))
+        secondary_title = file_object.name
+        file_title = request.POST.get("{0}_title".format(secondary_title))
         if file_title is None:
             file_title = file_object.name
-        
+        ds_id = slugify(file_title)
         mime_type = mimetypes.guess_type(file_object.name)[0]
-        result = fedora_repo.api.addDatastream(
-            pid=pid,
+        if mime_type is None:
+            mime_type = 'application/octet-stream'
+        result = repo.api.addDatastream(
+            pid=new_pid,
             controlGroup="M",
             dsID=ds_id,
             dsLabel=file_object.name,
             mimeType=mime_type,
             content=file_object)
-    
-    return HttpResponse()
+    # Create RELS-EXT relationship with content type and parent collection
+    save_rels_ext(repo,
+                  new_pid,
+                  config.get('FORM', 'fedora_collection'),
+                  None)    
+    etd_success_msg = {'pid': new_pid,
+                       'title':title,
+                       'advisors':[]}
+    request.session['etd-info'] = etd_success_msg
+    return HttpResponse(str(etd_success_msg))
+##    return HttpResponseRedirect('/etd/success')
 
     
     
