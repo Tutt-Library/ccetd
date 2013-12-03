@@ -289,7 +289,7 @@ def send_emails(config, info):
 
 @login_required
 def update(request):
-    "JSON View for AJAX Thesis Submission"
+    "View for Thesis Submission"
     repo = Repository()
     new_pid = repo.api.ingest(text=None)
     config = workflows.get(request.POST.get('workflow'))
@@ -345,34 +345,6 @@ def update(request):
     request.session['etd-info'] = etd_success_msg
     return HttpResponse(str(etd_success_msg))
 ##    return HttpResponseRedirect('/etd/success')
-
-    
-    
-@login_required
-@json_view
-def upload_file(request):
-    """
-    AJAX view for uploading files
-
-    Parameters:
-    request -- HTTP request, required
-    """
-##    if request.method != 'POST':
-##        return Http404
-    fedora_repo = Repository()
-    pid = request.POST.get('pid')
-    for file_name in request.FILES.keys():
-        file_object = request.FILES.get(file_name)
-        mime_type = mimetypes.guess_type(file_object.name)[0]
-        ds_id = slugify(file_object.name)
-        result = fedora_repo.api.addDatastream(
-            pid=pid,
-            controlGroup="M",
-            dsID=ds_id,
-            dsLabel=file_object.name,
-            mimeType=mime_type,
-            content=file_object)    
-    return {'pid': pid}
     
 
 def old_upload(request, workflow=None):
@@ -529,30 +501,24 @@ def old_upload(request, workflow=None):
                               context_instance=RequestContext(request))
 
 
-def router(request,
-           workflow=default,
-           step=1):
-    step = int(step)
-    if step == 1:
-        return render(request,
-                      'etd/index.html',
-                      {'app': APP,
-                       'institution': INSTITUTION,
-                       'default': default,
-                       'form': StepOneForm(),
-                       'workflow': workflow})
+
                        
                       
     
     
 
 def workflow(request, workflow='default'):
-    step_one_form = StepOneForm()       
+    step_one_form = StepOneForm()
+    step_two_form = StepTwoForm()
     if workflows.has_key(workflow):
         custom = workflows[workflow]
         step_one_form.fields['advisors'].choices = get_advisors(custom)
+        if custom.has_section('LANGUAGE'):
+            step_two_form.fields['languages'].choices = custom.items('LANGUAGE')
+        
+                                                  
     step_one_form.fields['graduation_dates'].choices = get_grad_dates(custom)
-    step_two_form = StepTwoForm()
+    
     return render(request,
                   'etd/default.html',
                   {'app': APP,

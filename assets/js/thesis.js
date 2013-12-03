@@ -227,13 +227,18 @@ function ThesisViewModel() {
    }
 
   self.validateStepThree = function() {
+    self.formError(false);
+    self.formErrors.removeAll();
     self.resetViews();
     self.setProgressBar(60);
     self.showStepFour(true);
 
   }
 
-   self.validateStepFour = function() {
+  self.validateStepFour = function() {
+    self.formError(false);
+    self.formErrors.removeAll();
+
      if(!self.hasHonorCode()) {
       self.honorCodeError(true);
      } else {
@@ -247,7 +252,7 @@ function ThesisViewModel() {
      if(!self.stepFourViewModel().isValid()) {
        return;
      }
-     $('#open-web-alert-dlg').modal('show');
+
      self.resetViews();
      self.setProgressBar(80);
 
@@ -264,17 +269,3 @@ function ThesisViewModel() {
  
 }
 
-
-function uploadFile() {
-  var formData = new FormData(this);
-  var fileLoadReq = new XMLHttpRequest();
-  fileLoadReq.open('POST', 'uploadFile', true);
-  fileLoadReq.onload = function(oEvent) {
-    if(fileLoadReq.status == 200) {
-      alert("File uploaded");
-    } else {
-      alert("Error " + fileLoadReq.status + " occurred uploading your file");
-    }
-  }
-   fileLoadReq.send(formData);
-}

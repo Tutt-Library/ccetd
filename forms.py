@@ -160,6 +160,12 @@ class StepTwoForm(forms.Form):
                                            label='Yes')
     has_maps = forms.BooleanField(required=False,
                                   label='Yes')
+    languages = forms.MultipleChoiceField(label='Languages',
+                               required=False,
+                               choices=[],
+                               widget=forms.SelectMultiple(
+                                   attrs={'class': 'form-control'}))
+
     page_numbers = forms.IntegerField(required=False,
                                       widget=forms.TextInput(
                                           attrs={'class': 'form-control',
