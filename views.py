@@ -23,6 +23,7 @@ import datetime
 import os
 import ConfigParser
 import logging
+import urlparse
 
 import aristotle.settings as settings
 from aristotle.views import json_view
@@ -121,9 +122,15 @@ def success(request):
 
     :param request: Django request object
     """
+    if request.get_full_path().startswith('/etd/'):
+        website_view = True
+    else:
+        website_view = False
     etd_success_msg = request.session['etd-info']
-        
     if etd_success_msg is not None:
+        etd_success_msg['thesis_url'] = urlparse.urljoin(
+            settings.FEDORA_URI,
+            'fedora/repository/{0}'.format(etd_success_msg['pid']))
         if etd_success_msg.has_key('email'):
             raw_email = etd_success_msg['email']
             if len(raw_email) > 3 and raw_email.find('@') > -1: # Rough email validation
@@ -133,22 +140,29 @@ def success(request):
             for row in etd_success_msg['advisors']:
                 if row.find("@") > -1:
                     to_email_addrs.append(row)
-            email_message = "%s successfully submitted to Colorado College" % etd_success_msg['title']
-            email_message += " Digital Archives available at %s%s" % (settings.REPOSITORY_ROOT,
-                                                                      etd_success_msg['pid'])
+            if 'member' in INSTITUTION:
+                institution_name = INSTITUTION['member']['name']
+            else:
+                institution_name = INSTITUTION['name']
+            email_message = "{0} successfully submitted to {1}".format(
+                etd_success_msg['title'],
+                institution_name)
+            email_message += " Digital Archives available at {0}".format(
+                etd_success_msg['thesis_url'])
             if len(to_email_addrs) > 0:
-                send_mail('%s submitted to DACC' % etd_success_msg['title'],
+                send_mail('{0} submitted to DACC'.format(etd_success_msg['title']),
                           email_message,
                           settings.EMAIL_HOST_USER,
                           to_email_addrs,
                           fail_silently=False)
-        etd_success_msg['thesis_url'] = '%s%s' % (settings.REPOSITORY_ROOT,
-                                                  etd_success_msg['pid'])
-        etd_success_msg['repository_url'] = settings.REPOSITORY_ROOT
+
+        etd_success_msg['repository_url'] = settings.FEDORA_URI
+        request.session.pop('etd-info')
         return direct_to_template(request,
                                   'etd/success.html',
-                                  {'info':etd_success_msg})
-    return HttpResponse('Success!')
+                                  {'info':etd_success_msg,
+                                   'website': website_view})
+    raise Http404
 
 def save_rels_ext(repository,
                   pid,
@@ -249,7 +263,8 @@ def create_mods(post, pid):
     extent = extent.strip()
     if len(extent) < 1:
         extent = None
-    template_vars = {'advisors': [],
+    template_vars = {'abstract': post.get('abstract', None),
+                     'advisors': [],
                      'config': config,
                      'creator': creator_name,
                      'degree': {'type': config.get('FORM',
@@ -273,10 +288,18 @@ def create_mods(post, pid):
     template_vars['location'] = '{0}, {1}'.format(
             address.get('addressLocality'),
             address.get('addressRegion'))
-            
+    if 'languages' in post:
+        languages = post.getlist('languages')
+        template_vars['languages'] = []
+        for code in languages:
+            template_vars['languages'].append(
+                config.get('LANGUAGE', code))
     for advisor in post.getlist('advisors'):
         template_vars['advisors'].append(config.get('FACULTY',
                                                     advisor))
+    if 'freeform_advisor' in post:
+        template_vars['advisors'].append(
+            post.get('freeform_advisor'))
     
     for word in post.getlist('keyword'):
         if len(word) > 0:
@@ -320,7 +343,7 @@ def update(request):
     for file_name in request.FILES.keys():
         file_object = request.FILES.get(file_name)
         secondary_title = file_object.name
-        file_title = request.POST.get("{0}_title".format(secondary_title))
+        file_title = request.POST.get("{0}_title".format(file_name))
         if file_title is None:
             file_title = file_object.name
         ds_id = slugify(file_title)
@@ -331,7 +354,7 @@ def update(request):
             pid=new_pid,
             controlGroup="M",
             dsID=ds_id,
-            dsLabel=file_object.name,
+            dsLabel=file_title,
             mimeType=mime_type,
             content=file_object)
     # Create RELS-EXT relationship with content type and parent collection
@@ -342,9 +365,11 @@ def update(request):
     etd_success_msg = {'pid': new_pid,
                        'title':title,
                        'advisors':[]}
+    if 'email' in request.POST:
+        etd_success_msg['email'] = request.POST.get('email')
     request.session['etd-info'] = etd_success_msg
-    return HttpResponse(str(etd_success_msg))
-##    return HttpResponseRedirect('/etd/success')
+##    return HttpResponse(str(etd_success_msg))
+    return HttpResponseRedirect('/etd/success')
     
 
 def old_upload(request, workflow=None):
@@ -508,6 +533,7 @@ def old_upload(request, workflow=None):
     
 
 def workflow(request, workflow='default'):
+    multiple_languages = False
     step_one_form = StepOneForm()
     step_two_form = StepTwoForm()
     if workflows.has_key(workflow):
@@ -515,20 +541,27 @@ def workflow(request, workflow='default'):
         step_one_form.fields['advisors'].choices = get_advisors(custom)
         if custom.has_section('LANGUAGE'):
             step_two_form.fields['languages'].choices = custom.items('LANGUAGE')
+            multiple_languages = True
         
                                                   
     step_one_form.fields['graduation_dates'].choices = get_grad_dates(custom)
-    
+    if request.get_full_path().startswith('/etd/'):
+        website_view = True
+    else:
+        website_view = False
     return render(request,
                   'etd/default.html',
                   {'app': APP,
                    'config': custom,
+                   'email_notices': custom.get('FORM', 'email_notices'),
                    'institution': INSTITUTION,
                    'default':default,
+                   'multiple_languages': multiple_languages,
                    'step_one_form': step_one_form,
                    'step_two_form': step_two_form,
                    'step_three_form': StepThreeForm(),
                    'step_four_form': StepFourForm(),
+                   'website': website_view,
                    'workflow':workflow})
     
     

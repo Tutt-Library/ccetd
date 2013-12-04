@@ -34,7 +34,8 @@
       {{ step_one_form.suffix }}
     </div>
  </div>
-{% if default.email_notices %}
+ <p>{{ config.FORM }}</p>
+{% if email_notices %}
  <div class="form-group">
   {{ step_one_form.email.errors }}
   <label class='control-label col-lg-2' for="id_thesis-email">{{ step_one_form.email.label }}</label>

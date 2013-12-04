@@ -255,11 +255,6 @@ function ThesisViewModel() {
 
      self.resetViews();
      self.setProgressBar(80);
-
-     $("#thesis-base-form").bind('ajax:complete', function() {
-         self.setProgressBar(100);
-     });     
-
      $("#thesis-base-form").submit();
 
 
