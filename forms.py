@@ -25,8 +25,8 @@ from django import forms
 from django.contrib.formtools.wizard import FormWizard
 from django.core.exceptions import ValidationError
 import lxml.etree as etree
-from eulxml.xmlmap import mods
-from eulxml.forms import XmlObjectForm,SubformField
+##from eulxml.xmlmap import mods
+##from eulxml.forms import XmlObjectForm,SubformField
 
 # Supporting Fields
 class AdvisorsField(forms.MultipleChoiceField):
