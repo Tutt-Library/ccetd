@@ -48,7 +48,7 @@ from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
 from django.http import HttpResponse,Http404,HttpResponseRedirect
 from django.template import Context,Library,Template,loader,RequestContext
-from eulxml.xmlmap import load_xmlobject_from_string, mods
+##from eulxml.xmlmap import load_xmlobject_from_string, mods
 
 
 # Sets workflows dict
