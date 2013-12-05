@@ -131,7 +131,7 @@ def success(request):
         etd_success_msg['thesis_url'] = urlparse.urljoin(
             settings.FEDORA_URI,
             'fedora/repository/{0}'.format(etd_success_msg['pid']))
-        if etd_success_msg.has_key('email'):
+        if etd_success_msg.has_key('email') and not settings.DEBUG:
             raw_email = etd_success_msg['email']
             if len(raw_email) > 3 and raw_email.find('@') > -1: # Rough email validation
                 to_email_addrs = [etd_success_msg['email'],]
