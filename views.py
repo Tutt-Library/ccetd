@@ -245,7 +245,7 @@ def create_mods(post, pid):
     if middle and middle != 'None':
         creator_name = "{0} {1}.".format(creator_name,
                                         middle)
-        suffix = post.get('suffix')
+    suffix = post.get('suffix')
     if suffix and suffix != 'None':
         creator_name = "{0} {1}".format(
             creator_name,
