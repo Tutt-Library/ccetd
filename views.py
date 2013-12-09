@@ -345,8 +345,9 @@ def update(request):
         secondary_title = file_object.name
         file_title = request.POST.get("{0}_title".format(file_name))
         if file_title is None or len(file_title) < 1:
-            file_title = file_object.name
-        ds_id = slugify(file_title)
+            file_title = file_object.name.split(".")[0]
+        # DS_ID max length of 64 characters
+        ds_id = slugify(file_title)[0:63]
         
         mime_type = mimetypes.guess_type(file_object.name)[0]
         if mime_type is None:
