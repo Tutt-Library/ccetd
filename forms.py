@@ -167,6 +167,7 @@ class StepTwoForm(forms.Form):
                                    attrs={'class': 'form-control'}))
 
     page_numbers = forms.IntegerField(required=False,
+                                      label='Last PDF page number',
                                       widget=forms.TextInput(
                                           attrs={'class': 'form-control',
                                                  'data-bind': 'value: pageNumberValue'}))    

@@ -29,7 +29,8 @@ import aristotle.settings as settings
 from aristotle.views import json_view
 from aristotle.settings import INSTITUTION
 import mimetypes
-from lxml import etree
+## from lxml import etree
+import xml.etree.ElementTree as etree
 from eulfedora.server import Repository
 from ccetd.forms import *
 #import islandoraUtils.xacml.tools as islandora_xacml
@@ -287,7 +288,7 @@ def create_mods(post, pid):
                      'pid': pid,
                      'thesis_note': config.get('FORM',
                                                'thesis_note'),
-                     'title': post.get('title'),
+                     'title': post.get('title').replace('&', '&amp;'),
                      'topics': [],
                      'year': year}
     if 'member' in INSTITUTION:

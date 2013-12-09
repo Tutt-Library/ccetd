@@ -16,6 +16,8 @@
   <mods:note type="thesis" displayLabel="Degree Name">{{ degree.name }}</mods:note>
   <mods:note type="thesis" displayLabel="Degree Type">{{ degree.type }}</mods:note>
   {% endif %}
+  <mods:note type="bibliography">Includes bibliographical references.</mods:note>
+  <mods:typeOfResource>text</mods:typeOfResource>
   <mods:genre authority="marcgt">thesis</mods:genre>
   <mods:accessCondition type="useAndReproduction">Copyright restrictions apply.</mods:accessCondition>
   <mods:physicalDescription>
