@@ -344,9 +344,10 @@ def update(request):
         file_object = request.FILES.get(file_name)
         secondary_title = file_object.name
         file_title = request.POST.get("{0}_title".format(file_name))
-        if file_title is None:
+        if file_title is None or len(file_title) < 1:
             file_title = file_object.name
         ds_id = slugify(file_title)
+        
         mime_type = mimetypes.guess_type(file_object.name)[0]
         if mime_type is None:
             mime_type = 'application/octet-stream'
