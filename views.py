@@ -237,32 +237,41 @@ def create_mods(post, pid):
     :rtype: String 
     """
     creator_name = post.get('family')
-    suffix = post.get('suffix')
-    if suffix and suffix != 'None':
-        creator_name = "{0} {1}".format(
-            creator_name,
-            suffix)
+
     
     creator_name = "{0}, {1}".format(creator_name,
                                      post.get('given'))
     middle = post.get('middle')
     if middle and middle != 'None':
-        creator_name = "{0} {1}".format(creator_name,
+        creator_name = "{0} {1}.".format(creator_name,
                                         middle)
+        suffix = post.get('suffix')
+    if suffix and suffix != 'None':
+        creator_name = "{0} {1}".format(
+            creator_name,
+            suffix)
     config = workflows.get(post.get('workflow'))
     extent = ''
     page_numbers = post.get('page_numbers', '')
     if len(page_numbers) > 0:
-        extent += '{0} pages : '.format(page_numbers)
+        extent += '{0} pages'.format(page_numbers)
     if post.has_key('has_illustrations'):
-        extent += 'illustrations'
+        extent += ' : illustrations'
     if post.has_key('has_maps'):
         if extent.endswith('illustrations'):
             extent += ', '
+        else:
+            extent += ' : '
         extent += 'map(s)'
     extent = extent.strip()
     if len(extent) < 1:
         extent = None
+    grad_date = post.get('graduation_date', None)
+    if grad_date is None:
+        # sorta a hack
+        year = datetime.datetime.utcnow().year
+    else:
+        year = int(grad_date[-4:])
     template_vars = {'abstract': post.get('abstract', None),
                      'advisors': [],
                      'config': config,
@@ -274,11 +283,13 @@ def create_mods(post, pid):
                      'department': config.get('FORM',
                                               'department'),
                      'extent': extent,
+                     'honor_code': post.get('honor_code', False),
                      'pid': pid,
                      'thesis_note': config.get('FORM',
                                                'thesis_note'),
                      'title': post.get('title'),
-                     'topics': []}
+                     'topics': [],
+                     'year': year}
     if 'member' in INSTITUTION:
         template_vars['institution'] = INSTITUTION['member']['name']
         address = INSTITUTION['member']['address']
