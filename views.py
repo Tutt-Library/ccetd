@@ -242,14 +242,19 @@ def create_mods(post, pid):
     
     creator_name = "{0}, {1}".format(creator_name,
                                      post.get('given'))
-    middle = post.get('middle')
-    if middle and middle != 'None':
-        creator_name = "{0} {1}.".format(creator_name,
-                                        middle)
+    middle = post.get('middle' ,'')
+    if len(middle) > 0 and middle != 'None':
+        creator_name = "{0} {1}".format(creator_name,
+                                         middle)
     suffix = post.get('suffix')
     if suffix and suffix != 'None':
-        creator_name = "{0} {1}".format(
+        if len(middle) == 1:
+            delimiter = '.,'
+        else:
+            delimiter = ','
+        creator_name = "{0}{1} {2}".format(
             creator_name,
+            delimiter,
             suffix)
     config = workflows.get(post.get('workflow'))
     extent = ''
@@ -267,16 +272,20 @@ def create_mods(post, pid):
     extent = extent.strip()
     if len(extent) < 1:
         extent = None
-    grad_date = post.get('graduation_date', None)
+    grad_date = post.get('graduation_dates', None)
     if grad_date is None:
         # sorta a hack
-        year = datetime.datetime.utcnow().year
+        date_str = datetime.datetime.utcnow().strftime("%Y-%m")
     else:
-        year = int(grad_date[-4:])
+        month, year = grad_date.split(" ")
+        date_str = "{0}-{1}".format(
+            year,
+            {'December': 12, 'May': 5, 'July': 7}.get(month))
     template_vars = {'abstract': post.get('abstract', None),
                      'advisors': [],
                      'config': config,
                      'creator': creator_name,
+                     'date_str': date_str,
                      'degree': {'type': config.get('FORM',
                                                    'degree_type'),
                                 'name': config.get('FORM',
@@ -289,8 +298,7 @@ def create_mods(post, pid):
                      'thesis_note': config.get('FORM',
                                                'thesis_note'),
                      'title': post.get('title').replace('&', '&amp;'),
-                     'topics': [],
-                     'year': year}
+                     'topics': []}
     if 'member' in INSTITUTION:
         template_vars['institution'] = INSTITUTION['member']['name']
         address = INSTITUTION['member']['address']

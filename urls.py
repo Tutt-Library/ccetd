@@ -18,7 +18,7 @@
 """
 __author__ = 'Jeremy Nelson'
 import ccetd.views
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 
 urlpatterns = patterns('ccetd.views',
     (r'^$','default'),

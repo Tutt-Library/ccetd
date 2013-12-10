@@ -80,9 +80,9 @@
     {% if institution %}
     <mods:publisher>{{ institution }}</mods:publisher>
     {% endif %}
-    {% if year %}
-    <mods:dateIssued keyDate="yes">{{ year }}</mods:dateIssued>
-    <mods:dateCreated>{{ year }}</mods:dateCreated>
+    {% if date_str %}
+    <mods:dateIssued keyDate="yes">{{ date_str }}</mods:dateIssued>
+    <mods:dateCreated>{{ date_str }}</mods:dateCreated>
     {% endif %}
     {% if location %}
     <mods:place>
