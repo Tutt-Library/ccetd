@@ -194,6 +194,7 @@ function ThesisViewModel() {
    self.validateStepTwo = function() {
      self.formError(false);
      self.formErrors.removeAll();
+
      if(!self.titleValue()) {
        self.titleValueStatus('has-error');
        self.formErrors.push({'error': 'Title is required'});
@@ -215,11 +216,18 @@ function ThesisViewModel() {
          self.thesisFileStatus();
        }
      }
-    if(!self.thesisKeywords().every(function(x) { return x.length > 0})) {
+    var emptyKeywords = true;
+    $("input[name$='keyword']").each(
+     function(index) { 
+        if($(this).val().length > 0) { 
+          emptyKeywords=false; 
+        } 
+      });
+    if(emptyKeywords == true) {
        self.thesisKeywordsStatus('has-error');
        self.formErrors.push({'error': 'At least one keyword is required'});
      } else {
-       self.thesisKeywordsStatus();
+       self.thesisKeywordsStatus('');
      }
 
      if(!self.stepTwoViewModel().isValid() || self.formErrors().length > 0) {
