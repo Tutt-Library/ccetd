@@ -280,7 +280,9 @@ def create_mods(post, pid):
         month, year = grad_date.split(" ")
         date_str = "{0}-{1}".format(
             year,
-            {'December': 12, 'May': 5, 'July': 7}.get(month))
+            {'December': '12',
+             'May': '05',
+             'July': '07'}.get(month))
     template_vars = {'abstract': post.get('abstract', None),
                      'advisors': [],
                      'config': config,

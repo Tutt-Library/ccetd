@@ -156,20 +156,26 @@ function ThesisViewModel() {
 
 
    self.validateStepOne = function()  {
+     self.formError(false);
+     self.formErrors.removeAll();
      if(!self.givenValue()) {
        self.givenNameStatus('has-error');
+       self.formErrors.push({'error': 'First name is required'});
      } else {
        self.givenNameStatus();
      }
      
      if(!self.familyValue()) {
        self.familyNameStatus('has-error');
+       self.formErrors.push({'error': 'Last name is required'});
+
      } else {
        self.familyNameStatus();
      }     
 
      if(self.advisorList().length < 1 && !self.advisorFreeFormValue())  {
        self.advisorsStatus('has-error'); 
+       self.formErrors.push({'error': 'At least one advisor is required'});
      } else {
        self.advisorsStatus(); 
     }
@@ -194,22 +200,22 @@ function ThesisViewModel() {
      } else {
        self.titleValueStatus();
      }
-     var filename = $('#id_thesis_file').val().replace(/.*(\/|\\)/, '');
-     var ext = filename.split(".")[1];
-     if(ext != 'pdf') {
-       self.formError(true);
-       self.thesisFileStatus('has-error');
-       self.formErrors.push({'error': 'File must be a PDF/A'});
-       return
-     } 
+
      if(!self.thesisFile()) {
        self.thesisFileStatus('has-error');
        self.formErrors.push({'error': 'Thesis File is required'});
      } else {
-       self.thesisFileStatus();
+       var filename = $('#id_thesis_file').val().replace(/.*(\/|\\)/, '');
+       var ext = filename.split(".")[1];
+       ext = ext.toLowerCase();
+       if(ext != 'pdf' && ext != 'mp4') {
+         self.thesisFileStatus('has-error');
+         self.formErrors.push({'error': 'File must be a PDF/A or MP4'});
+       } else {
+         self.thesisFileStatus();
+       }
      }
-
-    if(self.thesisKeywords().length < 1) {
+    if(!self.thesisKeywords().every(function(x) { return x.length > 0})) {
        self.thesisKeywordsStatus('has-error');
        self.formErrors.push({'error': 'At least one keyword is required'});
      } else {

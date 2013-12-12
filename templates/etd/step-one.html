@@ -48,6 +48,7 @@
 <div class="form-group" data-bind="css: advisorsStatus">
   {{ step_one_form.advisors.errors }}
    <label class='control-label col-lg-2' for='id_advisor-advisors'>{{ step_one_form.advisors.label }}*</label>
+   <p>(To add more than one advisor, use control + enter)</p>
    <div class="col-lg-4">
      {{ step_one_form.advisors }}
     <label>{{ step_one_form.freeform_advisor.label }}</label>
@@ -63,7 +64,8 @@
 </div>
 <div class="form-group">
   <div class="col-lg-3 col-lg-offset-2">
-   <a href="#" data-bind="click: validateStepOne" class="btn btn-primary btn-lg">Next Step</a>
+   <a href="#" data-bind="click: validateStepOne" 
+      class="btn btn-primary btn-lg">Next Step <span class="glyphicon glyphicon-chevron-right"></span></a>
   </div>
 </div>
 {# END Thesis Author DIV #}
