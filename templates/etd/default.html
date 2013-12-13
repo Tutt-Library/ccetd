@@ -108,7 +108,7 @@
    <ul>
    {% for workflow in active %}
     <li><a 
-        {% if not user.is_authenticated %}href="/apps/accounts/login?next=/apps/etd/{{ workflow.0 }}"
+        {% if not user.is_authenticated %}href="/accounts/login?next=/apps/etd/{{ workflow.0 }}"
         {% else %} 
         href="{{ request.get_full_path }}{{ workflow.0 }}"
         {% endif %}>{{ workflow.1|get_department_name }}</a>
