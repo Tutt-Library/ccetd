@@ -133,6 +133,7 @@ def success(request):
             settings.FEDORA_URI,
             'fedora/repository/{0}'.format(etd_success_msg['pid']))
         if etd_success_msg.has_key('email') and not settings.DEBUG:
+            config = workflows.get(etd_success_msg.get('workflow'))
             raw_email = etd_success_msg['email']
             if len(raw_email) > 3 and raw_email.find('@') > -1: # Rough email validation
                 to_email_addrs = [etd_success_msg['email'],]
@@ -141,6 +142,9 @@ def success(request):
             for row in etd_success_msg['advisors']:
                 if row.find("@") > -1:
                     to_email_addrs.append(row)
+            if config.has_section('STAFF'):
+                for email in config.options('STAFF'):
+                    to_email_addrs.append(email)
             if 'member' in INSTITUTION:
                 institution_name = INSTITUTION['member']['name']
             else:
@@ -337,7 +341,8 @@ def update(request):
     "View for Thesis Submission"
     repo = Repository()
     new_pid = repo.api.ingest(text=None)
-    config = workflows.get(request.POST.get('workflow'))
+    workflow = request.POST.get('workflow')
+    config = workflows.get(workflow)
     mods = create_mods(request.POST, pid=new_pid)
     mods_xml = etree.XML(mods)
     title = request.POST.get('title')
@@ -386,9 +391,11 @@ def update(request):
                   new_pid,
                   config.get('FORM', 'fedora_collection'),
                   None)    
-    etd_success_msg = {'pid': new_pid,
+    etd_success_msg = {'advisors':[],
+                       'pid': new_pid,
                        'title':title,
-                       'advisors':[]}
+                       'workflow': workflow
+                       }
     if 'email' in request.POST:
         etd_success_msg['email'] = request.POST.get('email')
     request.session['etd-info'] = etd_success_msg
