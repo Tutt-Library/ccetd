@@ -69,7 +69,7 @@ for filename in os.listdir(workflow_dir):
         workflow_config.set('FORM','location', location)
         workflows[fileinfo[0].lower()] = workflow_config
 
-# Helper functions 
+# Helper functions
 def get_advisors(config):
     """
     Helper function returns a sorted list of advisor email and
@@ -132,7 +132,7 @@ def success(request):
         etd_success_msg['thesis_url'] = urlparse.urljoin(
             settings.FEDORA_URI,
             'fedora/repository/{0}'.format(etd_success_msg['pid']))
-        if etd_success_msg.has_key('email') and not settings.DEBUG:
+        if etd_success_msg.has_key('email'):
             config = workflows.get(etd_success_msg.get('workflow'))
             raw_email = etd_success_msg['email']
             if len(raw_email) > 3 and raw_email.find('@') > -1: # Rough email validation
@@ -175,8 +175,8 @@ def save_rels_ext(repository,
                   restrictions):
     """
     Helper function saves RELS-EXT datastream for Thesis object to Repository
-   
-    :param repository: Fedora repository 
+
+    :param repository: Fedora repository
     :param pid: Thesis PID
     :param parent_pid: Parent Collection PID
     :param restrictions: Restrictions for RELS-EXT
@@ -210,7 +210,7 @@ def save_xacml_policy(repository,
     """
     Helper function saves XACML Policy to Thesis object
 
-    :param repository: Fedora repository 
+    :param repository: Fedora repository
     :param pid: Thesis PID
     :param restrictions: Restrictions for XACML Policy
     """
@@ -229,9 +229,9 @@ def save_xacml_policy(repository,
                                  mimeType="application/rdf+xml",
                                  content=xacml.getXmlString())
 
-            
 
-        
+
+
 def create_mods(post, pid):
     """
     Helper function generates a thesis MODS record from posted form
@@ -239,11 +239,11 @@ def create_mods(post, pid):
 
     :param post: A request.POST object
     :param pid: New PID for object
-    :rtype: String 
+    :rtype: String
     """
     creator_name = post.get('family')
 
-    
+
     creator_name = "{0}, {1}".format(creator_name,
                                      post.get('given'))
     middle = post.get('middle' ,'')
@@ -310,7 +310,7 @@ def create_mods(post, pid):
         address = INSTITUTION['member']['address']
     else:
         template_vars['institution'] = INSTITUTION['name']
-        address = INSTITUTION['address']    
+        address = INSTITUTION['address']
     template_vars['location'] = '{0}, {1}'.format(
             address.get('addressLocality'),
             address.get('addressRegion'))
@@ -326,11 +326,11 @@ def create_mods(post, pid):
     if 'freeform_advisor' in post:
         template_vars['advisors'].append(
             post.get('freeform_advisor'))
-    
+
     for word in post.getlist('keyword'):
         if len(word) > 0:
             template_vars['topics'].append(word)
-        
+
     return render_to_string('etd/mods.xml' , template_vars)
 
 def send_emails(config, info):
@@ -375,7 +375,7 @@ def update(request):
             file_title = file_object.name.split(".")[0]
         # DS_ID max length of 64 characters
         ds_id = slugify(file_title)[0:63]
-        
+
         mime_type = mimetypes.guess_type(file_object.name)[0]
         if mime_type is None:
             mime_type = 'application/octet-stream'
@@ -390,7 +390,7 @@ def update(request):
     save_rels_ext(repo,
                   new_pid,
                   config.get('FORM', 'fedora_collection'),
-                  None)    
+                  None)
     etd_success_msg = {'advisors':[],
                        'pid': new_pid,
                        'title':title,
@@ -401,14 +401,14 @@ def update(request):
     request.session['etd-info'] = etd_success_msg
 ##    return HttpResponse(str(etd_success_msg))
     return HttpResponseRedirect('/etd/success')
-    
+
 
 def old_upload(request, workflow=None):
     """
     Creates MODS and other metadata along with the file uploads to Fedora.
 
     :param request: HTTP request, required
-    :param workflow: Specific workflow for individual departments, blank value 
+    :param workflow: Specific workflow for individual departments, blank value
                      displays default view.
    """
     if request.method != 'POST':
@@ -469,7 +469,7 @@ def old_upload(request, workflow=None):
                 if len(topic) > 1:
                     mods_xml.subjects.append(mods.Subject(topic=topic))
         mods_xml.title = title_form.save()
-        # Generate workflow constant metadata 
+        # Generate workflow constant metadata
         year_result = re.search(r'(\d+)',
                                 upload_thesis_form.cleaned_data['graduation_dates'])
         if year_result:
@@ -514,7 +514,7 @@ def old_upload(request, workflow=None):
         #                             'administrator',
         #                             'p-dacc_admin']
         # if len(restrictions) > 0:
-        #    save_xacml_policy(repo,thesis_obj.pid,restrictions) 
+        #    save_xacml_policy(repo,thesis_obj.pid,restrictions)
         #    thesis_obj.save()
         #if restrictions.has_key('thesis'):
         #    save_rels_ext(repo,thesis_obj.pid,default['fedora_collection'],restrictions)
@@ -558,10 +558,10 @@ def old_upload(request, workflow=None):
 
 
 
-                       
-                      
-    
-    
+
+
+
+
 
 def workflow(request, workflow='default'):
     multiple_languages = False
@@ -573,8 +573,8 @@ def workflow(request, workflow='default'):
         if custom.has_section('LANGUAGE'):
             step_two_form.fields['languages'].choices = custom.items('LANGUAGE')
             multiple_languages = True
-        
-                                                  
+
+
     step_one_form.fields['graduation_dates'].choices = get_grad_dates(custom)
     if request.get_full_path().startswith('/etd/'):
         website_view = True
@@ -594,14 +594,14 @@ def workflow(request, workflow='default'):
                    'step_four_form': StepFourForm(),
                    'website': website_view,
                    'workflow':workflow})
-    
-    
+
+
 def old_workflow(request,workflow='default'):
     """
     Displays thesis entry form to end user.
 
     :param request: HTTP request, required
-    :param workflow: Specific workflow for individual departments, blank value 
+    :param workflow: Specific workflow for individual departments, blank value
                      displays default view.
     """
     if request.get_full_path().startswith('/etd/'):
@@ -611,7 +611,7 @@ def old_workflow(request,workflow='default'):
 
     if not request.user.is_authenticated():
          return HttpResponseRedirect("/accounts/login?next=%s" % request.path)
-                                   
+
     if workflow is None:
         workflow = 'default'
     if workflows.has_key(workflow):

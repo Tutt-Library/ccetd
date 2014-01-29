@@ -8,6 +8,7 @@
    {{ abstract }}
   </mods:abstract>
   {% endif %}
+  <mods:note type="admin">The author has given permission for this work to be deposited in the Digital Archive of Colorado College.</mods:note>
   {% if honor_code %}
   <mods:note type="admin">Colorado College Honor Code upheld.</mods:note>
   {% endif %}
