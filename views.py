@@ -305,6 +305,9 @@ def create_mods(post, pid):
                                                'thesis_note'),
                      'title': post.get('title').replace('&', '&amp;'),
                      'topics': []}
+    if config.has_option('FORM', 'additional_note'):
+        template_vars['additional_note'] = config.get('FORM',
+                                                      'additional_note')
     if 'member' in INSTITUTION:
         template_vars['institution'] = INSTITUTION['member']['name']
         address = INSTITUTION['member']['address']

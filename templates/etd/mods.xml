@@ -12,6 +12,9 @@
   {% if honor_code %}
   <mods:note type="admin">Colorado College Honor Code upheld.</mods:note>
   {% endif %}
+  {% if additional_note %}
+  <mods:note>{{ additional_note }}</mods:note>
+  {% endif %}
   <mods:note type="thesis">Senior Thesis -- Colorado College</mods:note>
   {% if degree %}
   <mods:note type="thesis" displayLabel="Degree Name">{{ degree.name }}</mods:note>
