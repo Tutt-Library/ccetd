@@ -5,7 +5,7 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   {% if abstract %}
   <mods:abstract>
-   {{ abstract }}
+   {{ abstract|escape }}
   </mods:abstract>
   {% endif %}
   <mods:note type="admin">The author has given permission for this work to be deposited in the Digital Archive of Colorado College.</mods:note>
@@ -72,12 +72,12 @@
   {% endif %}
   {% for keyword in topics %}
   <mods:subject>
-    <mods:topic>{{ keyword }}</mods:topic>
+    <mods:topic>{{ keyword|escape }}</mods:topic>
   </mods:subject>
   {% endfor %}
   {% if title %}
   <mods:titleInfo>
-    <mods:title>{{ title }}</mods:title>
+    <mods:title>{{ title|escape }}</mods:title>
   </mods:titleInfo>
   {% endif %}
   <mods:originInfo>
