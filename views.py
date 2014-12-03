@@ -39,6 +39,7 @@ from ccetd.forms import *
 from app_settings import APP
 from operator import itemgetter
 from django import forms
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.shortcuts import render as direct_to_template # quick hack to get running under django 1.5
@@ -163,6 +164,7 @@ def success(request):
 
         etd_success_msg['repository_url'] = settings.FEDORA_URI
         request.session.pop('etd-info')
+        logout(request)
         return direct_to_template(request,
                                   'etd/success.html',
                                   {'info':etd_success_msg,
