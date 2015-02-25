@@ -23,7 +23,7 @@ import logging,re,mimetypes
 from django import forms
 
 from django.core.exceptions import ValidationError
-import lxml.etree as etree
+import xml.etree.ElementTree as etree
 
 # Supporting Fields
 class AdvisorsField(forms.MultipleChoiceField):
@@ -95,7 +95,7 @@ class StepOneForm(forms.Form):
     def save(self,
              etree_mods,
              config):
-        """Creates MODS from fields and appends to etree_mods 
+        """Creates MODS from fields and appends to etree_mods
 
         """
         advisor_role = mods.Role(authority='marcrelator',
@@ -152,7 +152,7 @@ class StepTwoForm(forms.Form):
                                required=False,
                                widget=forms.Textarea(attrs={'class':'form-control',
                                                             'cols':60,
-                                                            'rows':5}))    
+                                                            'rows':5}))
     has_illustrations = forms.BooleanField(required=False,
                                            label='Yes')
     has_maps = forms.BooleanField(required=False,
@@ -167,7 +167,7 @@ class StepTwoForm(forms.Form):
                                       label='Last PDF page number',
                                       widget=forms.TextInput(
                                           attrs={'class': 'form-control',
-                                                 'data-bind': 'value: pageNumberValue'}))    
+                                                 'data-bind': 'value: pageNumberValue'}))
     thesis_file = forms.FileField(
         widget=forms.FileInput(
             attrs={'class': 'btn btn-default',
@@ -232,22 +232,22 @@ class StepThreeForm(forms.Form):
 class StepFourForm(forms.Form):
     honor_code = forms.BooleanField(label='I agree',
                                     widget=forms.CheckboxInput(
-                                    attrs={'data-bind': 'checked: hasSubmissionAgreement'}))    
+                                    attrs={'data-bind': 'checked: hasSubmissionAgreement'}))
     not_publically_available = forms.BooleanField(required=False,
                                                   label='I do not agree')
     submission_agreement = forms.BooleanField(required=False,
                                               label='I agree',
                                               widget=forms.CheckboxInput(
                                                   attrs={'data-bind': 'checked: hasHonorCode'}))
-            
-        
-        
-            
-        
 
-    
 
-# Custom Forms for Electronic Thesis and Dataset 
+
+
+
+
+
+
+# Custom Forms for Electronic Thesis and Dataset
 class AdvisorForm(forms.Form):
     """AdvisorForm associates form fields with its MODS name and supporting
        XML elements.
@@ -279,7 +279,7 @@ class AdvisorForm(forms.Form):
              config):
         """
         Method save method for creating multiple MODS name with advisor role
-        for MODS datastream in Fedora Commons server. Method returns a list 
+        for MODS datastream in Fedora Commons server. Method returns a list
         of MODS name elements
         """
         output = []
@@ -304,7 +304,7 @@ class AdvisorForm(forms.Form):
                 advisor.name_parts.append(mods.NamePart(text=raw_name))
                 output.append(advisor)
         return output
-       
+
 
 def pretty_name_generator(name_parts):
     suffix = filter(lambda x: x.type == 'suffix', name_parts)
@@ -327,10 +327,10 @@ def pretty_name_generator(name_parts):
                 yield '%s' % name.text
         else:
             yield ''
-         
+
 
 class InstitutionForm(forms.Form):
-    """InstitutionForm name MODS field with the degree granting institution 
+    """InstitutionForm name MODS field with the degree granting institution
        can use form values or passed in Config object to set MODS namePart value.
     """
     name = forms.CharField(label='Institution name',
@@ -402,7 +402,7 @@ class OriginInfoForm(forms.Form):
     def save(self,
              config=None,
              year_value=None):
-        """Extract year from padded in date value, set date captured and date 
+        """Extract year from padded in date value, set date captured and date
            issued to value."""
         if year_value:
             year = year_value
@@ -441,7 +441,7 @@ class PhysicalDescriptionForm(forms.Form):
                                       widget=forms.TextInput(
                                           attrs={'class': 'form-control',
                                                  'data-bind': 'value: pageNumberValue'}))
-  
+
     def save(self):
         """Method creates a MODS physicalDescription and child elements
            from form values.
@@ -470,7 +470,7 @@ class PhysicalDescriptionForm(forms.Form):
 
 class SubjectsForm(forms.Form):
     """SubjectsForm contains three keyword fields as a default
-    """ 
+    """
     keyword_1 = forms.CharField(max_length=30,
                                 required=False,
                                 label='Keyword 1',
@@ -489,7 +489,7 @@ class SubjectsForm(forms.Form):
 
     def save(self,
              total_keywords=10):
-        """Save method checks for all keywords and returns a list of MODS 
+        """Save method checks for all keywords and returns a list of MODS
            subject elements with topic child element for each keyword
 
            Parameters:
@@ -549,9 +549,9 @@ class ThesisDatasetForm(forms.Form):
                              label='Dataset Information')
             mods_xml.notes.append(info)
         return mods_xml
-    
+
 class ThesisTitleForm(forms.Form):
-    """ThesisTitleForm contains fields for creating a MODS titleInfo and child 
+    """ThesisTitleForm contains fields for creating a MODS titleInfo and child
        elements.
     """
     title = forms.CharField(max_length=225,
@@ -567,8 +567,8 @@ class ThesisTitleForm(forms.Form):
         return self.cleaned_data['title']
 
 class UploadThesisForm(forms.Form):
-    """:class:`aristotle.etd.ThesisForm` contains fields specific to ingesting an 
-    undergraduate or master thesis and dataset into a Fedora Commons repository using 
+    """:class:`aristotle.etd.ThesisForm` contains fields specific to ingesting an
+    undergraduate or master thesis and dataset into a Fedora Commons repository using
     eulfedora module.
     """
     abstract = forms.CharField(label='Abstract',
@@ -608,7 +608,7 @@ class UploadThesisForm(forms.Form):
         widget=forms.FileInput(
             attrs={'class': 'btn btn-default',
                    'data-url': '/apps/etd/uploadFile' }))
-  
+
     def clean_graduation_dates(self):
         grad_dates = self.cleaned_data['graduation_dates']
         return grad_dates
@@ -649,7 +649,7 @@ class UploadThesisForm(forms.Form):
             return thesis_uploaded_file
         else:
             raise ValidationError("Thesis file is required and must be either a PDF, mp3, or mp4")
-    
+
 
 
     def new_save(self,
@@ -659,18 +659,18 @@ class UploadThesisForm(forms.Form):
             etree_mods.append(
                 etree.XML(
                     mods.Abstract(text=self.cleaned_data['abstract']).serialize()))
-        
+
         if self.cleaned_data.has_key('honor_code'):
             etree_mods.append(
                 etree.XML(
                     mods.Note(type="admin",
                               text="Colorado College Honor Code upheld.").serialize()))
-        
-        
-        
-        
-        
-    
+
+
+
+
+
+
     def save(self,
              workflow=None):
         """
@@ -698,7 +698,7 @@ class UploadThesisForm(forms.Form):
             for code in self.cleaned_data.get('languages'):
                 obj_mods.languages.append(mods.Language(terms=[LanguageTerm(text=code.title()),]))
         if workflow:
-      
+
             if workflow.has_option('FORM','genre'):
                 genre=workflow.get('FORM','genre')
             else:
@@ -723,6 +723,6 @@ class UploadThesisForm(forms.Form):
         # Default Rights statement
         obj_mods.access_conditions.append(mods.AccessCondition(type="useAndReproduction",
                                                                text="Copyright restrictions apply."))
- 
+
         return obj_mods
 

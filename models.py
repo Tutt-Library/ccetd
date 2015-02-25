@@ -1,5 +1,5 @@
 """
- models.py - Creates electronic thesis and dataset content object for 
+ models.py - Creates electronic thesis and dataset content object for
  ingestion into a Fedora repository.
 """
 #
@@ -23,7 +23,7 @@ from django.db import models
 ##from eulfedora.models import DigitalObject,FileDatastream,XmlDatastream,FileDatastreamObject
 ##from eulxml.xmlmap import mods
 import aristotle.settings as settings
-import app_settings
+from . import app_settings
 
 
 ##class ThesisDatasetObject(DigitalObject):
@@ -54,5 +54,5 @@ import app_settings
 ##    email = models.EmailField(blank=True)
 ##    mods = models.TextField()
 ##    pid = models.CharField(max_length=50)
-##    
+##
 ##

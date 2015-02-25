@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
-  Copyright: 2011, 2013 Jeremy Nelson, Colorado College
+  Copyright: 2011-2015 Jeremy Nelson, Colorado College
 """
 
 
@@ -21,22 +21,23 @@ __author__ = 'Jeremy Nelson'
 
 import datetime
 import os
-import ConfigParser
+try:
+    import ConfigParser
+    import urlparse
+except ImportError:
+    # Python 3 hacks
+    import configparser as ConfigParser
+    import urllib.parse as urlparse
 import logging
-import urlparse
+
 
 import aristotle.settings as settings
 from aristotle.views import json_view
 from aristotle.settings import INSTITUTION
 import mimetypes
-## from lxml import etree
 import xml.etree.ElementTree as etree
-from eulfedora.server import Repository
 from ccetd.forms import *
-#import islandoraUtils.xacml.tools as islandora_xacml
-#import islandoraUtils.metadata.fedora_relationships as islandora_rels_ext
-##from ccetd.models import ThesisDatasetObject, ThesisRawMODS
-from app_settings import APP
+from .app_settings import APP
 from operator import itemgetter
 from django import forms
 from django.contrib.auth import logout
@@ -76,8 +77,7 @@ def get_advisors(config):
     Helper function returns a sorted list of advisor email and
     name tuples from a workflow config object.
 
-    :param config: Workflow RawConfigObject, required
-    """
+    :param config: Workflow RawConfigObject, required"""
     faculty_choices = None
     if config.has_section('FACULTY'):
         faculty_choices = sorted(config.items('FACULTY'),
