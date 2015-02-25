@@ -1,11 +1,11 @@
-# 
+#
 # etd_extras.py -- Custom Django template tags
 #
-# 
+#
 __author__ = 'Jeremy Nelson'
-import urllib2,logging
+import logging
 from django import template
-import django.utils.simplejson as json
+import json
 from django.utils.safestring import mark_safe
 import xml.etree.ElementTree as etree
 
@@ -27,11 +27,11 @@ def get_department(workflow):
         if workflow_config.get('FORM','begin_alert') == 'True':
             anchor.attrib['href'] = '#begin_alert'
             anchor.attrib['data-toggle'] = 'modal'
-    return mark_safe(etree.tostring(anchor))    
+    return mark_safe(etree.tostring(anchor))
 
 def get_department_name(config):
     """
-    Function takes a workflow's config object and returns a 
+    Function takes a workflow's config object and returns a
     department name or label
 
     :param config: Workflow config
@@ -41,7 +41,7 @@ def get_department_name(config):
         dept_name = config.get('FORM','label')
     elif config.has_option('FORM','department'):
         dept_name = config.get('FORM','department')
-    return mark_safe(dept_name) 
+    return mark_safe(dept_name)
 
 register.filter('get_department',
                 get_department)

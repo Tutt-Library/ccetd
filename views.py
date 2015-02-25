@@ -21,13 +21,10 @@ __author__ = 'Jeremy Nelson'
 
 import datetime
 import os
-try:
-    import ConfigParser
-    import urlparse
-except ImportError:
-    # Python 3 hacks
-    import configparser as ConfigParser
-    import urllib.parse as urlparse
+
+
+import configparser
+import requests
 import logging
 
 
@@ -61,7 +58,7 @@ workflow_dir = os.path.join(root,'ccetd/workflows')
 for filename in os.listdir(workflow_dir):
     fileinfo = os.path.splitext(filename)
     if fileinfo[1] == '.ini':
-        workflow_config = ConfigParser.RawConfigParser()
+        workflow_config = configparser.RawConfigParser()
         workflow_config.read(os.path.join(workflow_dir,filename))
         # Add universal constants to config object
         workflow_config.set('FORM','institution', INSTITUTION.get('name'))
@@ -344,58 +341,66 @@ def send_emails(config, info):
 @login_required
 def update(request):
     "View for Thesis Submission"
-    repo = Repository()
-    new_pid = repo.api.ingest(text=None)
     workflow = request.POST.get('workflow')
     config = workflows.get(workflow)
+    data = {"parent_pid": config.get('FORM', 'fedora_collection')}
+    if config.has_option("FORM", "content_model"):
+        data['content_model'] = config.get("FORM", "content_model")
+    else:
+        data['content_model'] = "islandora:compoundCModel"
+    title = request.POST.get('title')
+
+    data['label'] = title
+    if 'thesis_file' in request.FILES:
+        files = {"file": request.FILES.pop('thesis_file')[0]}
+        data["file_disd"] = "THESIS"
+        data["file_label"] = title
+        data["mime_type"] = "application/pdf"
+        etd_result = requests.post(
+            "{}/islandora/".format(settings.SEMANTIC_SERVER['api_url']),
+            data=data,
+            files=files)
+    else:
+        etd_result = requests.post(
+            "{}/islandora/".format(settings.SEMANTIC_SERVER['api_url']),
+            data=data)
+    new_pid = etd_result.json()['pid']
+    rest_url = "{}/islandora/{}".format(
+        settings.SEMANTIC_SERVER['api_url'],
+        new_pid)
+    # Sets Thesis Object state
+    update_state_result = requests.put(
+        rest_url,
+        data={"state": "A"})
     mods = create_mods(request.POST, pid=new_pid)
     mods_xml = etree.XML(mods)
-    title = request.POST.get('title')
-    thesis_pdf = request.FILES.pop('thesis_file')[0]
-    # Sets Thesis Object Title
-    repo.api.modifyObject(pid=new_pid,
-                          label=title,
-                          ownerId=settings.FEDORA_USER,
-                          state='A')
-    # Adds Thesis PDF Datastream
-    repo.api.addDatastream(pid=new_pid,
-                           dsID="THESIS",
-                           controlGroup="M",
-                           dsLabel=title,
-                           mimeType="application/pdf",
-                           content=thesis_pdf)
-    # Adds MODS to Thesis Object
-    repo.api.addDatastream(pid=new_pid,
-                           dsID="MODS",
-                           controlGroup="M",
-                           dsLabel="MODS",
-                           mimeType="text/xml",
-                           content=etree.tostring(mods_xml))
+    add_mods_result = requests.post(
+        "{}/datastream/MODS".format(rest_url),
+        data={
+            "control_group": "M",
+            "label": "MODS",
+            "mime_type": "text/xml",
+            "state": "A"
+            },
+        files={"file": etree.tostring(mods_xml)})
     # Iterate through remaining files and add as supporting datastreams
     for file_name in request.FILES.keys():
         file_object = request.FILES.get(file_name)
-        secondary_title = file_object.name
+        data = {"control_group": "M"}
         file_title = request.POST.get("{0}_title".format(file_name))
         if file_title is None or len(file_title) < 1:
             file_title = file_object.name.split(".")[0]
+        data['label'] = file_title
         # DS_ID max length of 64 characters
-        ds_id = slugify(file_title)[0:63]
-
-        mime_type = mimetypes.guess_type(file_object.name)[0]
-        if mime_type is None:
+        dsid = slugify(file_title)[0:63]
+        url = "{}/datastream/{}".format(rest_url, dsid)
+        data['mime_type'] = mimetypes.guess_type(file_object.name)[0]
+        if data['mime_type'] is None:
             mime_type = 'application/octet-stream'
-        result = repo.api.addDatastream(
-            pid=new_pid,
-            controlGroup="M",
-            dsID=ds_id,
-            dsLabel=file_title,
-            mimeType=mime_type,
-            content=file_object)
-    # Create RELS-EXT relationship with content type and parent collection
-    save_rels_ext(repo,
-                  new_pid,
-                  config.get('FORM', 'fedora_collection'),
-                  None)
+        file_upload_result = requests.post(
+            url,
+            data=data,
+            files={"file": file_object})
     etd_success_msg = {'advisors':[],
                        'pid': new_pid,
                        'title':title,
@@ -572,7 +577,7 @@ def workflow(request, workflow='default'):
     multiple_languages = False
     step_one_form = StepOneForm()
     step_two_form = StepTwoForm()
-    if workflows.has_key(workflow):
+    if workflow in workflows:
         custom = workflows[workflow]
         step_one_form.fields['advisors'].choices = get_advisors(custom)
         if custom.has_section('LANGUAGE'):
