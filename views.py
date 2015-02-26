@@ -27,6 +27,7 @@ import configparser
 import requests
 import logging
 
+import urllib.parse
 
 import aristotle.settings as settings
 from aristotle.views import json_view
@@ -127,10 +128,10 @@ def success(request):
         website_view = False
     etd_success_msg = request.session['etd-info']
     if etd_success_msg is not None:
-        etd_success_msg['thesis_url'] = urlparse.urljoin(
+        etd_success_msg['thesis_url'] = urllib.parse.urljoin(
             settings.FEDORA_URI,
             'fedora/repository/{0}'.format(etd_success_msg['pid']))
-        if etd_success_msg.has_key('email') and settings.DEBUG is False:
+        if 'email' in etd_success_msg and settings.DEBUG is False:
             config = workflows.get(etd_success_msg.get('workflow'))
             raw_email = etd_success_msg['email']
             if len(raw_email) > 3 and raw_email.find('@') > -1: # Rough email validation
@@ -264,9 +265,9 @@ def create_mods(post, pid):
     page_numbers = post.get('page_numbers', '')
     if len(page_numbers) > 0:
         extent += '{0} pages'.format(page_numbers)
-    if post.has_key('has_illustrations'):
+    if 'has_illustrations' in post:
         extent += ' : illustrations'
-    if post.has_key('has_maps'):
+    if 'has_maps' in post:
         if extent.endswith('illustrations'):
             extent += ', '
         else:
@@ -351,41 +352,49 @@ def update(request):
     title = request.POST.get('title')
     rest_url = "{}/islandora".format(settings.SEMANTIC_SERVER['api_url'])
     data['label'] = title
+    etd_result = requests.post(
+            rest_url,
+            data=data)
     if 'thesis_file' in request.FILES:
-        files = {"file": request.FILES.pop('thesis_file')[0]}
         data["file_disd"] = "THESIS"
         data["file_label"] = title
         data["mime_type"] = "application/pdf"
-        print("Rest url={}".format(rest_url))
-        etd_result = requests.post(
-            rest_url,
-            data=data,
-            files=files)
+        ##data["file"] = request.FILES.pop('thesis_file')[0]
+        print("{} in post={}".format(rest_url, data))
+
+
     else:
         etd_result = requests.post(
             rest_url,
-            data=data)
+            data=data,
+            headers=headers)
     if etd_result.status_code > 399:
         raise ValidationError(
             "Could not ingest thesis to Repository {}".format(
                 etd_result.json()))
     new_pid = etd_result.json()['pid']
-    rest_url += "{}".format(new_pid)
+    rest_url += "/{}".format(new_pid)
     # Sets Thesis Object state
     update_state_result = requests.put(
         rest_url,
         data={"state": "A"})
     mods = create_mods(request.POST, pid=new_pid)
     mods_xml = etree.XML(mods)
+    mods_url = "{}/datastream/MODS".format(rest_url)
     add_mods_result = requests.post(
-        "{}/datastream/MODS".format(rest_url),
+        mods_url,
         data={
             "control_group": "M",
             "label": "MODS",
             "mime_type": "text/xml",
-            "state": "A"
-            },
-        files={"file": etree.tostring(mods_xml)})
+            "state": "A",
+            "file": etree.tostring(mods_xml)
+            })
+    if 'thesis_file' in request.FILES:
+        add_thesis_request = requests.post(
+            url = "{}/datastream/THESIS".format(rest_url),
+            data={"label": title, "mime_type": "application/pdf"},
+            files={"file": request.FILES.get('thesis_file')})
     # Iterate through remaining files and add as supporting datastreams
     for file_name in request.FILES.keys():
         file_object = request.FILES.get(file_name)
