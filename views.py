@@ -349,25 +349,28 @@ def update(request):
     else:
         data['content_model'] = "islandora:compoundCModel"
     title = request.POST.get('title')
-
+    rest_url = "{}/islandora".format(settings.SEMANTIC_SERVER['api_url'])
     data['label'] = title
     if 'thesis_file' in request.FILES:
         files = {"file": request.FILES.pop('thesis_file')[0]}
         data["file_disd"] = "THESIS"
         data["file_label"] = title
         data["mime_type"] = "application/pdf"
+        print("Rest url={}".format(rest_url))
         etd_result = requests.post(
-            "{}/islandora/".format(settings.SEMANTIC_SERVER['api_url']),
+            rest_url,
             data=data,
             files=files)
     else:
         etd_result = requests.post(
-            "{}/islandora/".format(settings.SEMANTIC_SERVER['api_url']),
+            rest_url,
             data=data)
+    if etd_result.status_code > 399:
+        raise ValidationError(
+            "Could not ingest thesis to Repository {}".format(
+                etd_result.json()))
     new_pid = etd_result.json()['pid']
-    rest_url = "{}/islandora/{}".format(
-        settings.SEMANTIC_SERVER['api_url'],
-        new_pid)
+    rest_url += "{}".format(new_pid)
     # Sets Thesis Object state
     update_state_result = requests.put(
         rest_url,
