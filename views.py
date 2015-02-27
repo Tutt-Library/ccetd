@@ -348,26 +348,15 @@ def update(request):
     if config.has_option("FORM", "content_model"):
         data['content_model'] = config.get("FORM", "content_model")
     else:
-        data['content_model'] = "islandora:compoundCModel"
+        #! Need default Islandora Solution Pack for Thesis
+       ##data['content_model'] = "islandora:compoundCModel"
+       data['content_model'] = "islandora:sp_pdf"
     title = request.POST.get('title')
     rest_url = "{}/islandora".format(settings.SEMANTIC_SERVER['api_url'])
     data['label'] = title
     etd_result = requests.post(
             rest_url,
             data=data)
-    if 'thesis_file' in request.FILES:
-        data["file_disd"] = "THESIS"
-        data["file_label"] = title
-        data["mime_type"] = "application/pdf"
-        ##data["file"] = request.FILES.pop('thesis_file')[0]
-        print("{} in post={}".format(rest_url, data))
-
-
-    else:
-        etd_result = requests.post(
-            rest_url,
-            data=data,
-            headers=headers)
     if etd_result.status_code > 399:
         raise ValidationError(
             "Could not ingest thesis to Repository {}".format(
@@ -387,14 +376,15 @@ def update(request):
             "control_group": "M",
             "label": "MODS",
             "mime_type": "text/xml",
-            "state": "A",
-            "file": etree.tostring(mods_xml)
-            })
+            "state": "A"},
+        files= {"userfile": mods})
     if 'thesis_file' in request.FILES:
         add_thesis_request = requests.post(
-            url = "{}/datastream/THESIS".format(rest_url),
-            data={"label": title, "mime_type": "application/pdf"},
-            files={"file": request.FILES.get('thesis_file')})
+            url = "{}/datastream/OBJ".format(rest_url),
+            data={
+                "label": title,
+                "mime_type": "application/pdf"},
+            files={"userfile": request.FILES.pop('thesis_file')[0]})
     # Iterate through remaining files and add as supporting datastreams
     for file_name in request.FILES.keys():
         file_object = request.FILES.get(file_name)
@@ -412,7 +402,7 @@ def update(request):
         file_upload_result = requests.post(
             url,
             data=data,
-            files={"file": file_object})
+            files={"userfile": file_object})
     etd_success_msg = {'advisors':[],
                        'pid': new_pid,
                        'title':title,

@@ -12,15 +12,13 @@
         statement: <b>On my honor, I have neither given nor received unauthorized aid on this thesis</b>
     </div>
     {# START agreement div #}
-    <div id="agreement">
+    <h3 class="chk_box">Submission Agreement</h3>
+    <div id="submission-agreement">
       <div class="alert alert-danger" 
-           data-bind="visible: submissionAgreementError" 
-
-         >
-       <strong>Error!</strong> You must agree to the submission agreement below to submit your thesis through this
+           data-bind="visible: submissionAgreementError"> 
+                <strong>Error!</strong> You must agree to the submission agreement below to submit your thesis through this
        web form.
       </div>
-	<h3 class="chk_box">Submission Agreement</h3>
 	<b>{{ step_four_form.submission_agreement }} {{ step_four_form.submission_agreement.label }} </b>
        	   By checking the agreement box and submitting this form, I (the author and copyright owner) grant 
            {% if institution.member %}{{ institution.member.name }}{% else %}{{ institution.name }}{% endif %}
