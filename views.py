@@ -127,11 +127,13 @@ def success(request):
     else:
         website_view = False
     etd_success_msg = request.session['etd-info']
+    print("Request session keys is {}">format(request.session.keys()))
     if etd_success_msg is not None:
         etd_success_msg['thesis_url'] = urllib.parse.urljoin(
             settings.FEDORA_URI,
             'fedora/repository/{0}'.format(etd_success_msg['pid']))
-        if 'email' in etd_success_msg and settings.DEBUG is False:
+        print("Thesis success {}".format(etd_success_msg))
+        if 'email' in etd_success_msg: #and settings.DEBUG is False:
             config = workflows.get(etd_success_msg.get('workflow'))
             raw_email = etd_success_msg['email']
             if len(raw_email) > 3 and raw_email.find('@') > -1: # Rough email validation
@@ -139,6 +141,7 @@ def success(request):
             else:
                 to_email_addrs = []
             for row in etd_success_msg['advisors']:
+                print("\tadvisor={}".format(row))
                 if row.find("@") > -1:
                     to_email_addrs.append(row)
             if config.has_section('STAFF'):
@@ -154,6 +157,7 @@ def success(request):
             email_message += " Digital Archives available at {0}".format(
                 etd_success_msg['thesis_url'])
             if len(to_email_addrs) > 0:
+                print("Email addressed to {}".format(to_email_addrs))
                 send_mail('{0} submitted to DACC'.format(etd_success_msg['title']),
                           email_message,
                           settings.EMAIL_HOST_USER,
@@ -354,13 +358,14 @@ def update(request):
     title = request.POST.get('title')
     rest_url = "{}/islandora".format(settings.SEMANTIC_SERVER['api_url'])
     data['label'] = title
+    print("REST url is {}, data={}".format(rest_url, data))
     etd_result = requests.post(
             rest_url,
             data=data)
     if etd_result.status_code > 399:
         raise ValidationError(
             "Could not ingest thesis to Repository {}".format(
-                etd_result.json()))
+                etd_result.text))
     new_pid = etd_result.json()['pid']
     rest_url += "/{}".format(new_pid)
     # Sets Thesis Object state
@@ -403,7 +408,7 @@ def update(request):
             url,
             data=data,
             files={"userfile": file_object})
-    etd_success_msg = {'advisors':[],
+    etd_success_msg = {'advisors': request.POST.getlist('advisors'),
                        'pid': new_pid,
                        'title':title,
                        'workflow': workflow
@@ -574,7 +579,7 @@ def old_upload(request, workflow=None):
 
 
 
-
+@login_required
 def workflow(request, workflow='default'):
     multiple_languages = False
     step_one_form = StepOneForm()
