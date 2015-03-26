@@ -396,7 +396,7 @@ def update(request):
                   new_pid,
                   config.get('FORM', 'fedora_collection'),
                   None)
-    etd_success_msg = {'advisors':[],
+    etd_success_msg = {'advisors': request.POST.getlist('advisors'),
                        'pid': new_pid,
                        'title':title,
                        'workflow': workflow
@@ -567,7 +567,7 @@ def old_upload(request, workflow=None):
 
 
 
-
+@login_required
 def workflow(request, workflow='default'):
     multiple_languages = False
     step_one_form = StepOneForm()
