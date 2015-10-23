@@ -27,10 +27,11 @@ import urllib.parse
 
 import mimetypes
 import xml.etree.ElementTree as etree
-from flask import render_template
+from flask import redirect, render_template, request
 from flask.ext.login import login_required
 from operator import itemgetter
 from . import app
+from .forms import StepOneForm, StepTwoForm
 
 # Sets workflows dict
 workflows = dict()
@@ -90,7 +91,45 @@ def default():
     workflows.
     """
     return render_template("etd/default.html",
+                            user=None,
                             active=sorted(workflows.items()))
+
+@app.route("/login",  methods=['POST', 'GET'])
+def login():
+    """Login Method """
+    next_page = request.args.get('next')
+    return redirect(next_page)
+
+def logout():
+    return default()
+    
+@app.route("/<name>")
+def workflow(name='default'):
+    multiple_languages = False
+    step_one_form = StepOneForm()
+    step_two_form = StepTwoForm()
+    if name in workflows:
+        custom = workflows[name]
+        step_one_form.advisors.choices = get_advisors(custom)
+        if custom.has_section('LANGUAGE'):
+            step_two_form.fields['languages'].choices = custom.items('LANGUAGE')
+            multiple_languages = True
+
+
+    step_one_form.graduation_dates.choices = get_grad_dates(custom)
+    website_view = True
+    return render_template('etd/default.html',
+                   config=custom,
+                   email_notices=custom.get('FORM', 'email_notices'),
+                   multiple_languages=multiple_languages,
+                   step_one_form=step_one_form,
+                   step_two_form=step_two_form,
+                   step_three_form=None,#StepThreeForm(),
+                   step_four_form=None,#StepFourForm(),
+                   user=None,
+                   website=None,
+                   workflow=workflow)
+
 
 def success(request):
     """
@@ -382,261 +421,3 @@ def update(request):
     return HttpResponseRedirect('/etd/success')
 
 
-def old_upload(request, workflow=None):
-    """
-    Creates MODS and other metadata along with the file uploads to Fedora.
-
-    :param request: HTTP request, required
-    :param workflow: Specific workflow for individual departments, blank value
-                     displays default view.
-   """
-    if request.method != 'POST':
-        return Http404
-    config = workflows[workflow]
-    default = dict()
-    for row in config.items('FORM'):
-        default[row[0]] = row[1]
-    form_list = []
-    about_form = PhysicalDescriptionForm(request.POST,
-                                         prefix='about')
-    form_list.append(about_form)
-    advisor_form = AdvisorForm(request.POST,
-                               prefix='advisor')
-    form_list.append(advisor_form)
-    creator_form = CreatorForm(request.POST,
-                               prefix='creator')
-    form_list.append(creator_form)
-    dataset_form = ThesisDatasetForm(request.POST,
-                               request.FILES,
-                               prefix='dataset')
-    form_list.append(dataset_form)
-
-    media_form = MediaForm(request.POST,
-                           request.FILES,
-                           prefix='media')
-    form_list.append(media_form)
-    subjects_form = SubjectsForm(request.POST,
-                                 prefix='subject')
-    form_list.append(subjects_form)
-    title_form = ThesisTitleForm(request.POST,
-                                 prefix='title')
-    form_list.append(title_form)
-    upload_thesis_form = UploadThesisForm(request.POST,
-                                          request.FILES,
-                                          prefix='thesis')
-    if config.has_section('LANGUAGE'):
-        upload_thesis_form.languages = forms.MultipleChoiceField(label="Language(s) of Thesis",
-                                                                 choices=config.items('LANGUAGE'))
-    form_list.append(upload_thesis_form)
-    if all([form.is_valid() for form in form_list]):
-        mods_xml = upload_thesis_form.save(workflow=config)
-        mods_xml.physical_description = about_form.save()
-        mods_xml.names.append(creator_form.save())
-        advisors = advisor_form.save(config=config)
-        for advisor in advisors:
-            mods_xml.names.append(advisor)
-        if not dataset_form.is_empty():
-            mods_xml = dataset_form.mods(mods_xml=mods_xml)
-        subjects = subjects_form.save()
-        for subject_keyword in subjects:
-            mods_xml.subjects.append(subject_keyword)
-        # Now checks and adds additional subject form keywords
-        for i in range(4, 10):
-            subject_name = "subject-keyword_{0}".format(i)
-            if request.POST.has_key(subject_name):
-                topic = request.POST.get(subject_name)
-                if len(topic) > 1:
-                    mods_xml.subjects.append(mods.Subject(topic=topic))
-        mods_xml.title = title_form.save()
-        # Generate workflow constant metadata
-        year_result = re.search(r'(\d+)',
-                                upload_thesis_form.cleaned_data['graduation_dates'])
-        if year_result:
-            year = year_result.groups()[0]
-        else:
-            year = datetime.datetime.today().year
-        mods_xml.origin_info = OriginInfoForm().save(config=config,
-                                                     year_value=year)
-        mods_xml.names.append(DepartmentForm().save(config=config))
-        mods_xml.names.append(InstitutionForm().save(config=config))
-        if request.REQUEST.has_key('thesis-languages'):
-            language_codes = request.REQUEST.getlist('thesis-languages')
-            for code in language_codes:
-                mods_xml.languages.append(mods.Language(terms=[mods.LanguageTerm(text=code),]))
-        else:
-            # Sets a default language for the thesis as English
-            mods_xml.languages.append(mods.Language(terms=[mods.LanguageTerm(text='English'),]))
-        # Connect and save to Fedora repository
-        repo = Repository()
-        thesis_obj = repo.get_object(type=ThesisDatasetObject)
-        thesis_obj.mods.content = mods_xml
-        thesis_obj.thesis.content = request.FILES['thesis-thesis_file']
-        thesis_obj.thesis.label = thesis_obj.mods.content.title
-        if request.FILES.has_key('dataset-dataset_file'):
-            thesis_obj.dataset.content = request.FILES['dataset-dataset_file']
-            thesis_obj.dataset.label = 'Dataset for %s' % thesis_obj.mods.content.title
-        if request.FILES.has_key('media-media_file'):
-            thesis_obj.media.content = request.FILES['media-media_file']
-            thesis_obj.media.label = 'Media for {0}'.format(thesis_obj.mods.content.title)
-        thesis_obj.dc.content.title = thesis_obj.mods.content.title
-        thesis_obj.label = thesis_obj.mods.content.title
-        thesis_obj.save()
-        restrictions = {}
-        if not dataset_form.is_empty():
-            if dataset_form.cleaned_data['is_publically_available'] == True:
-                restrictions['dataset'] = True
-        if upload_thesis_form.cleaned_data['not_publically_available'] == True:
-            restrictions['thesis'] = True
-        #if len(restrictions) > 0:
-        #    restrictions['by_user'] = [] # Allows for future LDAP or Shibboleth support
-        #    restrictions['by_role']=['authenticated user',
-        #                             'administrator',
-        #                             'p-dacc_admin']
-        # if len(restrictions) > 0:
-        #    save_xacml_policy(repo,thesis_obj.pid,restrictions)
-        #    thesis_obj.save()
-        #if restrictions.has_key('thesis'):
-        #    save_rels_ext(repo,thesis_obj.pid,default['fedora_collection'],restrictions)
-        #else:
-        save_rels_ext(repo,thesis_obj.pid,default['fedora_collection'],{})
-#        logging.error("Before save {0}".format(dir(thesis_obj.mods)))
-        thesis_obj.save()
-        etd_success_msg = {'pid':thesis_obj.pid,
-                           'title':mods_xml.title,
-                           'advisors':[]}
-        if upload_thesis_form.cleaned_data.has_key('email'):
-            etd_success_msg['email'] = upload_thesis_form.cleaned_data['email']
-        for advisor in advisor_form.cleaned_data['advisors']:
-            etd_success_msg['advisors'].append(advisor)
-        # Adds staff member to advisor's list for email notification
-        if config.has_section('STAFF'):
-            for staff in config.items('STAFF'):
-                etd_success_msg['advisors'].append(staff[0])
-        request.session['etd-info'] = etd_success_msg
-        logging.error("Successfully ingested thesis with pid=%s" % thesis_obj.pid)
-        rels_ext = thesis_obj.getDatastreamObject('RELS-EXT')
-        return HttpResponseRedirect('/etd/success')
-    advisor_form.fields['advisors'].choices = get_advisors(config)
-    upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(config)
-    if config.has_option('FORM','template_name'):
-        template = config.get('FORM','template_name')
-    else:
-        template = 'default.html'
-    return render_to_response('etd/%s' % template,
-                             {'default': default,
-                              'about_form':about_form,
-                              'advisor_form':advisor_form,
-                              'config':config,
-                              'creator_form':creator_form,
-                              'dataset_form':dataset_form,
-                              'subjects_form':subjects_form,
-                              'title_form':title_form,
-                              'form':upload_thesis_form,
-                              'workflow':workflow},
-                              context_instance=RequestContext(request))
-
-
-
-
-
-
-
-@login_required
-def workflow(request, workflow='default'):
-    multiple_languages = False
-    step_one_form = StepOneForm()
-    step_two_form = StepTwoForm()
-    if workflows.has_key(workflow):
-        custom = workflows[workflow]
-        step_one_form.fields['advisors'].choices = get_advisors(custom)
-        if custom.has_section('LANGUAGE'):
-            step_two_form.fields['languages'].choices = custom.items('LANGUAGE')
-            multiple_languages = True
-
-
-    step_one_form.fields['graduation_dates'].choices = get_grad_dates(custom)
-    if request.get_full_path().startswith('/etd/'):
-        website_view = True
-    else:
-        website_view = False
-    return render(request,
-                  'etd/default.html',
-                  {'app': APP,
-                   'config': custom,
-                   'email_notices': custom.get('FORM', 'email_notices'),
-                   'institution': INSTITUTION,
-                   'default':default,
-                   'multiple_languages': multiple_languages,
-                   'step_one_form': step_one_form,
-                   'step_two_form': step_two_form,
-                   'step_three_form': StepThreeForm(),
-                   'step_four_form': StepFourForm(),
-                   'website': website_view,
-                   'workflow':workflow})
-
-
-def old_workflow(request,workflow='default'):
-    """
-    Displays thesis entry form to end user.
-
-    :param request: HTTP request, required
-    :param workflow: Specific workflow for individual departments, blank value
-                     displays default view.
-    """
-    if request.get_full_path().startswith('/etd/'):
-        website_view = True
-    else:
-        website_view = False
-
-    if not request.user.is_authenticated():
-         return HttpResponseRedirect("/accounts/login?next=%s" % request.path)
-
-    if workflow is None:
-        workflow = 'default'
-    if workflows.has_key(workflow):
-        custom = workflows[workflow]
-    form_items = custom.items('FORM')
-    default = dict()
-    for row in form_items:
-        default[row[0]] = row[1]
-    about_form = PhysicalDescriptionForm(prefix='about')
-    advisor_form = AdvisorForm(prefix='advisor')
-    advisors = get_advisors(custom)
-    if advisors is None:
-        advisor_form.fields['freeform_advisor'].label = 'First Advisor'
-    else:
-        advisor_form.fields['advisors'].choices = advisors
-    dataset_form = ThesisDatasetForm(prefix='dataset')
-    creator_form = CreatorForm(prefix='creator')
-    subject_form = SubjectsForm(prefix='subject')
-    title_form = ThesisTitleForm(prefix='title')
-    upload_thesis_form = UploadThesisForm(prefix='thesis')
-    upload_thesis_form.fields['graduation_dates'].choices = get_grad_dates(custom)
-    if custom.has_option('FORM','template_name'):
-        template_name = custom.get('FORM','template_name')
-    else:
-        template_name = 'default.html'
-    has_dataset = False
-    if custom.has_option('FORM','dataset'):
-        has_dataset = custom.get('FORM','dataset')
-    if custom.has_section('LANGUAGE'):
-        upload_thesis_form.fields['languages'] = forms.MultipleChoiceField(label="Language(s) of Thesis",
-                                                                           required=False,
-                                                                           choices=custom.items('LANGUAGE'))
-    return direct_to_template(request,
-                              'etd/{0}'.format(template_name),
-                              {'app': APP,
-                               'institution': INSTITUTION,
-                               'default':default,
-                               'about_form':about_form,
-                               'advisor_form':advisor_form,
-                               'begin_alert':custom.has_option('FORM','begin_alert'),
-                               'config':custom,
-                               'creator_form':creator_form,
-                               'dataset_form':dataset_form,
-                               'has_dataset':has_dataset,
-                               'subjects_form':subject_form,
-                               'title_form':title_form,
-                               'form':upload_thesis_form,
-                               'website': website_view,
-                               'workflow':workflow})

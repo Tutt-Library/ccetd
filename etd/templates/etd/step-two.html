@@ -2,17 +2,17 @@
 <div data-bind="visible: showStepTwo">
  <h2>
    Step 2: Upload Thesis and Enter Information
-        {% if step_two_form.thesis_file.errors or step_two_form.title.errors %}
+        {# if step_two_form.thesis_file.errors or step_two_form.title.errors %}
         <span class="error">Errors(s), please fix</span>
-        {% endif %}
+        {% endif #}
  </h2>
  <div class="form-group" data-bind="css: thesisFileStatus" >
    <label for="id_thesis_file" class="col-lg-3 control-label">
      <b>Thesis*</b> (<i>Browse to attach thesis</i>):
    </label>
    <div class="col-lg-3">
-     {{ step_two_form.thesis_file }}
-      {{ step_two_form.thesis_file.errors }}<br/>
+     {{ step_two_form.thesis_file(class_="btn btn-default", **{'data-bind': 'value: thesisFile'}) }}
+     {# step_two_form.thesis_file.errors #}<br/>
    </div>
  </div>
  <div class="form-group" data-bind="css: titleValueStatus">
@@ -20,8 +20,8 @@
    {{ step_two_form.title.label }}*
   </label>
   <div class="col-lg-5">
-      {{ step_two_form.title }}
-      {{ step_two_form.title.errors }}
+      {{ step_two_form.title(size=225, class_="form-control", **{'data-bind': 'value: titleValue'}) }}
+      {# step_two_form.title.errors #}
   </div>
  </div>
  <div class="form-group">
@@ -29,7 +29,7 @@
           class="col-lg-3 control-label">{{ step_two_form.page_numbers.label }}
 </label>
    <div class="col-lg-2"> 
-    {{ step_two_form.page_numbers }}
+    {{ step_two_form.page_numbers(class_="form-control") }}
    </div>
  </div>
  <div class="form-group">
@@ -40,7 +40,7 @@
   <div class="col-lg-2">
    <div class="checkbox">
     <label>
-    {{ step_two_form.has_illustrations }}  {{ step_two_form.has_illustrations.label }}  
+    {{ step_two_form.has_illustrations(class_="form-control") }}  {{ step_two_form.has_illustrations.label }}  
     </label>
    </div>
   </div>
@@ -51,7 +51,7 @@
 
   <div class="col-lg-2">
    <div class="checkbox">
-    {{ step_two_form.has_maps }}{{ step_two_form.has_maps.label }}
+    {{ step_two_form.has_maps(class_="form-control") }}{{ step_two_form.has_maps.label }}
    </div>
   </div>
 </div>
@@ -62,7 +62,7 @@
  {{ step_two_form.languages.label }}*:
  </label>
  <div class="col-lg-3">
-   {{ step_two_form.languages }}
+   {{ step_two_form.languages(class_="form-control") }}
  </div>
 </div>
 {% endif %} 
@@ -72,7 +72,7 @@
   {{ step_two_form.abstract.label }}:
  </label>
  <div class="col-lg-6">
-  {{ step_two_form.abstract }}
+  {{ step_two_form.abstract(cols=60, rows=5, class_="form-control") }}
  </div>
 </div>
 <div class="form-group" data-bind="css: thesisKeywordsStatus">

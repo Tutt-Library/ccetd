@@ -1,0 +1,15 @@
+html, body {
+  background-color: #eee;
+  height: 100%;
+}
+
+
+#footer {
+ height: 60px;
+}
+
+
+#first-container {
+  margin-top: 65px;
+}
+

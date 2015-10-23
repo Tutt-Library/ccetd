@@ -1,11 +1,11 @@
-{% comment %}START Row DIV{% endcomment %}
+{# START Row DIV #}
 <form method="POST" role="form" action="/etd/{{ workflow }}/update"  
      enctype="multipart/form-data" 
      class="form-horizontal"
      id="thesis-base-form">
  <input type="hidden" data-bind="value: thesisPID" name="pid">
  <input type="hidden" value="{{ workflow }}" id="workflow" name="workflow">
-{% csrf_token %}
+{# csrf_token #}
 {# START Progress Row #}
 <div class="row">
  <div class="col-sm-8 col-md-8">
@@ -33,11 +33,11 @@
 {# END Progress Row #}
 </div>
 <div class="row">
-  {% include 'step-one.html' %}
-  {% include 'step-two.html' %}
-  {% include 'step-three.html' %}
-  {% include 'step-four.html' %}
+  {% include 'etd/step-one.html' %}
+  {% include 'etd/step-two.html' %}
+  {# include 'step-three.html' %}
+  {% include 'step-four.html' #}
 </div>
 </form>
-{% comment %}END Row DIV{% endcomment %}
+{# END Row DIV #}
 </div>
