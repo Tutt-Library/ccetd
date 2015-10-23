@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
-  Copyright: 2011, 2013 Jeremy Nelson, Colorado College
+  Copyright: 2011, 2013, 2015 Jeremy Nelson, Colorado College
 """
 
 
@@ -21,50 +21,31 @@ __author__ = 'Jeremy Nelson'
 
 import datetime
 import os
-import ConfigParser
+import configparser
 import logging
-import urlparse
+import urllib.parse
 
-import aristotle.settings as settings
-from aristotle.views import json_view
-from aristotle.settings import INSTITUTION
 import mimetypes
-## from lxml import etree
 import xml.etree.ElementTree as etree
-from eulfedora.server import Repository
-from ccetd.forms import *
-#import islandoraUtils.xacml.tools as islandora_xacml
-#import islandoraUtils.metadata.fedora_relationships as islandora_rels_ext
-##from ccetd.models import ThesisDatasetObject, ThesisRawMODS
-from app_settings import APP
+from flask import render_template
+from flask.ext.login import login_required
 from operator import itemgetter
-from django import forms
-from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
-from django.shortcuts import render as direct_to_template # quick hack to get running under django 1.5
-from django.shortcuts import render
-from django.shortcuts import render_to_response
-from django.template import Context, Template
-from django.template.loader import render_to_string
-from django.template.defaultfilters import slugify
-from django.http import HttpResponse,Http404,HttpResponseRedirect
-from django.template import Context,Library,Template,loader,RequestContext
-##from eulxml.xmlmap import load_xmlobject_from_string, mods
-
+from . import app
 
 # Sets workflows dict
 workflows = dict()
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-workflow_dir = os.path.join(root,'ccetd/workflows')
+workflow_dir = os.path.join(root,'workflows')
 for filename in os.listdir(workflow_dir):
     fileinfo = os.path.splitext(filename)
     if fileinfo[1] == '.ini':
-        workflow_config = ConfigParser.RawConfigParser()
+        workflow_config = configparser.RawConfigParser()
         workflow_config.read(os.path.join(workflow_dir,filename))
         # Add universal constants to config object
-        workflow_config.set('FORM','institution', INSTITUTION.get('name'))
-        address = INSTITUTION.get('address')
+        workflow_config.set('FORM',
+                            'institution', 
+                            app.config.get('INSTITUTION').get('name'))
+        address = app.config.get('INSTITUTION').get('address')
         location = "{0}, {1}".format(address.get('addressLocality'),
                                      address.get('addressRegion'))
         workflow_config.set('FORM','location', location)
@@ -102,21 +83,14 @@ def get_grad_dates(config):
     return grad_dates
 
 # Request Handlers
-def default(request):
+@app.route("/")
+def default():
     """
     Displays home-page of Django ETD app along with a list of active
     workflows.
     """
-    if request.get_full_path().startswith('/etd/'):
-        website_view = True
-    else:
-        website_view = False
-    return direct_to_template(request,
-                              'etd/default.html',
-                              {'active':sorted(workflows.items()),
-                               'app': APP,
-                               'institution': INSTITUTION,
-                               'website':website_view})
+    return render_template("etd/default.html",
+                            active=sorted(workflows.items()))
 
 def success(request):
     """

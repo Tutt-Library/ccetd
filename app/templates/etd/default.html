@@ -1,10 +1,8 @@
-{% extends 'app-base.html' %}
-{% load etd_extras %}
-{% load i18n %}
+{% extends 'etd/base.html' %}
 
-{% block head-title %}{% trans "Electronic Thesis Submission for Colorado College" %}{% endblock %}
-{% block more-css %}
- <link href="{{ STATIC_URL }}css/thesis.css" rel="stylesheet" />
+{% block head_title %}Electronic Thesis Submission for Colorado College{% endblock %}
+{% block more_css %}
+ <link href="{{ url_for('static', filename="css/thesis.css") }}" rel="stylesheet" />
  
 {% endblock %}
 
@@ -15,29 +13,29 @@
    <iframe src="/apps/website-header" class="website-header" scrolling="no"></iframe>
   </div>
   {% else %}
-   {% include 'snippets/navigation-action-bar.html' %}
+   {% include 'etd/snippets/navigation-action-bar.html' %}
   {% endif %}
  </div>
 {% endblock %}
 
-{% block action-view-subtitle %}
+{% block action_view_subtitle %}
 {% if workflow %}
-{{ config|get_department_name }} 
+{# config|get_department_name #} 
 {% endif %}
 {% endblock %}
 
 
-{% block library-breadcrumb %}
+{% block library_breadcrumb %}
 {% endblock %}
 
 {% block body %}
 <div class="row" >
  <div class="col-sm-8 col-md-8" style=" margin-top: 0px">
   <ul class="breadcrumb" >
-   <li><a href="http://www.coloradocollege.edu/library">{% trans "Library Home" %}</a></li>
-   <li><a href="/etd">{% trans "ETD" %}</a></li>
+   <li><a href="http://www.coloradocollege.edu/library">Library Home</a></li>
+   <li><a href="/etd">ETD</a></li>
   {% if workflow %}
-   <li class="active"><a href="#" >{{ config|get_department_name }}</a></li>
+   <li class="active"><a href="#" >{# config|get_department_name #}</a></li>
   {% endif %}
   </ul>
  </div>
@@ -73,7 +71,7 @@
    </div> 
 {% else %}
    <div class="help_steps">
-    <h1 class="help_step">{% trans "What now?" %}</h1>
+    <h1 class="help_step">What now?</h1>
     <ol start="1">
      <li>Select your department web form</li>
      <li>Enter your last name and TIGER library number</li>
@@ -92,12 +90,12 @@
     Tutt Library Reference Desk at 389-6662.</p>
   </div>
   </aside>
-   {% comment %}END left-column DIV{% endcomment %}
+   {# END left-column DIV #}
   </div>
-  {% comment %}START main-column DIV{% endcomment %}
+  {# comment %}START main-column DIV #}
   <div class="col-md-8 col-sm-8 well">
  {% if workflow %}
-    <h1>{{ config|get_department_name }} Thesis Submission</h1>
+    <h1>{# config|get_department_name #} Thesis Submission</h1>
    {% include 'thesis-form.html' %}
  {% else %}
    <h1>Colorado College Electronic Thesis Submission</h1>
@@ -111,12 +109,13 @@
         {% if not user.is_authenticated %}href="/accounts/login?next=/etd/{{ workflow.0 }}"
         {% else %} 
         href="{{ request.get_full_path }}{{ workflow.0 }}"
-        {% endif %}>{{ workflow.1|get_department_name }}</a>
+        {% endif %}>{ workflow.1|get_department_name #}</a>
+
      </li>
    {% endfor %}
    </ul>
  {% endif %}
-  {% comment %}END main-column DIV{% endcomment %}
+  {# END main-column DIV #}
   </div>
 </div>
 </div>
@@ -133,12 +132,12 @@
   {% endif %}
 {% endblock %} 
 
-{% block more-js %}
-{% comment %}
+{% block more_js %}
+{#
 <script src="{{ STATIC_URL}}js/jquery.ui.widget.js"></script>
 <script src="{{ STATIC_URL}}js/jquery.fileupload.js"></script>
 <script src="{{ STATIC_URL}}js/jquery.iframe-transport.js"></script>
-{% endcomment %}
+#}
 <script src="{{ STATIC_URL }}js/knockout.validation.min.js"></script>
 <script src="{{ STATIC_URL }}js/thesis.js"></script>
 <script>
@@ -152,7 +151,7 @@
 {% endblock %}
 
 
-{% block more-dialogs %}
+{% block more_dialogs %}
 <div class="modal fade" id="open-web-alert-dlg">
   <div class="modal-dialog">
     <div class="modal-content">

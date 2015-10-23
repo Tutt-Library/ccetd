@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+	{% block head_title %}{% endblock %}
+    </title>
+    {% block meta %}
+    <meta name="description" content="Aristotle Library Apps Interface" >
+    <meta name="author" content="Jeremy Nelson">
+    {% endblock %}
+    {% block more_meta %}{% endblock %}
+    
+    <link rel="shortcut icon" href="{{ url_for('static', filename="ico/favicon.png") }}">
+
+    <title>Starter Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename="css/bootstrap.min.css") }}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename="css/default.css") }}" rel="stylesheet">
+    {% block more_css %}{% endblock %}
+
+  </head>
+  <body>
+   {# START main DIV #}
+   <div id="main">
+
+  {% block navbar %}
+    {% include 'etd/snippets/navigation-action-bar.html' %}
+  {% endblock %} 
+  
+  {# START body container #}
+  <div class="container main-container"> 
+  {% block body %}{% endblock %}
+  {# END body container #}
+  </div>
+  {# comment %}
+  {% endblock %}
+
+      <div class="starter-template">
+        <h1>Bootstrap starter template</h1>
+        <p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>
+      </div>
+
+    </div><!-- /.container -->
+  {% endcomment #}
+  
+  {# END main DIV #}
+  </div>
+
+  {% block footer %}
+  {# START footer DIV #}
+  <div id="footer">
+   <div class="container">
+     {% include 'etd/snippets/footer-action-bar.html' %}
+   </div>
+     {# END footer DIV #}
+  </div> 
+  {% endblock %} 
+
+  {% block dialogs %}
+    {% include 'etd/snippets/about.html' %}
+    {% include 'etd/snippets/help.html' %}
+    {% include 'etd/snippets/feedback.html' %}
+ {% endblock %} 
+ {% block more_dialogs %}{% endblock %}  
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{{ url_for('static', filename="js/jquery.js") }}"></script>
+    <script src="{{ url_for('static', filename="js/bootstrap.min.js") }}"></script>
+    <script src="{{ url_for('static', filename="js/knockout.js") }}"></script>
+   {% block more_js %}{% endblock %} 
+  </body>
+</html>
