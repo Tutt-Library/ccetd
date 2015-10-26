@@ -7,7 +7,8 @@
       <div class="alert alert-danger" data-bind="visible: honorCodeError" style="color: rgb(255, 0, 0) !important">
         <strong>Error!</strong> You must agree to the Honor Code statement before submitting
       </div>
-        {{ step_four_form.honor_code }} <strong>{{ step_four_form.honor_code.label }}</strong>
+        {{ step_four_form.honor_code(**{'data-bind': 'checked: hasHonorCode'}) }} 
+        <strong>{{ step_four_form.honor_code.label }}</strong>
         By checking this box I indicate agreement with this
         statement: <b>On my honor, I have neither given nor received unauthorized aid on this thesis</b>
     </div>
@@ -21,11 +22,12 @@
        web form.
       </div>
 	<h3 class="chk_box">Submission Agreement</h3>
-	<b>{{ step_four_form.submission_agreement }} {{ step_four_form.submission_agreement.label }} </b>
+	<b>{{ step_four_form.submission_agreement(**{'data-bind': 'checked: hasSubmissionAgreement'}) }} 
+           {{ step_four_form.submission_agreement.label }} </b>
        	   By checking the agreement box and submitting this form, I (the author and copyright owner) grant 
-           {% if institution.member %}{{ institution.member.name }}{% else %}{{ institution.name }}{% endif %}
+           {{ config.get('INSTITUTION').get('name') }}
            the non-exclusive right to reproduce and distribute my thesis/work in print and electronic form. I agree
-	   that {% if institution.member %}{{ institution.member.name }}{% else %}{{ institution.name }}{% endif %}
+	   that {{ config.get('INSTITUTION').get('name') }}
            may, without changing the content, convert my thesis/work to any medium or step_four_format for the 
 	   purpose of historical preservation and to make publically available in open access to a larger community of
 	   scholars. All such copies will retain original notices of authorship and copyright.<br/>
@@ -34,20 +36,19 @@
 	   law protects me against the unauthorized use of this work; the right to use in future works all or part of this
 	   work.</p>
 	<p>I understand that 
-          {% if institution.member %}{{ institution.member.name }}{% else %}{{ institution.name }}{% endif %}
+           {{ config.get('INSTITUTION').get('name') }}
            shall have the right to non-commercial use which includes the right to reproduce,
 	   distribute, and make copies of the work (electronically or in print) in connection with digital repositories, 
-	   teaching, and scholarly activities at 
+	   teaching, and scholarly activities at {{ config.get('INSTITUTION''name') }}.
 
-          {% if institution.member %}{{ institution.member.name }}{% else %} {{ institution.name }}{% endif %}.
         </p>
-        {% comment %}
+        {#
         <p><strong>{{ step_four_form.not_publically_available }} {{ step_four_form.not_publically_available.label }}</strong>
            By checking this box and submitting this form, I (the author and copyright owner) do not want my thesis to be 
            publically available to a larger community of scholars.  Only {{ default.institution }} faculty will be able 
            to access the full-text of my thesis.   
            </p>
-       {% endcomment %}
+       #}
    {# END agreement DIV #}
     </div>
   <div class="step_four_form-group">

@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
-  Copyright: 2011, 2013, 2015 Jeremy Nelson, Colorado College
+  Copyright: 2011-2016 Jeremy Nelson, Colorado College
 """
 
 
@@ -27,11 +27,12 @@ import urllib.parse
 
 import mimetypes
 import xml.etree.ElementTree as etree
-from flask import redirect, render_template, request
-from flask.ext.login import login_required
+from flask import abort, redirect, render_template, request
+from flask.ext.login import login_required, login_user, logout_user
 from operator import itemgetter
-from . import app
-from .forms import StepOneForm, StepTwoForm
+from . import app, ils_patron_check
+from .forms import LoginForm, StepOneForm, StepTwoForm, StepThreeForm
+from .forms import StepFourForm
 
 # Sets workflows dict
 workflows = dict()
@@ -51,6 +52,9 @@ for filename in os.listdir(workflow_dir):
                                      address.get('addressRegion'))
         workflow_config.set('FORM','location', location)
         workflows[fileinfo[0].lower()] = workflow_config
+
+
+
 
 # Helper functions
 def get_advisors(config):
@@ -98,12 +102,27 @@ def default():
 def login():
     """Login Method """
     next_page = request.args.get('next')
-    return redirect(next_page)
+    form = LoginForm()
+    if request.method == "POST": #form.validate()
+        username = form.username.data
+        ils_number = form.password.data
+        student = ils_patron_check(ils_number)
+        if student:
+            login_user(student)
+            return redirect(next_page or default())
+    return render_template("registration/login.html",
+                           next=next_page,
+                           user=None,
+                           form=form)
+        
+    
 
 def logout():
-    return default()
+    logout_user()
+    return redirect(default)
     
 @app.route("/<name>")
+@login_required
 def workflow(name='default'):
     multiple_languages = False
     step_one_form = StepOneForm()
@@ -111,26 +130,23 @@ def workflow(name='default'):
     if name in workflows:
         custom = workflows[name]
         step_one_form.advisors.choices = get_advisors(custom)
+        step_one_form.graduation_dates.choices = get_grad_dates(custom)
         if custom.has_section('LANGUAGE'):
             step_two_form.fields['languages'].choices = custom.items('LANGUAGE')
             multiple_languages = True
-
-
-    step_one_form.graduation_dates.choices = get_grad_dates(custom)
     website_view = True
     return render_template('etd/default.html',
-                   config=custom,
                    email_notices=custom.get('FORM', 'email_notices'),
                    multiple_languages=multiple_languages,
                    step_one_form=step_one_form,
                    step_two_form=step_two_form,
-                   step_three_form=None,#StepThreeForm(),
-                   step_four_form=None,#StepFourForm(),
+                   step_three_form=StepThreeForm(),
+                   step_four_form=StepFourForm(),
                    user=None,
                    website=None,
-                   workflow=workflow)
+                   workflow=name)
 
-
+@login_required
 def success(request):
     """
     Displays result from a successful thesis submission to the repository

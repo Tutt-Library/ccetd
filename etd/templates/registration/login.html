@@ -1,0 +1,39 @@
+{% extends "etd/base.html" %}
+
+{% block action_view_title %}Login{% endblock %}
+
+{% block body %}
+{% if form.errors %}
+  <h2 style="color: rgb(255,0,0); margin-top: 60px;">Error!</h2>
+  <p>Your TIGER number was not found. Please double-check your TIGER number 
+  and either visit or contact Tutt Library Circulation at (719) 389-6184 to 
+  confirm your TIGER number</p> 
+{% endif %}
+<h3>Please login</h3>
+<div class="row">
+ <div class="col-md-6">
+ <form class="form-horizontal" method="post" action="/login?next={% if next %}{{ next }}{% else %}{{ request.path }}{% endif %}">
+ {# csrf_token #}
+  <div>
+    <label for="id_username" class="control-label">Your last name:</label>
+    <div>{{ form.username }}</div>
+
+   <label for="id_password" class="control-label">Your TIGER# (at the bottom of your Gold Card)</label>
+   <div class="">
+     {{ form.password }}
+    </div>
+  </div>
+  <div>
+    <div class="">
+      <input type="submit" class="btn btn-primary" value="Login" />
+    </div>
+  </div>
+  {#<input type="hidden" name="next" 
+   {% if next %}value="{{ next }}"{% else %}value="{{ request.path }}" {% endif %} />#}
+</form>
+ </div>
+ <div class="col-md-6">
+  <img src="{{ url_for('static', filename="img/cc-gold-card.jpg") }}">
+ </div>
+</div>
+{% endblock %}

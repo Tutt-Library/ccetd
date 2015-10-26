@@ -206,7 +206,7 @@ function ThesisViewModel() {
        self.thesisFileStatus('has-error');
        self.formErrors.push({'error': 'Thesis File is required'});
      } else {
-       var filename = $('#id_thesis_file').val().replace(/.*(\/|\\)/, '');
+       var filename = $('#thesis_file').val().replace(/.*(\/|\\)/, '');
        var ext = filename.split(".")[1];
        ext = ext.toLowerCase();
        if(ext != 'pdf' && ext != 'mp4') {
@@ -234,7 +234,7 @@ function ThesisViewModel() {
        self.formError(true);
        return;
      } 
-
+     console.log("Before step three");
      self.resetViews();
      self.showStepThree(true);
      self.setProgressBar(40);

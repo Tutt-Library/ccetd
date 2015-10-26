@@ -95,7 +95,7 @@
   {# comment %}START main-column DIV #}
   <div class="col-md-8 col-sm-8 well">
  {% if workflow %}
-    <h1>{# config|get_department_name #} Thesis Submission</h1>
+    <h1>{# workflow.1.get('FORM', 'department') #} Thesis Submission</h1>
    {% include 'etd/thesis-form.html' %}
  {% else %}
    <h1>Colorado College Electronic Thesis Submission</h1>
