@@ -23,6 +23,7 @@ import datetime
 import os
 import configparser
 import logging
+import requests
 import urllib.parse
 
 import mimetypes
@@ -30,6 +31,7 @@ import xml.etree.ElementTree as etree
 from flask import abort, redirect, render_template, request
 from flask.ext.login import login_required, login_user, logout_user
 from operator import itemgetter
+from werkzeug.exceptions import InternalServerError
 from . import app, ils_patron_check
 from .forms import LoginForm, StepOneForm, StepTwoForm, StepThreeForm
 from .forms import StepFourForm
@@ -98,7 +100,7 @@ def default():
                             user=None,
                             active=sorted(workflows.items()))
 
-@app.route("/login",  methods=['POST', 'GET'])
+@app.route("/login", methods=['POST', 'GET'])
 def login():
     """Login Method """
     next_page = request.args.get('next')
@@ -146,6 +148,7 @@ def workflow(name='default'):
                    website=None,
                    workflow=name)
 
+@app.route("/success")
 @login_required
 def success(request):
     """
@@ -296,9 +299,9 @@ def create_mods(post, pid):
     page_numbers = post.get('page_numbers', '')
     if len(page_numbers) > 0:
         extent += '{0} pages'.format(page_numbers)
-    if post.has_key('has_illustrations'):
+    if 'has_illustrations' in post:
         extent += ' : illustrations'
-    if post.has_key('has_maps'):
+    if 'has_maps' in post:
         if extent.endswith('illustrations'):
             extent += ', '
         else:
@@ -339,12 +342,8 @@ def create_mods(post, pid):
     if config.has_option('FORM', 'additional_note'):
         template_vars['additional_note'] = config.get('FORM',
                                                       'additional_note')
-    if 'member' in INSTITUTION:
-        template_vars['institution'] = INSTITUTION['member']['name']
-        address = INSTITUTION['member']['address']
-    else:
-        template_vars['institution'] = INSTITUTION['name']
-        address = INSTITUTION['address']
+    template_vars['institution'] = app.config.get('INSTITUTION', 'name')
+    address = app.config.get('INSTITUTION','address')
     template_vars['location'] = '{0}, {1}'.format(
             address.get('addressLocality'),
             address.get('addressRegion'))
@@ -365,26 +364,40 @@ def create_mods(post, pid):
         if len(word) > 0:
             template_vars['topics'].append(word)
 
-    return render_to_string('etd/mods.xml' , template_vars)
+    return render_template('etd/mods.xml' , **template_vars)
 
 def send_emails(config, info):
     pass
 
+@app.route("/<name>/update", methods=['POST'])
 @login_required
-def update(request):
+def update(name):
     "View for Thesis Submission"
-    repo = Repository()
-    new_pid = repo.api.ingest(text=None)
-    workflow = request.POST.get('workflow')
+    print("In update route name={}".format(name))
+    new_pid_result = requests.post(
+        "{}new?namespace={}".format(
+            app.config.get("REST_URL"),
+            app.config.get("NAMESPACE")),
+        auth=app.config.get("FEDORA_AUTH"))
+    if new_pid_result.status_code > 399:
+        abort(new_pid_result.status_code)
+        raise InternalServerError(
+            "New pid generation failed with Fedora {}\nCode={} Error={}".format(
+             app.config.get("REST_URL"),
+             new_pid_result.status_code,
+             new_pid_result.text))     
+    new_pid = new_pid_result.text    
+    print("New pid is {}".format(new_pid))
+    workflow = request.form.get('workflow')
     config = workflows.get(workflow)
-    mods = create_mods(request.POST, pid=new_pid)
+    mods = create_mods(request.form, pid=new_pid)
     mods_xml = etree.XML(mods)
-    title = request.POST.get('title')
-    thesis_pdf = request.FILES.pop('thesis_file')[0]
+    title = request.form.get('title')
+    thesis_pdf = request.files.pop('thesis_file')
     # Sets Thesis Object Title
     repo.api.modifyObject(pid=new_pid,
                           label=title,
-                          ownerId=settings.FEDORA_USER,
+                          ownerId=app.config.get("FEDORA_AUTH")[0],
                           state='A')
     # Adds Thesis PDF Datastream
     repo.api.addDatastream(pid=new_pid,
@@ -401,10 +414,10 @@ def update(request):
                            mimeType="text/xml",
                            content=etree.tostring(mods_xml))
     # Iterate through remaining files and add as supporting datastreams
-    for file_name in request.FILES.keys():
-        file_object = request.FILES.get(file_name)
+    for file_name in request.files.keys():
+        file_object = request.files.get(file_name)
         secondary_title = file_object.name
-        file_title = request.POST.get("{0}_title".format(file_name))
+        file_title = request.form.get("{0}_title".format(file_name))
         if file_title is None or len(file_title) < 1:
             file_title = file_object.name.split(".")[0]
         # DS_ID max length of 64 characters
@@ -431,9 +444,9 @@ def update(request):
                        'workflow': workflow
                        }
     if 'email' in request.POST:
-        etd_success_msg['email'] = request.POST.get('email')
+        etd_success_msg['email'] = request.post.get('email')
     request.session['etd-info'] = etd_success_msg
 ##    return HttpResponse(str(etd_success_msg))
-    return HttpResponseRedirect('/etd/success')
+    return HttpResponseRedirect('/success')
 
 
