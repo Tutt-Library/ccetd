@@ -23,6 +23,7 @@ import datetime
 import os
 import configparser
 import logging
+import re
 import requests
 import urllib.parse
 
@@ -88,6 +89,16 @@ def get_grad_dates(config):
     if config.has_option('FORM','sum_grad'):
         grad_dates.append(2*(config.get('FORM','sum_grad'),))
     return grad_dates
+
+
+def slugify(value):
+    """
+    Converts to lowercase, removes non-word characters (alphanumerics and
+    underscores) and converts spaces to hyphens. Also strips leading and
+    trailing whitespace.
+    """
+    value = re.sub('[^\w\s-]', '', value).strip().lower()
+    return re.sub('[-\s]+', '-', value)
 
 # Request Handlers
 @app.route("/")
@@ -201,42 +212,38 @@ def success(request):
                                   'etd/success.html',
                                   {'info':etd_success_msg,
                                    'website': website_view})
-    raise Http404
+    abort(404)
 
-def save_rels_ext(repository,
-                  pid,
-                  parent_pid,
-                  restrictions):
+def save_rels_ext(pid,
+                  collection_pid,
+                  restrictions=None,
+                  parent_pid=None,
+                  sequence_num=None):
+
     """
     Helper function saves RELS-EXT datastream for Thesis object to Repository
 
-    :param repository: Fedora repository
-    :param pid: Thesis PID
-    :param parent_pid: Parent Collection PID
-    :param restrictions: Restrictions for RELS-EXT
+    :param pid: Fedora Object's PID
+    :param collection_pid: Object's Collection PID
+    :param restrictions: Restrictions for RELS-EXT, defaults to None
+    :param parent_pid: Parent of a compound object, defaults to None
+    :param sequence_num: Sequence number, defaults to None
     """
-    rels_ext_template = loader.get_template('rels-ext.xml')
-    #rels_ext = islandora_rels_ext.rels_ext_string(pid=pid)
-    #rels_ext.addRelationship('isMemberOfCollection',
-    #                         parent_pid)
-    #rels_ext.addRelationship('hasModel',
-    #                         settings.FEDORA_ETDCMODEL)
-    context = Context({'object_pid':pid,
-                       'parent_pid':parent_pid,
-                       'content_model':settings.FEDORA_ETDCMODEL,
-                       'restrictions':restrictions})
-    #for user in restrictions['by_user']:
-    #    rels_ext.addRelationship('ViewableByUser',
-    #                             user)
-    #for role in restrictions['by_role']:
-    #    rels_ext.addRelationship('isViewableByRole',
-    #                            role)
-    rels_ext = rels_ext_template.render(context)
-    repository.api.addDatastream(pid=pid,
-                                 dsID="RELS-EXT",
-                                 dsLabel="RELS-EXT",
-                                 mimeType="application/rdf+xml",
-                                 content=rels_ext)
+    rels_ext = render_template('rels-ext',
+              {'object_pid':pid,
+               'collection_pid':parent_pid,
+               'content_model':settings.FEDORA_ETDCMODEL,
+               'restrictions':restrictions,
+               'parent_pid': parent_pid,
+               'sequence_num': sequence_num})
+    add_rels_ext_result = requests.post(
+         "{}{}/datastream/RELS-EXT".format(
+           app.config.get("REST_URL"),
+           new_pid),
+         data={"dsLabel": "RELS-EXT",
+               "mimeType": "application/rdf+xml"},
+         files={"content": rels_ext},
+         auth=app.config.get("FEDORA_AUTH"))
 
 def save_xacml_policy(repository,
                       pid,
@@ -393,51 +400,73 @@ def update(name):
     mods = create_mods(request.form, pid=new_pid)
     mods_xml = etree.XML(mods)
     title = request.form.get('title')
-    thesis_pdf = request.files.pop('thesis_file')
+    thesis_pdf = request.files.get('thesis_file')
     # Sets Thesis Object Title
-    repo.api.modifyObject(pid=new_pid,
-                          label=title,
-                          ownerId=app.config.get("FEDORA_AUTH")[0],
-                          state='A')
+    repo_modify_obj_result = requests.post(
+        "{}{}".format(app.config.get("REST_URL"),
+                      new_pid),
+        data={"label": title,
+              "ownerID": app.config.get("FEDORA_AUTH")[0],
+              "state": 'A'},
+        auth=app.config.get("FEDORA_AUTH"))
     # Adds Thesis PDF Datastream
-    repo.api.addDatastream(pid=new_pid,
-                           dsID="THESIS",
-                           controlGroup="M",
-                           dsLabel=title,
-                           mimeType="application/pdf",
-                           content=thesis_pdf)
+    repo_add_thesis_result = requests.post(
+         "{}{}/datastreams/THESIS".format(app.config.get("REST_URL"),
+                                      new_pid),
+         data={"controlGroup": "M",
+               "dsLabel":title,
+               "mimeType": "application/pdf"},
+         files={"content": thesis_pdf},
+         auth=app.config.get("FEDORA_AUTH"))
     # Adds MODS to Thesis Object
-    repo.api.addDatastream(pid=new_pid,
-                           dsID="MODS",
-                           controlGroup="M",
-                           dsLabel="MODS",
-                           mimeType="text/xml",
-                           content=etree.tostring(mods_xml))
+    repo_add_mods_result = requests.post(
+         "{}{}/datastreams/MODS".format(app.config.get("REST_URL"),
+                                        new_pid),
+         data={"controlGroup": "M",
+               "dsLabel": "MODS",
+               "mimeType": "text/xml"},
+         files={"content": etree.tostring(mods_xml)},
+         auth=app.config.get("FEDORA_AUTH"))
     # Iterate through remaining files and add as supporting datastreams
-    for file_name in request.files.keys():
+    for i,file_name in enumerate(request.files.keys()):
+        if file_name.startswith("thesis_file"):
+            continue
         file_object = request.files.get(file_name)
+        if file_object.content_length < 1:
+            continue
         secondary_title = file_object.name
         file_title = request.form.get("{0}_title".format(file_name))
         if file_title is None or len(file_title) < 1:
             file_title = file_object.name.split(".")[0]
-        # DS_ID max length of 64 characters
-        ds_id = slugify(file_title)[0:63]
-
+        # label max length of 64 characters
+        label = slugify(file_title)[0:63]
         mime_type = mimetypes.guess_type(file_object.name)[0]
         if mime_type is None:
             mime_type = 'application/octet-stream'
-        result = repo.api.addDatastream(
-            pid=new_pid,
-            controlGroup="M",
-            dsID=ds_id,
-            dsLabel=file_title,
-            mimeType=mime_type,
-            content=file_object)
+        pid_result = requests.post(
+            "{}new".format(app.config.get("REST_URL"),
+            data={"label": label,
+                  "namespace": app.config.get("NAMESPACE"),
+                  "state": "M"},
+            auth=app.config.get("FEDORA_AUTH")))
+        file_pid = pid_result.text
+        new_file_result = requests.post(
+            "{}{}/datastreams/FILE".format(
+                app.config.get("REST_URL"),
+                file_pid),
+            data={"label": label,
+                  "controlGroup": "M",
+                  "dsLabel": file_title,
+                  "mimeType": "text/xml"},
+            files={"content": file_object})
+        save_rels_ext(file_pid,
+            collection_pid=config.get('FORM', 'fedora_collection'),
+            restrictions=None,
+            parent_pid=new_pid,
+            sequence_num=i)
     # Create RELS-EXT relationship with content type and parent collection
-    save_rels_ext(repo,
-                  new_pid,
-                  config.get('FORM', 'fedora_collection'),
-                  None)
+    save_rels_ext(new_pid,
+                  config.get('FORM', 'fedora_collection'))
     etd_success_msg = {'advisors': request.POST.getlist('advisors'),
                        'pid': new_pid,
                        'title':title,
