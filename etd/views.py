@@ -1,5 +1,6 @@
 """
- views.py -- Views for ETD application.
+ views.py -- Views for ETD application using Fedora API-M documentation at
+ https://wiki.duraspace.org/display/FEDORA38/REST+API
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -29,7 +30,7 @@ import urllib.parse
 
 import mimetypes
 import xml.etree.ElementTree as etree
-from flask import abort, redirect, render_template, request
+from flask import abort, redirect, render_template, request, session, url_for
 from flask.ext.login import login_required, login_user, logout_user
 from operator import itemgetter
 from werkzeug.exceptions import InternalServerError
@@ -161,22 +162,18 @@ def workflow(name='default'):
 
 @app.route("/success")
 @login_required
-def success(request):
+def success():
     """
     Displays result from a successful thesis submission to the repository
 
     :param request: Django request object
     """
-    if request.get_full_path().startswith('/etd/'):
-        website_view = True
-    else:
-        website_view = False
-    etd_success_msg = request.session['etd-info']
+    etd_success_msg = session['etd-info']
     if etd_success_msg is not None:
-        etd_success_msg['thesis_url'] = urlparse.urljoin(
-            settings.FEDORA_URI,
-            'fedora/repository/{0}'.format(etd_success_msg['pid']))
-        if etd_success_msg.has_key('email') and settings.DEBUG is False:
+        etd_success_msg['thesis_url'] = "{}/{}".format(
+            app.config.get('ISLANDORA_URL'), 
+            etd_success_msg['pid'])
+        if 'email' in etd_success_msg and app.config.get('DEBUG') is False:
             config = workflows.get(etd_success_msg.get('workflow'))
             raw_email = etd_success_msg['email']
             if len(raw_email) > 3 and raw_email.find('@') > -1: # Rough email validation
@@ -205,20 +202,21 @@ def success(request):
                           to_email_addrs,
                           fail_silently=False)
 
-        etd_success_msg['repository_url'] = settings.FEDORA_URI
-        request.session.pop('etd-info')
-        logout(request)
-        return direct_to_template(request,
-                                  'etd/success.html',
-                                  {'info':etd_success_msg,
-                                   'website': website_view})
+        etd_success_msg['repository_url'] = app.config.get('FEDORA_URI')
+        session.pop('etd-info')
+        return render_template('etd/success.html',
+                               info=etd_success_msg,
+                               user=None,
+                               website=False)
     abort(404)
 
 def save_rels_ext(pid,
                   collection_pid,
+                  content_model=app.config.get("CONTENT_MODEL"),
                   restrictions=None,
                   parent_pid=None,
-                  sequence_num=None):
+                  sequence_num=None,
+                  ):
 
     """
     Helper function saves RELS-EXT datastream for Thesis object to Repository
@@ -229,21 +227,27 @@ def save_rels_ext(pid,
     :param parent_pid: Parent of a compound object, defaults to None
     :param sequence_num: Sequence number, defaults to None
     """
-    rels_ext = render_template('rels-ext',
-              {'object_pid':pid,
-               'collection_pid':parent_pid,
-               'content_model':settings.FEDORA_ETDCMODEL,
-               'restrictions':restrictions,
-               'parent_pid': parent_pid,
-               'sequence_num': sequence_num})
-    add_rels_ext_result = requests.post(
-         "{}{}/datastream/RELS-EXT".format(
+    rels_ext = render_template('etd/rels-ext.xml',
+              object_pid = pid,
+              collection_pid = collection_pid,
+              content_model = content_model,
+              restrictions=restrictions,
+              parent_pid= parent_pid,
+              sequence_num=sequence_num)
+    rels_ext_url = "{}{}/datastreams/RELS-EXT?{}".format(
            app.config.get("REST_URL"),
-           new_pid),
-         data={"dsLabel": "RELS-EXT",
-               "mimeType": "application/rdf+xml"},
+           pid,
+           urllib.parse.urlencode({"dsLabel": "RELS-EXT",
+               "mimeType": "application/rdf+xml"}))
+    add_rels_ext_result = requests.post(
+         rels_ext_url,
          files={"content": rels_ext},
          auth=app.config.get("FEDORA_AUTH"))
+    if add_rels_ext_result.status_code > 399:
+        raise ValueError("Failed to add rels_ext to {} Error {}\n{}".format(
+            pid,
+            add_rels_ext_result.status_code,
+            add_rels_ext_result.text))
 
 def save_xacml_policy(repository,
                       pid,
@@ -330,7 +334,6 @@ def create_mods(post, pid):
              'July': '07'}.get(month))
     template_vars = {'abstract': post.get('abstract', None),
                      'advisors': [],
-                     'config': config,
                      'creator': creator_name,
                      'date_str': date_str,
                      'degree': {'type': config.get('FORM',
@@ -341,11 +344,13 @@ def create_mods(post, pid):
                                               'department'),
                      'extent': extent,
                      'honor_code': post.get('honor_code', False),
+                     'institution': app.config.get("INSTITUTION"),
                      'pid': pid,
                      'thesis_note': config.get('FORM',
                                                'thesis_note'),
                      'title': post.get('title').replace('&', '&amp;'),
-                     'topics': []}
+                     'topics': [],
+                     'workflow': config}
     if config.has_option('FORM', 'additional_note'):
         template_vars['additional_note'] = config.get('FORM',
                                                       'additional_note')
@@ -402,39 +407,52 @@ def update(name):
     title = request.form.get('title')
     thesis_pdf = request.files.get('thesis_file')
     # Sets Thesis Object Title
-    repo_modify_obj_result = requests.post(
-        "{}{}".format(app.config.get("REST_URL"),
-                      new_pid),
-        data={"label": title,
-              "ownerID": app.config.get("FEDORA_AUTH")[0],
-              "state": 'A'},
+    modify_obj_url = "{}{}?{}".format(
+        app.config.get("REST_URL"),
+        new_pid,
+        urllib.parse.urlencode(
+            {"label": title,
+             "ownerID": app.config.get("FEDORA_AUTH")[0],
+             "state": 'A'}))
+    repo_modify_obj_result = requests.put(
+        modify_obj_url,
         auth=app.config.get("FEDORA_AUTH"))
     # Adds Thesis PDF Datastream
-    repo_add_thesis_result = requests.post(
-         "{}{}/datastreams/THESIS".format(app.config.get("REST_URL"),
-                                      new_pid),
-         data={"controlGroup": "M",
+    add_thesis_url = "{}{}/datastreams/THESIS?{}".format(
+        app.config.get("REST_URL"),
+        new_pid,
+        urllib.parse.urlencode({"controlGroup": "M",
                "dsLabel":title,
-               "mimeType": "application/pdf"},
-         files={"content": thesis_pdf},
+               "mimeType": "application/pdf"}))
+    raw_pdf = thesis_pdf.read()
+    repo_add_thesis_result = requests.post(
+         add_thesis_url,
+         files={"content": raw_pdf},
          auth=app.config.get("FEDORA_AUTH"))
+    if repo_add_thesis_result.status_code > 399:
+        raise ValueError("Add Thesis Result Failed {}\n{}".format(
+            repo_add_thesis_result.status_code,
+            repo_add_thesis_result.text))
     # Adds MODS to Thesis Object
-    repo_add_mods_result = requests.post(
-         "{}{}/datastreams/MODS".format(app.config.get("REST_URL"),
-                                        new_pid),
-         data={"controlGroup": "M",
+    mods_url = "{}{}/datastreams/MODS?{}".format(
+        app.config.get("REST_URL"),
+        new_pid,
+        urllib.parse.urlencode({"controlGroup": "M",
                "dsLabel": "MODS",
-               "mimeType": "text/xml"},
-         files={"content": etree.tostring(mods_xml)},
+               "mimeType": "text/xml"}))
+    repo_add_mods_result = requests.post(
+         mods_url,
+         files={"content": mods},
          auth=app.config.get("FEDORA_AUTH"))
     # Iterate through remaining files and add as supporting datastreams
     for i,file_name in enumerate(request.files.keys()):
         if file_name.startswith("thesis_file"):
             continue
         file_object = request.files.get(file_name)
-        if file_object.content_length < 1:
+        raw_file = file_object.stream.read()
+        if len(raw_file) < 1:
             continue
-        secondary_title = file_object.name
+        #secondary_title = file_object.name
         file_title = request.form.get("{0}_title".format(file_name))
         if file_title is None or len(file_title) < 1:
             file_title = file_object.name.split(".")[0]
@@ -443,12 +461,14 @@ def update(name):
         mime_type = mimetypes.guess_type(file_object.name)[0]
         if mime_type is None:
             mime_type = 'application/octet-stream'
-        pid_result = requests.post(
-            "{}new".format(app.config.get("REST_URL"),
-            data={"label": label,
+        file_url = "{}new?{}".format(
+            app.config.get("REST_URL"),
+            urllib.parse.urlencode({"label": label,
                   "namespace": app.config.get("NAMESPACE"),
-                  "state": "M"},
-            auth=app.config.get("FEDORA_AUTH")))
+                  "state": "M"}))
+        pid_result = requests.post(
+            file_url,
+            auth=app.config.get("FEDORA_AUTH"))
         file_pid = pid_result.text
         new_file_result = requests.post(
             "{}{}/datastreams/FILE".format(
@@ -459,23 +479,25 @@ def update(name):
                   "dsLabel": file_title,
                   "mimeType": "text/xml"},
             files={"content": file_object})
+        collection_pid = config.get('FORM', 'fedora_collection')
         save_rels_ext(file_pid,
-            collection_pid=config.get('FORM', 'fedora_collection'),
+            collection_pid=collection_pid,
+            content_model="info:fedora/islandora:sp_pdf",
             restrictions=None,
             parent_pid=new_pid,
             sequence_num=i)
     # Create RELS-EXT relationship with content type and parent collection
     save_rels_ext(new_pid,
-                  config.get('FORM', 'fedora_collection'))
-    etd_success_msg = {'advisors': request.POST.getlist('advisors'),
+                  collection_pid=config.get('FORM', 'fedora_collection'))
+                  
+    etd_success_msg = {'advisors': request.form.getlist('advisors'),
                        'pid': new_pid,
                        'title':title,
                        'workflow': workflow
                        }
-    if 'email' in request.POST:
-        etd_success_msg['email'] = request.post.get('email')
-    request.session['etd-info'] = etd_success_msg
-##    return HttpResponse(str(etd_success_msg))
-    return HttpResponseRedirect('/success')
+    if 'email' in request.form:
+        etd_success_msg['email'] = request.form.get('email')
+    session['etd-info'] = etd_success_msg
+    return redirect(url_for('success'))
 
 

@@ -1,9 +1,7 @@
-{% extends 'app-base.html' %}
-{% load etd_extras %}
-{% load i18n %}
+{% extends 'etd/base.html' %}
 
-{% block head-title %}Successful Thesis Submission to Digital Archives of Colorado College {% endblock %}
-{% block more-css %}
+{% block head_title %}Successful Thesis Submission to Digital Archives of Colorado College {% endblock %}
+{% block more_css %}
  <link href="{{ STATIC_URL }}css/jquery-ui-1.8.13.custom.css" rel="stylesheet" />
  <link href="{{ STATIC_URL }}css/thesis.css" rel="stylesheet" />
 {% endblock %}
@@ -15,7 +13,7 @@
    <iframe src="/apps/website-header" class="website-header" scrolling="no"></iframe>
   </div>
   {% else %}
-   {% include 'snippets/navigation-action-bar.html' %}
+   {% include 'etd/snippets/navigation-action-bar.html' %}
   {% endif %}
  </div>
 {% endblock %}
@@ -24,10 +22,10 @@
 <div class="row" >
  <div class="col-sm-8 col-md-8" style=" margin-top: 0px">
   <ul class="breadcrumb" >
-   <li><a href="http://www.coloradocollege.edu/library">{% trans "Library Home" %}</a></li>
-   <li><a href="/etd">{% trans "ETD" %}</a></li>
+   <li><a href="http://www.coloradocollege.edu/library">Library Home</a></li>
+   <li><a href="/etd">ETD</a></li>
   {% if workflow %}
-   <li class="active"><a href="#" >{{ config|get_department_name }}</a></li>
+   <li class="active"><a href="#" >{{ config.get('INSTITUTION').get('name') }}</a></li>
   {% endif %}
   </ul>
  </div>
@@ -67,6 +65,6 @@
    <iframe src="/apps/website-footer" class="website-footer" scrolling="no"></iframe>
   </div>
   {% else %}
-   {% include  'snippets/footer-action-bar.html' %}
+   {% include  'etd/snippets/footer-action-bar.html' %}
   {% endif %}
 {% endblock %} 

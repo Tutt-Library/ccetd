@@ -13,7 +13,7 @@
    <fedora:isConstituentOf rdf:resource="info:fedora/{{ parent_pid }}"></fedora:isConstituentOf>
    {% endif %}
    {% if sequence_num %}
-   <islandora:isSequenceNumberOf{{ parent_pid}}>{{ sequence_num }}</islandora:isSequenceNumberOf{{ parent_pid}}>
+   <islandora:isSequenceNumberOf{{ parent_pid.replace(":", "_")}}>{{ sequence_num }}</islandora:isSequenceNumberOf{{ parent_pid.replace(":", "_")}}>
    {% endif %}
    {% if restrictions %}
    {% for user in restrictions.by_user %}

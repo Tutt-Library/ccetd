@@ -1,112 +1,114 @@
 {% autoescape off %}
-<mods:mods xmlns:mods="http://www.loc.gov/mods/v3" 
+<mods xmlns:mods="http://www.loc.gov/mods/v3" 
            xmlns="http://www.loc.gov/mods/v3" 
            xmlns:xlink="http://www.w3.org/1999/xlink" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   {% if abstract %}
-  <mods:abstract>
+  <abstract>
    {{ abstract|escape }}
-  </mods:abstract>
+  </abstract>
   {% endif %}
-  <mods:note type="admin">The author has given permission for this work to be deposited in the Digital Archive of Colorado College.</mods:note>
+  <note type="admin">The author has given permission for this work to be deposited in the Digital Archive of Colorado College.</note>
   {% if honor_code %}
-  <mods:note type="admin">Colorado College Honor Code upheld.</mods:note>
+  <note type="admin">Colorado College Honor Code upheld.</note>
   {% endif %}
   {% if additional_note %}
-  <mods:note>{{ additional_note }}</mods:note>
+  <note>{{ additional_note }}</note>
   {% endif %}
-  <mods:note type="thesis">Senior Thesis -- Colorado College</mods:note>
+  <note type="thesis">Senior Thesis -- Colorado College</note>
   {% if degree %}
-  <mods:note type="thesis" displayLabel="Degree Name">{{ degree.name }}</mods:note>
-  <mods:note type="thesis" displayLabel="Degree Type">{{ degree.type }}</mods:note>
+  <note type="thesis" displayLabel="Degree Name">{{ degree.name }}</note>
+  <note type="thesis" displayLabel="Degree Type">{{ degree.type }}</note>
   {% endif %}
-  <mods:note type="bibliography">Includes bibliographical references.</mods:note>
-  <mods:typeOfResource>text</mods:typeOfResource>
-  <mods:genre authority="marcgt">thesis</mods:genre>
-  <mods:accessCondition type="useAndReproduction">Copyright restrictions apply.</mods:accessCondition>
-  <mods:physicalDescription>
+  <note type="bibliography">Includes bibliographical references.</note>
+  <typeOfResource>text</typeOfResource>
+  <genre authority="marcgt">thesis</genre>
+  <accessCondition type="useAndReproduction">Copyright restrictions apply.</accessCondition>
+  <physicalDescription>
     {% if extent %}
-    <mods:extent>{{ extent }}</mods:extent>
+    <extent>{{ extent }}</extent>
     {% endif %}
-    <mods:digitalOrigin>born digital</mods:digitalOrigin>
-  </mods:physicalDescription>
+    <digitalOrigin>born digital</digitalOrigin>
+  </physicalDescription>
   {% if creator %}
-  <mods:name type="personal">
-    <mods:role>
-      <mods:roleTerm type="text" authority="marcrelator">creator</mods:roleTerm>
-    </mods:role>
-    <mods:namePart>{{ creator }}</mods:namePart>
-  </mods:name>
+  <name type="personal">
+    <role>
+      <roleTerm type="text" authority="marcrelator">creator</roleTerm>
+    </role>
+    <namePart>{{ creator }}</namePart>
+  </name>
   {% endif %}
   {% for advisor in advisors %}
-  <mods:name type="personal">
-    <mods:role>
-      <mods:roleTerm type="text" authority="marcrelator">thesis advisor</mods:roleTerm>
-    </mods:role>
-    <mods:namePart>{{ advisor }}</mods:namePart>
-  </mods:name>
+  <name type="personal">
+    <role>
+      <roleTerm type="text" authority="marcrelator">thesis advisor</roleTerm>
+    </role>
+    <namePart>{{ advisor }}</namePart>
+  </name>
   {% endfor %}
   {% if freeform_advisor %}
-  <mods:name type="personal">
-    <mods:role>
-      <mods:roleTerm type="text" authority="marcrelator">thesis advisor</mods:roleTerm>
-    </mods:role>
-    <mods:namePart>{{ freeform_advisor }}</mods:namePart>
-  </mods:name>
+  <name type="personal">
+    <role>
+      <roleTerm type="text" authority="marcrelator">thesis advisor</roleTerm>
+    </role>
+    <namePart>{{ freeform_advisor }}</namePart>
+  </name>
   {% endif %}
   {% if department %}
-  <mods:name type="corporate">
-    <mods:role>
-      <mods:roleTerm type="text" authority="marcrt">sponsor</mods:roleTerm>
-    </mods:role>
-    <mods:namePart>{{ department }}</mods:namePart>
-  </mods:name>
+  <name type="corporate">
+    <role>
+      <roleTerm type="text" authority="marcrt">sponsor</roleTerm>
+    </role>
+    <namePart>{{ department }}</namePart>
+  </name>
   {% endif %}
-  {% if institution %}
-  <mods:name type="corporate">
-    <mods:namePart>{{ institution }}</mods:namePart>
-    <mods:role>
-      <mods:roleTerm type="text" authority="marcrt">degree grantor</mods:roleTerm>
-    </mods:role>
-  </mods:name>
+  {% if institution  %}
+  <name type="corporate">
+    <namePart>{{ institution.get('name') }}</namePart>
+    <role>
+      <roleTerm type="text" authority="marcrt">degree grantor</roleTerm>
+    </role>
+  </name>
   {% endif %}
   {% for keyword in topics %}
-  <mods:subject>
-    <mods:topic>{{ keyword|escape }}</mods:topic>
-  </mods:subject>
+  <subject>
+    <topic>{{ keyword|escape }}</topic>
+  </subject>
   {% endfor %}
   {% if title %}
-  <mods:titleInfo>
-    <mods:title>{{ title|escape }}</mods:title>
-  </mods:titleInfo>
+  <titleInfo>
+    <title>{{ title|escape }}</title>
+  </titleInfo>
   {% endif %}
-  <mods:originInfo>
+  <originInfo>
     {% if institution %}
-    <mods:publisher>{{ institution }}</mods:publisher>
+    <publisher>{{ institution.get('name') }}</publisher>
     {% endif %}
     {% if date_str %}
-    <mods:dateIssued keyDate="yes">{{ date_str }}</mods:dateIssued>
-    <mods:dateCreated>{{ date_str }}</mods:dateCreated>
+    <dateIssued keyDate="yes">{{ date_str }}</dateIssued>
+    <dateCreated>{{ date_str }}</dateCreated>
     {% endif %}
-    {% if location %}
-    <mods:place>
-      <mods:placeTerm>{{ location }}</mods:placeTerm>
-    </mods:place>
+    {% if institution %}
+    <place>
+      <placeTerm>{{ institution.get('address').get('addressLocality') }},
+                  {{ institution.get('address').get('addressRegion') }}
+     </placeTerm>
+    </place>
     {% endif %}
-  </mods:originInfo>
+  </originInfo>
   {% if languages %}
   {% for language in languages %}
-  <mods:language>
-    <mods:languageTerm>{{ language }}</mods:languageTerm>
-  </mods:language>
+  <language>
+    <languageTerm>{{ language }}</languageTerm>
+  </language>
   {% endfor %}
   {% else %}
-  <mods:language>
-    <mods:languageTerm>English</mods:languageTerm>
-  </mods:language>
+  <language>
+    <languageTerm>English</languageTerm>
+  </language>
   {% endif %}
-  <mods:location>
-    <mods:url usage="primary display">http://hdl.handle.net/10176/{{ pid }}</mods:url>
-  </mods:location>
-</mods:mods>
+  <location>
+    <url usage="primary display">{{ config.get('ISLANDORA_URL') }}/objects/{{ pid }}</url>
+  </location>
+</mods>
 {% endautoescape %}
