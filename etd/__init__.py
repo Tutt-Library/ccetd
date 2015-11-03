@@ -41,8 +41,6 @@ def request_loader(request):
     student = ils_patron_check(user_id)
     if not student:
         return
-    else:
-        student.is_authenticated = True
     return student 
 
 from .views import *

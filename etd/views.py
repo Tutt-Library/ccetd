@@ -46,7 +46,11 @@ for filename in os.listdir(workflow_dir):
     fileinfo = os.path.splitext(filename)
     if fileinfo[1] == '.ini':
         workflow_config = configparser.RawConfigParser()
-        workflow_config.read(os.path.join(workflow_dir,filename))
+        try:
+            workflow_config.read(os.path.join(workflow_dir,filename))
+        except:
+            print("Failed to load {}".format(filename))
+            continue
         # Add universal constants to config object
         workflow_config.set('FORM',
                             'institution', 
@@ -399,7 +403,6 @@ def update(name):
              new_pid_result.status_code,
              new_pid_result.text))     
     new_pid = new_pid_result.text    
-    print("New pid is {}".format(new_pid))
     workflow = request.form.get('workflow')
     config = workflows.get(workflow)
     mods = create_mods(request.form, pid=new_pid)
@@ -464,11 +467,12 @@ def update(name):
         file_url = "{}new?{}".format(
             app.config.get("REST_URL"),
             urllib.parse.urlencode({"label": label,
-                  "namespace": app.config.get("NAMESPACE"),
-                  "state": "M"}))
+                  "namespace": app.config.get("NAMESPACE")}))
         pid_result = requests.post(
             file_url,
             auth=app.config.get("FEDORA_AUTH"))
+        if pid_result.status_code > 399:
+            raise ValueError("Could not create pid with {}".format(file_url))
         file_pid = pid_result.text
         new_file_result = requests.post(
             "{}{}/datastreams/FILE".format(
@@ -482,7 +486,7 @@ def update(name):
         collection_pid = config.get('FORM', 'fedora_collection')
         save_rels_ext(file_pid,
             collection_pid=collection_pid,
-            content_model="info:fedora/islandora:sp_pdf",
+            content_model="info:fedora/islandora:sp_document",
             restrictions=None,
             parent_pid=new_pid,
             sequence_num=i)
