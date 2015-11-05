@@ -4,6 +4,7 @@ import hashlib
 import re
 import requests
 
+from bs4 import BeautifulSoup
 from flask import Flask
 from flask.ext.login import LoginManager 
 from .patron import Student
@@ -42,6 +43,20 @@ def request_loader(request):
     if not student:
         return
     return student 
+
+
+def harvest():
+     """ Harvests Header, Tabs, and Footer from Library Website"""
+    website_result = requests.get(app.config.get("INSITUTION").get("url"))
+    library_website = BeautifulSoup(website_result.text)
+    header = library_website.find(id="header")
+    tabs = library_website.find(id="library-tabs")
+    footer = library_website.find(id="footer")
+    for snippet in [header, tabs, footer]:
+        anchors = header.find_all('a')
+        for anchor in anchors:
+            existing_href = anchor.attrs.get('href')
+            pass  
 
 from .views import *
 

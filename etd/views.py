@@ -174,7 +174,7 @@ def success():
     """
     etd_success_msg = session['etd-info']
     if etd_success_msg is not None:
-        etd_success_msg['thesis_url'] = "{}/{}".format(
+        etd_success_msg['thesis_url'] = "{}/object/{}".format(
             app.config.get('ISLANDORA_URL'), 
             etd_success_msg['pid'])
         if 'email' in etd_success_msg and app.config.get('DEBUG') is False:
@@ -421,7 +421,7 @@ def update(name):
         modify_obj_url,
         auth=app.config.get("FEDORA_AUTH"))
     # Adds Thesis PDF Datastream
-    add_thesis_url = "{}{}/datastreams/THESIS?{}".format(
+    add_thesis_url = "{}{}/datastreams/OBJ?{}".format(
         app.config.get("REST_URL"),
         new_pid,
         urllib.parse.urlencode({"controlGroup": "M",
