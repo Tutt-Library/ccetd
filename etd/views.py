@@ -132,9 +132,17 @@ def login():
                            next=next_page,
                            user=None,
                            form=form)
-        
-    
 
+@app.route("/header")        
+def header():
+    return render_template("etd/snippets/header.html")
+
+
+@app.route("/footer")        
+def footer():
+    return render_template("etd/snippets/footer.html")
+
+@app.route("/logout")    
 def logout():
     logout_user()
     return redirect(default)

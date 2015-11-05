@@ -7,15 +7,13 @@
 {% endblock %}
 
 {% block navbar %}
+<div class="container">
  <div class="row">
-  {% if website %}
   <div class="col-md-12 col-sm-12">
-   <iframe src="/apps/website-header" class="website-header" scrolling="no"></iframe>
-  </div>
-  {% else %}
-   {% include 'etd/snippets/navigation-action-bar.html' %}
-  {% endif %}
+   <iframe src="{{ url_for('header') }}" class="website-header" scrolling="no"></iframe>
+   </div>
  </div>
+</div>
 {% endblock %}
 
 {% block action_view_subtitle %}
@@ -29,7 +27,7 @@
 {% endblock %}
 
 {% block body %}
-<div class="row" >
+<div class="row" style="top-margin: 800px">
  <div class="col-sm-8 col-md-8" style=" margin-top: 0px">
   <ul class="breadcrumb" >
    <li><a href="http://www.coloradocollege.edu/library">Library Home</a></li>
@@ -122,14 +120,12 @@
 {% endblock %}
 
 {% block footer %}
-<div class="row-fluid">
-  {% if website %}
+<div class="container">
+ <div class="row-fluid">
   <div class="span12 offset1">
-   <iframe src="/apps/website-footer" class="website-footer" scrolling="no"></iframe>
+   <iframe src="{{ url_for('footer') }}" class="website-footer" scrolling="no"></iframe>
   </div>
-  {% else %}
-   {% include  'etd/snippets/footer-action-bar.html' %}
-  {% endif %}
+</div>
 {% endblock %} 
 
 {% block more_js %}

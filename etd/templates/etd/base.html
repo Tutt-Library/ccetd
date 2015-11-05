@@ -7,14 +7,14 @@
 	{% block head_title %}{% endblock %}
     </title>
     {% block meta %}
-    <meta name="description" content="Aristotle Library Apps Interface" >
+    <meta name="description" content="Colorado College Thesis Self-Submission">
     <meta name="author" content="Jeremy Nelson">
     {% endblock %}
     {% block more_meta %}{% endblock %}
     
     <link rel="shortcut icon" href="{{ url_for('static', filename="ico/favicon.png") }}">
 
-    <title>Starter Template for Bootstrap</title>
+    <title>Colorado College Thesis Self-Submission</title>
 
     <!-- Bootstrap core CSS -->
     <link href="{{ url_for('static', filename="css/bootstrap.min.css") }}" rel="stylesheet">
@@ -29,7 +29,6 @@
    <div id="main">
 
   {% block navbar %}
-    {% include 'etd/snippets/navigation-action-bar.html' %}
   {% endblock %} 
   
   {# START body container #}
