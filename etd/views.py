@@ -396,7 +396,6 @@ def send_emails(config, info):
 @login_required
 def update(name):
     "View for Thesis Submission"
-    print("In update route name={}".format(name))
     new_pid_result = requests.post(
         "{}new?namespace={}".format(
             app.config.get("REST_URL"),
@@ -427,13 +426,17 @@ def update(name):
     repo_modify_obj_result = requests.put(
         modify_obj_url,
         auth=app.config.get("FEDORA_AUTH"))
-    # Adds Thesis PDF Datastream
-    add_thesis_url = "{}{}/datastreams/OBJ?{}".format(
-        app.config.get("REST_URL"),
-        new_pid,
-        urllib.parse.urlencode({"controlGroup": "M",
-               "dsLabel":title,
-               "mimeType": "application/pdf"}))
+    # Adds Thesis PDF Datastream 
+    #add_thesis_url = "{}{}/datastreams/OBJ?{}".format(
+    #    app.config.get("REST_URL"),
+    #    new_pid,
+    #    urllib.parse.urlencode({"controlGroup": "M",
+    #           "dsLabel":title,
+    #           "mimeType": "application/pdf"}))
+    add_thesis_url = "{}new?{}".format(
+            app.config.get("REST_URL"),
+            urllib.parse.urlencode({"label": title,
+               "namespace": app.config.get("NAMESPACE")}))
     raw_pdf = thesis_pdf.read()
     repo_add_thesis_result = requests.post(
          add_thesis_url,
@@ -443,6 +446,24 @@ def update(name):
         raise ValueError("Add Thesis Result Failed {}\n{}".format(
             repo_add_thesis_result.status_code,
             repo_add_thesis_result.text))
+    pdf_pid = repo_add_thesis_result.text
+    add_pdf_thesis_url = "{}{}/datastreams/OBJ?{}".format(
+        app.config.get("REST_URL"),
+        pdf_pid,
+        urllib.parse.urlencode({"controlGroup": "M",
+               "dsLabel":title,
+               "mimeType": "application/pdf"}))
+    raw_pdf = thesis_pdf.read()
+    repo_add_pdf_thesis_result = requests.post(
+         add_pdf_thesis_url,
+         files={"content": raw_pdf},
+         auth=app.config.get("FEDORA_AUTH"))
+    save_rels_ext(pdf_pid,
+         collection_pid=config.get('FORM', 'fedora_collection'),
+         content_model="islandora:sp_pdf",
+         restrictions=None,
+         parent_pid=new_pid,
+         sequence_num=1)
     # Adds MODS to Thesis Object
     mods_url = "{}{}/datastreams/MODS?{}".format(
         app.config.get("REST_URL"),
@@ -493,10 +514,10 @@ def update(name):
         collection_pid = config.get('FORM', 'fedora_collection')
         save_rels_ext(file_pid,
             collection_pid=collection_pid,
-            content_model="info:fedora/islandora:sp_document",
+            content_model="islandora:sp_document",
             restrictions=None,
             parent_pid=new_pid,
-            sequence_num=i)
+            sequence_num=i+1)
     # Create RELS-EXT relationship with content type and parent collection
     save_rels_ext(new_pid,
                   collection_pid=config.get('FORM', 'fedora_collection'))

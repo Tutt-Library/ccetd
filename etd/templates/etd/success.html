@@ -3,20 +3,9 @@
 {% block head_title %}Successful Thesis Submission to Digital Archives of Colorado College {% endblock %}
 {% block more_css %}
  <link href="{{ STATIC_URL }}css/jquery-ui-1.8.13.custom.css" rel="stylesheet" />
- <link href="{{ STATIC_URL }}css/thesis.css" rel="stylesheet" />
+ <link href="{{ url_for('static', filename='css/thesis.css') }}" rel="stylesheet" />
 {% endblock %}
 
-{% block navbar %}
- <div class="row">
-  {% if website %}
-  <div class="col-md-12 col-sm-12">
-   <iframe src="/apps/website-header" class="website-header" scrolling="no"></iframe>
-  </div>
-  {% else %}
-   {% include 'etd/snippets/navigation-action-bar.html' %}
-  {% endif %}
- </div>
-{% endblock %}
 
 {% block body %}
 <div class="row" >
@@ -57,14 +46,3 @@
 {# END Main Rwo #}
 </div>
 {% endblock %}
-
-{% block footer %}
-<div class="row-fluid">
-  {% if website %}
-  <div class="span12 offset1">
-   <iframe src="/apps/website-footer" class="website-footer" scrolling="no"></iframe>
-  </div>
-  {% else %}
-   {% include  'etd/snippets/footer-action-bar.html' %}
-  {% endif %}
-{% endblock %} 
