@@ -97,7 +97,6 @@ def harvest():
             base_url,
             src)
    
-    
     cache.set('styles', '\n'.join([str(s) for s in styles]))
     cache.set("header", str(header))
     cache.set("tabs", str(tabs))
@@ -107,6 +106,4 @@ def harvest():
 
 from .views import *
 from .filters import *
-
-
 

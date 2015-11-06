@@ -415,6 +415,7 @@ def update(name):
     mods_xml = etree.XML(mods)
     title = request.form.get('title')
     thesis_pdf = request.files.get('thesis_file')
+    #raw_pdf = thesis_pdf.read()
     # Sets Thesis Object Title
     modify_obj_url = "{}{}?{}".format(
         app.config.get("REST_URL"),
@@ -435,12 +436,11 @@ def update(name):
     #           "mimeType": "application/pdf"}))
     add_thesis_url = "{}new?{}".format(
             app.config.get("REST_URL"),
-            urllib.parse.urlencode({"label": title,
+            urllib.parse.urlencode({"label": "{} PDF".format(title),
                "namespace": app.config.get("NAMESPACE")}))
-    raw_pdf = thesis_pdf.read()
+    
     repo_add_thesis_result = requests.post(
          add_thesis_url,
-         files={"content": raw_pdf},
          auth=app.config.get("FEDORA_AUTH"))
     if repo_add_thesis_result.status_code > 399:
         raise ValueError("Add Thesis Result Failed {}\n{}".format(
@@ -451,13 +451,17 @@ def update(name):
         app.config.get("REST_URL"),
         pdf_pid,
         urllib.parse.urlencode({"controlGroup": "M",
-               "dsLabel":title,
+               "dsLabel": "{} PDF".format(title),
                "mimeType": "application/pdf"}))
-    raw_pdf = thesis_pdf.read()
     repo_add_pdf_thesis_result = requests.post(
          add_pdf_thesis_url,
-         files={"content": raw_pdf},
+         files={"content": thesis_pdf},
          auth=app.config.get("FEDORA_AUTH"))
+    if repo_add_pdf_thesis_result.status_code > 399:
+        raise ValueError("Add PDF Object failed {} Error with URL {}\n{}".format(
+            repo_add_pdf_thesis_result.status_code,
+            add_pdf_thesis_url,
+             repo_add_pdf_thesis_result.text))    
     save_rels_ext(pdf_pid,
          collection_pid=config.get('FORM', 'fedora_collection'),
          content_model="islandora:sp_pdf",
