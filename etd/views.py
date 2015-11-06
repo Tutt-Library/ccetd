@@ -158,7 +158,7 @@ def workflow(name='default'):
         step_one_form.advisors.choices = get_advisors(custom)
         step_one_form.graduation_dates.choices = get_grad_dates(custom)
         if custom.has_section('LANGUAGE'):
-            step_two_form.fields['languages'].choices = custom.items('LANGUAGE')
+            step_two_form.languages.choices = custom.items('LANGUAGE')
             multiple_languages = True
     website_view = True
     return render_template('etd/default.html',
