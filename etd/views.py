@@ -137,7 +137,6 @@ def login():
 def header():
     return render_template("etd/snippets/header.html")
 
-
 @app.route("/footer")        
 def footer():
     return render_template("etd/snippets/footer.html")
@@ -145,7 +144,7 @@ def footer():
 @app.route("/logout")    
 def logout():
     logout_user()
-    return redirect(default)
+    return redirect('/')
     
 @app.route("/<name>")
 @login_required

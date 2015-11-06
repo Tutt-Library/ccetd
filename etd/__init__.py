@@ -27,17 +27,18 @@ cache = FileSystemCache(
 
 def ils_patron_check(user_id):
     student = Student()
-    if app.debug:
-        student.id = "DEBUG"
-        return student
+    #if app.debug:
+    #    student.id = "DEBUG"
+    #    return student
     catalog_patron_url = app.config.get('CATALOG_AUTH_URL').format(user_id)
-    auth_result = requests.get(catalog_patron_url)
-    if auth_result < 400:
+    auth_result = requests.get(catalog_patron_url, verify=False)
+    if auth_result.status_code < 400:
         raw_html = auth_result.text
         if not re.search(r'ERRMSG=',raw_html):
-            hash_key = hashlib.sha256(app.config.get('SECRET_KEY').encode() +
-                                      user_id.encode())
-            student.id = hash_key.hexdigest()
+            #hash_key = hashlib.sha256(app.config.get('SECRET_KEY').encode() +
+            #                          user_id.encode())
+            #student.id = hash_key.hexdigest()
+            student.id = user_id
             return student
 
 
@@ -54,7 +55,6 @@ def request_loader(request):
     if not student:
         return
     return student 
-
 
 def harvest():
     """ Harvests Header, Tabs, and Footer from Library Website"""

@@ -29,6 +29,13 @@
    <div id="main">
 
   {% block navbar %}
+  <div class="container">
+   <div class="row">
+     <div class="col-md-12 col-sm-12">
+      <iframe src="{{ url_for('header') }}" class="website-header" scrolling="no"></iframe>
+     </div>
+   </div>
+  </div>
   {% endblock %} 
   
   {# START body container #}
@@ -52,13 +59,13 @@
 
   {% block footer %}
   {# START footer DIV #}
-  <div id="footer">
-   <div class="container">
-     {% include 'etd/snippets/footer-action-bar.html' %}
-   </div>
-     {# END footer DIV #}
-  </div> 
-  {% endblock %} 
+<div class="container">
+ <div class="row-fluid">
+  <div class="span12 offset1">
+   <iframe src="{{ url_for('footer') }}" class="website-footer" scrolling="no"></iframe>
+  </div>
+</div>
+ {% endblock %} 
 
   {% block dialogs %}
     {% include 'etd/snippets/help.html' %}
