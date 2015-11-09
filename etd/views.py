@@ -26,6 +26,7 @@ import configparser
 import logging
 import re
 import requests
+import smtplib
 import urllib.parse
 
 import mimetypes
@@ -184,7 +185,7 @@ def success():
         etd_success_msg['thesis_url'] = "{}/object/{}".format(
             app.config.get('ISLANDORA_URL'), 
             etd_success_msg['pid'])
-        if 'email' in etd_success_msg and app.config.get('DEBUG') is False:
+        if 'email' in etd_success_msg:# and app.config.get('DEBUG') is False:
             config = workflows.get(etd_success_msg.get('workflow'))
             raw_email = etd_success_msg['email']
             if len(raw_email) > 3 and raw_email.find('@') > -1: # Rough email validation
@@ -197,21 +198,16 @@ def success():
             if config.has_section('STAFF'):
                 for email in config.options('STAFF'):
                     to_email_addrs.append(email)
-            if 'member' in INSTITUTION:
-                institution_name = INSTITUTION['member']['name']
-            else:
-                institution_name = INSTITUTION['name']
+            institution_name = app.config.get('INSTITUTION')['name']
             email_message = "{0} successfully submitted to {1}".format(
                 etd_success_msg['title'],
                 institution_name)
             email_message += " Digital Archives available at {0}".format(
                 etd_success_msg['thesis_url'])
             if len(to_email_addrs) > 0:
-                send_mail('{0} submitted to DACC'.format(etd_success_msg['title']),
-                          email_message,
-                          settings.EMAIL_HOST_USER,
-                          to_email_addrs,
-                          fail_silently=False)
+                send_email({"subject": '{0} submitted to DACC'.format(etd_success_msg['title']),
+                            "text": email_message,
+                            "recipients": to_email_addrs})
 
         etd_success_msg['repository_url'] = app.config.get('FEDORA_URI')
         session.pop('etd-info')
@@ -389,8 +385,32 @@ def create_mods(post, pid):
 
     return render_template('etd/mods.xml' , **template_vars)
 
-def send_emails(config, info):
-    pass
+def send_email(info):
+    sender = app.config.get('EMAIL')['user']
+    recipients = info.get('recipients') 
+    subject = info.get('subject')
+    text = info.get('text')
+    message = """\From: {}\nTo: {}\nSubject: {}\n\n{}""".format(
+        sender,
+        ",".join(recipients),
+        subject,
+        text)
+    #try:
+    server = smtplib.SMTP(app.config.get('EMAIL')['host'],
+                              app.config.get('EMAIL')['port'])
+
+    server.ehlo()
+    if app.config.get('EMAIL')['tls']:
+        server.starttls()
+    server.login(sender,
+                 app.config.get("EMAIL")["password"])
+    server.sendmail(sender, recipients, message)
+    server.close()
+    #except:
+    #    print("Error trying to send email")
+    #    return False
+    return True
+    
 
 @app.route("/<name>/update", methods=['POST'])
 @login_required
