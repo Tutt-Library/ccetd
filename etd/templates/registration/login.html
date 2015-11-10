@@ -19,7 +19,7 @@
 <h1>Please login</h1>
 <div class="row">
  <div class="col-md-6">
- <form class="form-horizontal" method="post" action="/login?next={% if next %}{{ next }}{% else %}{{ request.path }}{% endif %}">
+ <form class="form-horizontal" method="post" action="/etd/login?next={% if next %}{{ next }}{% else %}{{ request.path }}{% endif %}">
  {# csrf_token #}
   <div class="row">
   <section class="col-md-7">

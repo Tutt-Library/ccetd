@@ -73,7 +73,7 @@ def harvest():
             app.config.get("INSTITUTION").get("url"))
         base_url = "{}://{}".format(url_parse.scheme, url_parse.netloc) 
     website_result = requests.get(app.config.get("INSTITUTION").get("url"))
-    library_website = BeautifulSoup(website_result.text)
+    library_website = BeautifulSoup(website_result.text, "html.parser")
     header = library_website.find(id="header")
     tabs = library_website.find(id="library-tabs")
     tabs.attrs['style'] = """height: 120px;background-image: url('{}');""".format(

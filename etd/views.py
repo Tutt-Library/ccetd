@@ -107,6 +107,7 @@ def slugify(value):
     return re.sub('[-\s]+', '-', value)
 
 # Request Handlers
+#@app.route("/etd/")
 @app.route("/")
 def default():
     """

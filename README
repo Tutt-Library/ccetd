@@ -1,20 +1,25 @@
-== Discover Aristotle Project ==
+# Electronic Thesis and Dissertation Flask Application
 
-Electronic Thesis and Dissertation Django Application
+The Electronic Thesis and Dissertation Flask application was originally a 
+pylons application developed at Colorado College, next it was migrated to
+Django and now is part of the Discover Aristotle project at Colorado College 
+Tutt Library. It now runs as an independent Flask application running
+under gunicorn.
 
-The Electronic Thesis and Dissertation Django application was originally a 
-pylons application developed at Colorado College. It has been migrated to the
-Django and now is part of the Discover Aristotle bibliographic, repository, 
-and access framework being actively developed at Colorado College Tutt Library
-and other institutions. Unless explictly set, all software code, ideas, 
+Unless explictly set, all software code, ideas, 
 configuations, and any associated intellectual work is licensed under the Apache 2 
 open source license or under a Creative Commons copyright.
 
 
-Dependencies:
-- eulfedora
-- eulxml
+## Dependencies
+    *  Flask
+    *  Flask-Login
+    *  Flask-WTForms
+    *  requests
+    *  BeautifulSoup
 
-Optional: 
-- aristotle.datasets # Supports dataset submission
-- aristotle.marc # Supports MARC record generation from MODS metadata
+## Running under gunicorn
+To run the ccetd application, use the following command:
+
+    `nohup gunicorn -b 0.0.0.0:8095 run:parent_app &` 
+

@@ -79,6 +79,13 @@
     Tutt Library Reference Desk at 389-6662.</p>
   </div>
   </aside>
+  <br>
+  <a class="btn btn-info center-block" 
+     href="https://github.com/Tutt-Library/ccetd/issues">
+    <span class="glyphicon glyphicon-exclamation-sign"></span>
+    Report Bug 
+  </a>
+   <hr>
    {# END left-column DIV #}
   </div>
   {# comment %}START main-column DIV #}
@@ -95,7 +102,7 @@
    <ul>
    {% for workflow in active %}
     <li><a 
-        {% if not user.is_authenticated %}href="/login?next={{ workflow.0 }}"
+        {% if not user.is_authenticated %}href="/etd/login?next=/etd/{{ workflow.0 }}"
         {% else %} 
         href="{{ request.get_full_path }}{{ workflow.0 }}"
         {% endif %}>
