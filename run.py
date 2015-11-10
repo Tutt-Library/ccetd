@@ -1,5 +1,6 @@
 from etd import app
 from werkzeug.wsgi import DispatcherMiddleware
+from werkzeug.serving import run_simple
 
 def simple(env, resp):
     resp(b'200 OK', [('Content-Type', b'text/plain')])
@@ -10,4 +11,5 @@ parent_app = DispatcherMiddleware(
     {"/etd": app})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8095, debug=True)
+#    app.run(host='0.0.0.0', port=8095, debug=True)
+     run_simple('0.0.0.0', 8095, parent_app, use_reloader=True, use_debugger=True)

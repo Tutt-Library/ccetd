@@ -27,9 +27,9 @@ cache = FileSystemCache(
 
 def ils_patron_check(user_id):
     student = Student()
-    #if app.debug:
-    #    student.id = "DEBUG"
-    #    return student
+    if app.debug:
+        student.id = "DEBUG"
+        return student
     catalog_patron_url = app.config.get('CATALOG_AUTH_URL').format(user_id)
     auth_result = requests.get(catalog_patron_url, verify=False)
     if auth_result.status_code < 400:

@@ -449,17 +449,10 @@ def update(name):
         modify_obj_url,
         auth=app.config.get("FEDORA_AUTH"))
     # Adds Thesis PDF Datastream 
-    #add_thesis_url = "{}{}/datastreams/OBJ?{}".format(
-    #    app.config.get("REST_URL"),
-    #    new_pid,
-    #    urllib.parse.urlencode({"controlGroup": "M",
-    #           "dsLabel":title,
-    #           "mimeType": "application/pdf"}))
     add_thesis_url = "{}new?{}".format(
             app.config.get("REST_URL"),
             urllib.parse.urlencode({"label": "{} PDF".format(title),
                "namespace": app.config.get("NAMESPACE")}))
-    
     repo_add_thesis_result = requests.post(
          add_thesis_url,
          auth=app.config.get("FEDORA_AUTH"))
@@ -489,24 +482,30 @@ def update(name):
          restrictions=None,
          parent_pid=new_pid,
          sequence_num=1)
-    # Adds MODS to Thesis Object
-    mods_url = "{}{}/datastreams/MODS?{}".format(
-        app.config.get("REST_URL"),
-        new_pid,
-        urllib.parse.urlencode({"controlGroup": "M",
+    # Adds MODS to Thesis Object and PDF Object
+    for pid in [new_pid, pdf_pid]:
+        mods_url = "{}{}/datastreams/MODS?{}".format(
+            app.config.get("REST_URL"),
+            pid,
+            urllib.parse.urlencode({"controlGroup": "M",
                "dsLabel": "MODS",
                "mimeType": "text/xml"}))
-    repo_add_mods_result = requests.post(
-         mods_url,
-         files={"content": mods},
-         auth=app.config.get("FEDORA_AUTH"))
+        repo_add_mods_result = requests.post(
+            mods_url,
+             files={"content": mods},
+             auth=app.config.get("FEDORA_AUTH"))
+        if repo_add_mods_result.status_code > 399:
+            raise ValueError("Add MODS to {} failed {}\Error{}".format(
+                pid,
+                repo_add_mods_result.status_code,
+                repo_add_mods_result.text))
+
     # Iterate through remaining files and add as supporting datastreams
     for i,file_name in enumerate(request.files.keys()):
         if file_name.startswith("thesis_file"):
             continue
         file_object = request.files.get(file_name)
-        raw_file = file_object.stream.read()
-        if len(raw_file) < 1:
+        if file_object.stream.__sizeof__() < 50:
             continue
         #secondary_title = file_object.name
         file_title = request.form.get("{0}_title".format(file_name))
@@ -527,15 +526,24 @@ def update(name):
         if pid_result.status_code > 399:
             raise ValueError("Could not create pid with {}".format(file_url))
         file_pid = pid_result.text
+        new_file_url = "{}{}/datastreams/FILE?{}".format(
+            app.config.get("REST_URL"),
+            file_pid,
+            urllib.parse.urlencode({"label": label,
+                "controlGroup": "M",
+                "dsLabel": file_title,
+                "mimeType": mime_type}))
         new_file_result = requests.post(
-            "{}{}/datastreams/FILE".format(
-                app.config.get("REST_URL"),
-                file_pid),
-            data={"label": label,
-                  "controlGroup": "M",
-                  "dsLabel": file_title,
-                  "mimeType": "text/xml"},
-            files={"content": file_object})
+            new_file_url,
+            files={"content": file_object},
+            auth=app.config.get("FEDORA_AUTH"))
+        if new_file_result.status_code > 399:
+            raise ValueError(
+                "Could not update {} to pid {}, code {}\nError {}".format(
+                    label,
+                    file_pid,
+                    new_file_result.status_code,
+                    new_file_result.text))
         collection_pid = config.get('FORM', 'fedora_collection')
         save_rels_ext(file_pid,
             collection_pid=collection_pid,
