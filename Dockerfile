@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y && \
 RUN git clone $CCETD_GIT $CCETD_HOME && \
   cd $CCETD_HOME && \
   mkdir instance && \
+  git checkout -b development && \
+  git pull origin development && \
   pip3 install -r requirements.txt
   
 COPY $CCETD_CONF $CCETD_HOME/instance/conf.py
