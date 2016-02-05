@@ -17,6 +17,8 @@ RUN git clone $CCETD_GIT $CCETD_HOME && \
   pip3 install -r requirements.txt
   
 COPY $CCETD_CONF $CCETD_HOME/instance/conf.py
+COPY workflows/library-science.ini $CCETD_HOME/workflows/library-science.ini
+
 WORKDIR $CCETD_HOME
 EXPOSE 8095
 
