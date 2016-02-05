@@ -18,6 +18,6 @@ RUN git clone $CCETD_GIT $CCETD_HOME && \
   
 COPY $CCETD_CONF $CCETD_HOME/instance/conf.py
 WORKDIR $CCETD_HOME
-EXPOSE 5000
+EXPOSE 8095
 
 CMD ["python", "run.py"]
