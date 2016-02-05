@@ -1,5 +1,6 @@
 Flask
 Flask-login
+Flask-WTF
 requests
 elasticsearch
 elasticsearch_dsl
