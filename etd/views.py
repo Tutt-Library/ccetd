@@ -106,6 +106,11 @@ def slugify(value):
     value = re.sub('[^\w\s-]', '', value).strip().lower()
     return re.sub('[-\s]+', '-', value)
 
+# Error Handlers
+@app.errorhandler(401)
+def person_not_auth(e):
+    return render_template("etd/401.html"), 401
+
 # Request Handlers
 #@app.route("/etd/")
 @app.route("/")
@@ -144,10 +149,9 @@ def footer():
     return render_template("etd/snippets/footer.html")
 
 @app.route("/logout")
-@login_required
 def logout():
     logout_user()
-    return redirect('/')
+    return redirect(url_for('default'))
 
     
 @app.route("/<name>")

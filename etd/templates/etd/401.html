@@ -1,0 +1,21 @@
+{% extends 'etd/base.html' %}
+
+{% block head_title %}401 Unauthorized Error {% endblock %}
+{% block more_css %}
+ <link href="{{ url_for('static', filename="css/thesis.css") }}" rel="stylesheet" />
+ 
+{% endblock %}
+
+{% block library_breadcrumb %}
+{% endblock %}
+
+{% block body %}
+<div class="row" style="top-margin: 800px">
+  <section class="col-md-8 col-md-offset-2">
+   <h1>Unauthorized error!</h1>
+   <p>You need to be logged in to access {{ request.path }}. 
+   Login <a href="{{ url_for('login') }}?next=/etd/{{ request.path }}">here</a>.</p>
+
+  </section>
+</div>
+{% endblock %}
