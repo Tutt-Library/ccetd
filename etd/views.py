@@ -32,7 +32,7 @@ import urllib.parse
 import mimetypes
 import xml.etree.ElementTree as etree
 from flask import abort, redirect, render_template, request, session, url_for
-from flask.ext.login import login_required, login_user, logout_user
+from flask.ext.login import login_required, login_user, logout_user, current_user
 from operator import itemgetter
 from werkzeug.exceptions import InternalServerError
 from . import app, ils_patron_check
@@ -143,14 +143,17 @@ def header():
 def footer():
     return render_template("etd/snippets/footer.html")
 
-@app.route("/logout")    
+@app.route("/logout")
+@login_required
 def logout():
     logout_user()
     return redirect('/')
+
     
 @app.route("/<name>")
 @login_required
 def workflow(name='default'):
+    print("In workflow {} {}".format(name, current_user))
     multiple_languages = False
     step_one_form = StepOneForm()
     step_two_form = StepTwoForm()
@@ -505,7 +508,7 @@ def update(name):
         if file_name.startswith("thesis_file"):
             continue
         file_object = request.files.get(file_name)
-        if file_object.stream.__sizeof__() < 50:
+        if file_object.stream.__sizeof__() < 65:
             continue
         #secondary_title = file_object.name
         file_title = request.form.get("{0}_title".format(file_name))

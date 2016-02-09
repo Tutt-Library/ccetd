@@ -23,3 +23,6 @@ To run the ccetd application, use the following command:
 
     `nohup gunicorn -b 0.0.0.0:8095 run:parent_app &` 
 
+    `nohup gunicorn -f uconfig.py run:parent_app &`
+
+
