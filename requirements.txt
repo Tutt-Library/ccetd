@@ -1,0 +1,8 @@
+Flask
+Flask-login
+Flask-WTF
+requests
+elasticsearch
+elasticsearch_dsl
+beautifulsoup4
+click
