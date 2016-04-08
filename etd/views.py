@@ -111,6 +111,13 @@ def slugify(value):
 def person_not_auth(e):
     return render_template("etd/401.html"), 401
 
+@app.errorhandler(500)
+def ccetd_error(e):
+    print("Error is {} {}".format(e, type(e)))
+    if not app.debug:
+        pass 
+    return render_template("etd/500.html", error=e), 500
+
 # Request Handlers
 #@app.route("/etd/")
 @app.route("/")
@@ -126,6 +133,7 @@ def default():
 @app.route("/login", methods=['POST', 'GET'])
 def login():
     """Login Method """
+    abort(500)
     next_page = request.args.get('next')
     form = LoginForm()
     if request.method == "POST": #form.validate()
@@ -213,8 +221,8 @@ def success():
             email_message += " Digital Archives available at {0}".format(
                 etd_success_msg['thesis_url'])
             if len(to_email_addrs) > 0:
-                send_email({"subject": '{0} submitted to DACC'.format(etd_success_msg['title']),
-                            "text": email_message,
+                send_email({"subject": '{0} submitted to DACC'.format(etd_success_msg['title'].encode()),
+                            "text": email_message.encode(),
                             "recipients": to_email_addrs})
 
         etd_success_msg['repository_url'] = app.config.get('FEDORA_URI')

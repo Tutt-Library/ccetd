@@ -1,0 +1,23 @@
+{% extends 'etd/base.html' %}
+
+{% block head_title %}500 Server Error {% endblock %}
+{% block more_css %}
+ <link href="{{ url_for('static', filename="css/thesis.css") }}" rel="stylesheet" />
+ 
+{% endblock %}
+
+{% block library_breadcrumb %}
+{% endblock %}
+
+{% block body %}
+<div class="row" style="top-margin: 800px">
+  <section class="col-md-8 col-md-offset-2">
+   <h4 style="font-size: 5em !important;">We're Sorry <img src="{{ url_for('static', filename="img/frown.png") }}"></h4>
+   <p class="lead">
+    An error has occurred during the submission of your thesis. Please contact the Digital Innovations Librarian, Sarah Bogard 
+    (<a href="mailto:sarah.bogard@coloradocollege.edu&Subject={{ error }}|escape">sarah.bogard@coloradocollege.edu</a>), with a description of your problem. 
+    </p>
+    <pre style="font-size: 1.5em; color: red">{{ error }}</p>
+  </section>
+</div>
+{% endblock %}
