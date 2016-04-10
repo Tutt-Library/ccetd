@@ -133,7 +133,6 @@ def default():
 @app.route("/login", methods=['POST', 'GET'])
 def login():
     """Login Method """
-    abort(500)
     next_page = request.args.get('next')
     form = LoginForm()
     if request.method == "POST": #form.validate()
