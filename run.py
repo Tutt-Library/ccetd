@@ -10,6 +10,8 @@ parent_app = DispatcherMiddleware(
     simple, 
     {"/etd": app})
 
+app.debug = True
+
 if __name__ == '__main__':
-#    app.run(host='0.0.0.0', port=8095, debug=True)
-     run_simple('0.0.0.0', 8095, parent_app, use_reloader=True, use_debugger=True)
+    app.run(host='0.0.0.0', port=8095, debug=True)
+#     run_simple('0.0.0.0', 8095, parent_app, use_reloader=True, use_debugger=True)

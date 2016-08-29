@@ -38,32 +38,7 @@ from werkzeug.exceptions import InternalServerError
 from . import app, ils_patron_check
 from .forms import LoginForm, StepOneForm, StepTwoForm, StepThreeForm
 from .forms import StepFourForm
-
-# Sets workflows dict
-workflows = dict()
-root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-workflow_dir = os.path.join(root,'workflows')
-for filename in os.listdir(workflow_dir):
-    fileinfo = os.path.splitext(filename)
-    if fileinfo[1] == '.ini':
-        workflow_config = configparser.RawConfigParser()
-        try:
-            workflow_config.read(os.path.join(workflow_dir,filename))
-        except:
-            print("Failed to load {}".format(filename))
-            continue
-        # Add universal constants to config object
-        workflow_config.set('FORM',
-                            'institution', 
-                            app.config.get('INSTITUTION').get('name'))
-        address = app.config.get('INSTITUTION').get('address')
-        location = "{0}, {1}".format(address.get('addressLocality'),
-                                     address.get('addressRegion'))
-        workflow_config.set('FORM','location', location)
-        workflows[fileinfo[0].lower()] = workflow_config
-
-
-
+from .sparql import DEPARTMENT_LIST
 
 # Helper functions
 def get_advisors(config):
@@ -113,9 +88,9 @@ def person_not_auth(e):
 
 @app.errorhandler(500)
 def ccetd_error(e):
-    print("Error is {} {}".format(e, type(e)))
-    if not app.debug:
-        pass 
+#   print("Error is {} {}".format(e, type(e)))
+#    if not app.debug:
+#        pass 
     return render_template("etd/500.html", error=e), 500
 
 # Request Handlers
@@ -126,9 +101,22 @@ def default():
     Displays home-page of Django ETD app along with a list of active
     workflows.
     """
+    sparql =DEPARTMENT_LIST.format(app.config.get("INSTITUTION").get("url"))
+    result = requests.post(app.config.get("TRIPLESTORE_URL"),
+        data={"query": sparql,
+              "format": "json"})
+    if result.status_code > 399:
+        raise ValueError("Cannot run DEPARTMENT_LIST sparql on {}".format(
+            app.config.get("TRIPLESTORE_URL")))
+    workflows = list()
+    bindings = result.json().get('results').get('bindings')
+    for row in bindings:
+        dept_iri = row.get('iri').get('value')
+        label = row.get('label').get('value')
+        workflows.append({"iri": dept_iri, "label": label})
     return render_template("etd/default.html",
                             user=None,
-                            active=sorted(workflows.items()))
+                            active=workflows)
 
 @app.route("/login", methods=['POST', 'GET'])
 def login():
