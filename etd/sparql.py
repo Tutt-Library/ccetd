@@ -8,8 +8,7 @@ PREFIX schema: <http://schema.org/>"""
 DEPARTMENT_LIST = PREFIX + """
 SELECT DISTINCT ?iri ?label
 WHERE {{
-    ?iri rdf:type bf:Organization .
+    ?iri rdf:type schema:CollegeDepartment .
     ?iri rdfs:label ?label .
-    ?iri bf:partOf <{0}>
 }} ORDER BY ?label
 """

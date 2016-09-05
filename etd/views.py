@@ -101,7 +101,7 @@ def default():
     Displays home-page of Django ETD app along with a list of active
     workflows.
     """
-    sparql =DEPARTMENT_LIST.format(app.config.get("INSTITUTION").get("url"))
+    sparql = DEPARTMENT_LIST
     result = requests.post(app.config.get("TRIPLESTORE_URL"),
         data={"query": sparql,
               "format": "json"})
