@@ -1,0 +1,27 @@
+@prefix bf: <http://id.loc.gov/ontologies/bibframe/> .
+@prefix cc_fac: <https://www.coloradocollege.edu/ns/faculty/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcr: <http://knowledgelinks.io/ns/dc/> .
+@prefix kdr: <http://knowledgelinks.io/ns/data-resources/> .
+@prefix kds: <http://knowledgelinks.io/ns/data-structures/> .
+@prefix loc: <http://id.loc.gov/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix pcdm: <http://pcdm.org/models#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix relators: <http://id.loc.gov/vocabulary/relators/> .
+@prefix schema: <http://schema.org/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://catalog.coloradocollege.edu.edu/0a75d55a-76ad-11e6-a286-005056c00008> bf:identifier [a bf:Local ;
+    rdf:value "coccc:26669" ;
+    rdfs:label "Art Department Theses 2016-2017 PID"@en ] .
+
+<http://catalog.coloradocollege.edu/34f089c2-7082-11e6-a872-005056c00008> bf:identifier [a bf:Local ;
+    rdf:value "coccc:26674" ;
+    rdfs:label "Economics and Business Theses 2016-2017 PID"@en ] .
+
+<http://catalog.coloradocollege.edu/d0e7610a-72ba-11e6-b6dc-005056c00008> bf:identifier [a bf:Local ;
+    rdf:value "coccc:26687" ;
+    rdfs:label "Mathematics and Computer Science Theses 2016-2017 PID"@en ] .
