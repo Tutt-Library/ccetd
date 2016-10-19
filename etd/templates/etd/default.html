@@ -102,10 +102,10 @@
    <ul>
    {% for workflow in active %}
     <li><a 
-        {% if not user.is_authenticated %}href="/etd/login?next=/etd/{{ workflow.get('iri') }}"
-        {% else %} 
-        href="{{ request.get_full_path }}{{ workflow.get('iri') }}"
-        {% endif %}>
+        {# if not user.is_authenticated %}href="/etd/login?next={{ workflow.get('iri') }}"
+        {% else #} 
+        href="{{ url_for('workflow', name=workflow.get('iri')) }}"
+        {# endif #}>
         {# if workflow.1.has_option('FORM', 'label') }
            {{ workflow.1.get('FORM', 'label') }}
         {% else #}

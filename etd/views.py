@@ -24,6 +24,7 @@ import datetime
 import os
 import configparser
 import logging
+import rdflib
 import re
 import requests
 import smtplib
@@ -38,37 +39,38 @@ from werkzeug.exceptions import InternalServerError
 from . import app, ils_patron_check
 from .forms import LoginForm, StepOneForm, StepTwoForm, StepThreeForm
 from .forms import StepFourForm
-from .sparql import DEPARTMENT_LIST
+from .sparql import DEPARTMENT_FACULTY, DEPARTMENT_LIST
 
 # Helper functions
-def get_advisors(config):
+def get_advisors(dept_iri):
     """
     Helper function returns a sorted list of advisor email and
-    name tuples from a workflow config object.
+    name tuples sparql query.
 
     :param config: Workflow RawConfigObject, required
     """
-    faculty_choices = None
-    if config.has_section('FACULTY'):
-        faculty_choices = sorted(config.items('FACULTY'),
-                                 key=itemgetter(1))
+    faculty_choices = []
+    sparql = DEPARTMENT_FACULTY.format(
+        dept_iri,
+        datetime.datetime.utcnow().isoformat())
+    result = requests.post(app.config.get("TRIPLESTORE_URL"),
+        data={"query": sparql,
+              "format": "json"})
+    bindings = result.json().get('results').get('bindings')
+    for row in bindings:
+        faculty_choices.append((row.get('person_iri').get('value'),
+                                row.get('name').get('value')))
     return faculty_choices
 
 
-def get_grad_dates(config):
+def get_grad_dates(dept_iri):
     """
     Helper function returns a list of tuples for graduation
     dates in a workflow config object.
 
-    :param config: Workflow RawConfigObject, required
+    :param dept_iri: Department IRI, required
     """
-    grad_dates = []
-    if config.has_option('FORM','winter_grad'):
-        grad_dates.append(2*(config.get('FORM','winter_grad'),))
-    if config.has_option('FORM','spr_grad'):
-        grad_dates.append(2*(config.get('FORM','spr_grad'),))
-    if config.has_option('FORM','sum_grad'):
-        grad_dates.append(2*(config.get('FORM','sum_grad'),))
+    grad_dates = [('fall', 'Fall'), ('spring', 'Spring'), ('summer', 'Summer')]
     return grad_dates
 
 
@@ -149,23 +151,23 @@ def logout():
     return redirect(url_for('default'))
 
     
-@app.route("/<name>")
-@login_required
-def workflow(name='default'):
+@app.route("/dept")
+#@login_required
+def workflow():
+    name = request.args.get('name')
     print("In workflow {} {}".format(name, current_user))
+    dept_iri = rdflib.URIRef(name)
     multiple_languages = False
     step_one_form = StepOneForm()
     step_two_form = StepTwoForm()
-    if name in workflows:
-        custom = workflows[name]
-        step_one_form.advisors.choices = get_advisors(custom)
-        step_one_form.graduation_dates.choices = get_grad_dates(custom)
-        if custom.has_section('LANGUAGE'):
-            step_two_form.languages.choices = custom.items('LANGUAGE')
-            multiple_languages = True
+    step_one_form.advisors.choices = get_advisors(dept_iri)
+    step_one_form.graduation_dates.choices = get_grad_dates(dept_iri)
+    #if custom.has_section('LANGUAGE'):
+    #    step_two_form.languages.choices = custom.items('LANGUAGE')
+    #    multiple_languages = True
     website_view = True
     return render_template('etd/default.html',
-                   email_notices=custom.get('FORM', 'email_notices'),
+#                   email_notices=custom.get('FORM', 'email_notices'),
                    multiple_languages=multiple_languages,
                    step_one_form=step_one_form,
                    step_two_form=step_two_form,

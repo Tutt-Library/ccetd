@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- Copyright: 2011 Colorado College
+ Copyright: 2011-2016 Colorado College
 
 """
 __author__ = 'Jeremy Nelson'
