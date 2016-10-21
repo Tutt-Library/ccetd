@@ -1,10 +1,41 @@
 __author__ = "Jeremy Nelson"
 
 PREFIX = """PREFIX bf: <http://id.loc.gov/ontologies/bibframe/>
-PREFIX cc_fac: <https://www.coloradocollege.edu/ns/faculty/> 
+PREFIX cc_fac: <https://www.coloradocollege.edu/ns/faculty/>
+PREFIX cc_info: <https://www.coloradocollege.edu/ns/info/>  
+PREFIX etd: <http://catalog.coloradocollege.edu/ns/etd#> 
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
 PREFIX schema: <http://schema.org/>"""
+
+ADDL_NOTES = PREFIX + """
+SELECT DISTINCT ?note
+WHERE {{
+    ?thesis etd:slug "{0}" .
+    ?thesis etd:additional-note ?note .
+}}"""
+
+
+ADVISOR_NAME = PREFIX + """
+SELECT DISTINCT ?name
+WHERE {{
+    <{0}> rdfs:label ?name .
+}}"""
+
+COLLECTION_PID = PREFIX + """
+SELECT DISTINCT ?pid
+WHERE {{
+    ?thesis etd:slug "{0}" .
+    ?thesis etd:fedora38-pid ?pid .
+}}"""
+
+DEGREE_INFO = PREFIX + """
+SELECT DISTINCT ?type ?name
+WHERE {{
+    ?thesis etd:slug "{0}" .
+    ?thesis etd:degree-name ?name .
+    ?thesis etd:degree-type ?type .
+}}"""
 
 DEPARTMENT_FACULTY = PREFIX + """
 SELECT DISTINCT ?person_iri ?name
@@ -27,10 +58,65 @@ WHERE {{
 }} ORDER BY ?lname
 """
 
-DEPARTMENT_LIST = PREFIX + """
+DEPARTMENT_IRI = PREFIX + """
+SELECT DISTINCT ?iri
+WHERE {{
+    ?thesis etd:slug "{0}" .
+    ?year etd:theses ?thesis .
+    ?year schema:organizer ?iri .
+}}"""
+
+
+DEPARTMENT_NAME = PREFIX + """
+SELECT DISTINCT ?name 
+WHERE {{ 
+    ?thesis etd:slug "{0}" .
+    ?year etd:theses ?thesis .
+    ?year schema:organizer ?iri .
+    ?iri rdfs:label ?name .
+}}"""
+
+GRAD_DATES = PREFIX + """
+SELECT DISTINCT ?date ?label
+WHERE {{
+     ?year schema:organizer <{0}> .
+     ?year schema:superEvent ?academic_year .
+     ?academic_year cc_info:graduation ?grad .
+     ?grad rdf:value ?date .
+     ?grad rdfs:label ?label .
+}} ORDER BY ?date
+"""
+
+LANG_LABEL = PREFIX + """
+SELECT DISTINCT ?language
+WHERE {{
+    <{0}> rdfs:label ?language .
+}}"""
+
+THESIS_LANGUAGES = PREFIX + """
 SELECT DISTINCT ?iri ?label
 WHERE {{
-    ?iri rdf:type schema:CollegeDepartment .
+    ?thesis etd:slug "{0}" .
+    ?thesis etd:language ?iri .
     ?iri rdfs:label ?label .
 }} ORDER BY ?label
 """
+
+THESES_LIST = PREFIX + """
+SELECT DISTINCT ?dept_name ?label ?slug
+WHERE {
+    ?dept_year etd:theses ?thesis .
+    ?dept_year schema:organizer ?dept .
+    ?dept rdfs:label ?dept_name .
+    ?thesis etd:slug ?slug .
+    OPTIONAL { ?thesis rdfs:label ?label }
+} ORDER BY ?dept_name
+"""
+
+THESIS_NOTE = PREFIX + """
+SELECT DISTINCT ?note
+WHERE {{
+    ?thesis etd:slug "{0}" .
+    ?thesis etd:thesis-note ?note .
+}}"""
+

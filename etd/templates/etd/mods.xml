@@ -12,9 +12,9 @@
   {% if honor_code %}
   <note type="admin">Colorado College Honor Code upheld.</note>
   {% endif %}
-  {% if additional_note %}
-  <note>{{ additional_note }}</note>
-  {% endif %}
+  {% for note in additional_notes %}
+  <note>{{ note }}</note>
+  {% endfor %}
   <note type="thesis">Senior Thesis -- Colorado College</note>
   {% if degree %}
   <note type="thesis" displayLabel="Degree Name">{{ degree.name }}</note>
@@ -86,8 +86,8 @@
     {% endif %}
     {% if date_str %}
     <dateIssued keyDate="yes">{{ date_str }}</dateIssued>
-    <dateCreated>{{ date_str }}</dateCreated>
     {% endif %}
+    <dateCreated>{{ " "|creation_date }}</dateCreated>
     {% if institution %}
     <place>
       <placeTerm>{{ institution.get('address').get('addressLocality') }},

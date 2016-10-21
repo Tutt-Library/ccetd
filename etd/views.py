@@ -39,7 +39,12 @@ from werkzeug.exceptions import InternalServerError
 from . import app, ils_patron_check
 from .forms import LoginForm, StepOneForm, StepTwoForm, StepThreeForm
 from .forms import StepFourForm
-from .sparql import DEPARTMENT_FACULTY, DEPARTMENT_LIST
+from .sparql import ADDL_NOTES, ADVISOR_NAME, COLLECTION_PID, DEGREE_INFO 
+from .sparql import DEPARTMENT_FACULTY, DEPARTMENT_IRI, DEPARTMENT_NAME  
+from .sparql import GRAD_DATES, LANG_LABEL, THESES_LIST, THESIS_LANGUAGES 
+from .sparql import THESIS_NOTE
+
+mimetypes.add_type("application/x-sas", ".sas")
 
 # Helper functions
 def get_advisors(dept_iri):
@@ -62,6 +67,35 @@ def get_advisors(dept_iri):
                                 row.get('name').get('value')))
     return faculty_choices
 
+def get_collection_pid(slug):
+    """Retrieves collection pid for new thesis
+
+    Args:
+        slug -- Thesis Slug
+    """
+    sparql = COLLECTION_PID.format(slug)
+    result = requests.post(app.config.get("TRIPLESTORE_URL"),
+        data={"query": sparql,
+              "format": "json"})
+    bindings = result.json().get('results').get('bindings')
+    if len(bindings) == 1:
+        return bindings[0].get('pid').get('value')
+    else:
+        raise ValueError("Missing Fedora 3.8 PID for {}".format(slug))
+
+def get_dept_iri(slug):
+    """Retrieves and returns Departmental IRI based on workflow slug
+
+    Args:
+        slug -- Thesis Slug
+    """
+    sparql = DEPARTMENT_IRI.format(slug)
+    result = requests.post(app.config.get("TRIPLESTORE_URL"),
+        data={"query": sparql,
+              "format": "json"})
+    bindings = result.json().get('results').get('bindings')
+    if len(bindings) == 1:
+        return rdflib.URIRef(bindings[0].get('iri').get('value'))
 
 def get_grad_dates(dept_iri):
     """
@@ -70,9 +104,39 @@ def get_grad_dates(dept_iri):
 
     :param dept_iri: Department IRI, required
     """
-    grad_dates = [('fall', 'Fall'), ('spring', 'Spring'), ('summer', 'Summer')]
+    grad_dates = []
+    sparql = GRAD_DATES.format(dept_iri)
+    result = requests.post(app.config.get("TRIPLESTORE_URL"),
+         data={"query": sparql,
+               "format": "json"})
+    bindings = result.json().get('results').get('bindings')
+    for row in bindings:
+         grad_dates.append((row.get('date').get('value'),
+                            row.get('label').get('value')))
     return grad_dates
 
+
+def set_languages(slug, step_two_form):
+    """Takes slug, retrieves languages if present for thesis workflow and
+    adds to the languages choices.
+
+    Args:
+        slug -- Thesis slug
+        step_two_form -- Thesis Step Two Form
+    """
+    sparql = THESIS_LANGUAGES.format(slug)
+    result = requests.post(app.config.get("TRIPLESTORE_URL"),
+        data={"query": sparql,
+              "format": "json"})
+    bindings = result.json().get('results').get('bindings')
+    if len(bindings) > 0:
+        choices = []
+        for row in bindings:
+            choices.append((row.get('iri').get('value'),
+                            row.get('label').get('value')))
+        step_two_form.languages.choices = choices
+        return True
+    return False  
 
 def slugify(value):
     """
@@ -95,6 +159,11 @@ def ccetd_error(e):
 #        pass 
     return render_template("etd/500.html", error=e), 500
 
+# Customer filters
+@app.template_filter("creation_date")
+def create_date(stub):
+    return datetime.datetime.utcnow().isoformat()
+
 # Request Handlers
 #@app.route("/etd/")
 @app.route("/")
@@ -103,7 +172,7 @@ def default():
     Displays home-page of Django ETD app along with a list of active
     workflows.
     """
-    sparql = DEPARTMENT_LIST
+    sparql = THESES_LIST
     result = requests.post(app.config.get("TRIPLESTORE_URL"),
         data={"query": sparql,
               "format": "json"})
@@ -113,9 +182,13 @@ def default():
     workflows = list()
     bindings = result.json().get('results').get('bindings')
     for row in bindings:
-        dept_iri = row.get('iri').get('value')
-        label = row.get('label').get('value')
-        workflows.append({"iri": dept_iri, "label": label})
+        dept_name = row.get('dept_name').get('value')
+        if 'label' in row:
+            label = row.get('label').get('value')
+        else:
+            label = dept_name
+        slug = row.get('slug').get('value')
+        workflows.append({"slug": slug, "label": label})
     return render_template("etd/default.html",
                             user=None,
                             active=workflows)
@@ -151,20 +224,15 @@ def logout():
     return redirect(url_for('default'))
 
     
-@app.route("/dept")
+@app.route("/<name>")
 #@login_required
-def workflow():
-    name = request.args.get('name')
-    print("In workflow {} {}".format(name, current_user))
-    dept_iri = rdflib.URIRef(name)
-    multiple_languages = False
+def workflow(name):
+    dept_iri = get_dept_iri(name)
     step_one_form = StepOneForm()
     step_two_form = StepTwoForm()
     step_one_form.advisors.choices = get_advisors(dept_iri)
     step_one_form.graduation_dates.choices = get_grad_dates(dept_iri)
-    #if custom.has_section('LANGUAGE'):
-    #    step_two_form.languages.choices = custom.items('LANGUAGE')
-    #    multiple_languages = True
+    multiple_languages = set_languages(name, step_two_form)
     website_view = True
     return render_template('etd/default.html',
 #                   email_notices=custom.get('FORM', 'email_notices'),
@@ -288,8 +356,7 @@ def save_xacml_policy(repository,
 
 
 
-
-def create_mods(post, pid):
+def create_mods(**kwargs):
     """
     Helper function generates a thesis MODS record from posted form
     contents and workflow config
@@ -298,9 +365,57 @@ def create_mods(post, pid):
     :param pid: New PID for object
     :rtype: String
     """
+    def __run_query__(sparql):
+        result = requests.post(app.config.get("TRIPLESTORE_URL"),
+            data={"query": sparql,
+                  "format": "json"})
+        bindings = result.json().get('results').get('bindings')
+        return bindings
+
+    def get_addl_notes():
+        notes = []
+        sparql = ADDL_NOTES.format(slug)
+        bindings = __run_query__(sparql)
+        for row in bindings:
+            notes.append(row.get('note').get('value'))
+        return notes
+    def get_advisor_name(person_uri):
+        sparql = ADVISOR_NAME.format(person_uri)
+        bindings = __run_query__(sparql)
+        if len(bindings) == 1:
+            return bindings[0].get('name').get('value')
+    def get_degree_info():
+        sparql = DEGREE_INFO.format(slug)
+        bindings = __run_query__(sparql)
+        if len(bindings) == 1:
+            return {"type": bindings[0].get('type').get('value'),
+                    "name": bindings[0].get('name').get('value')}
+        else:
+            return {"type": "bachelor",
+                    "name": "Bachelor of Arts"}
+    def get_dept_name():
+        sparql = DEPARTMENT_NAME.format(slug)
+        bindings = __run_query__(sparql)
+        if len(bindings) == 1:
+            return bindings[0].get('name').get('value')
+        
+
+    def get_language(lang_uri):
+        sparql = LANG_LABEL.format(lang_uri)
+        bindings = __run_query__(sparql)
+        if len(bindings) == 1:
+            return bindings[0].get('language').get('value')
+       
+    def get_thesis_note():
+        sparql = THESIS_NOTE.format(slug)
+        bindings = __run_query__(sparql)
+        if len(bindings) > 0:
+            return bindings[0].get('note').get('value')
+
+    post = kwargs.get("post")
+    pid = kwargs.get("pid")
+    slug = kwargs.get('slug')
     creator_name = post.get('family')
-
-
     creator_name = "{0}, {1}".format(creator_name,
                                      post.get('given'))
     middle = post.get('middle' ,'')
@@ -317,7 +432,6 @@ def create_mods(post, pid):
             creator_name,
             delimiter,
             suffix)
-    config = workflows.get(post.get('workflow'))
     extent = ''
     page_numbers = post.get('page_numbers', '')
     if len(page_numbers) > 0:
@@ -334,38 +448,20 @@ def create_mods(post, pid):
     if len(extent) < 1:
         extent = None
     grad_date = post.get('graduation_dates', None)
-    if grad_date is None:
-        # sorta a hack
-        date_str = datetime.datetime.utcnow().strftime("%Y-%m")
-    else:
-        month, year = grad_date.split(" ")
-        date_str = "{0}-{1}".format(
-            year,
-            {'December': '12',
-             'May': '05',
-             'July': '07'}.get(month))
     template_vars = {'abstract': post.get('abstract', None),
                      'advisors': [],
+                     'additional_notes': get_addl_notes(),
                      'creator': creator_name,
-                     'date_str': date_str,
-                     'degree': {'type': config.get('FORM',
-                                                   'degree_type'),
-                                'name': config.get('FORM',
-                                                   'degree_name')},
-                     'department': config.get('FORM',
-                                              'department'),
+                     'date_str': grad_date,
+                     'degree': get_degree_info(),
+                     'department': get_dept_name(),
                      'extent': extent,
                      'honor_code': post.get('honor_code', False),
                      'institution': app.config.get("INSTITUTION"),
                      'pid': pid,
-                     'thesis_note': config.get('FORM',
-                                               'thesis_note'),
+                     'thesis_note': get_thesis_note(),
                      'title': post.get('title').replace('&', '&amp;'),
-                     'topics': [],
-                     'workflow': config}
-    if config.has_option('FORM', 'additional_note'):
-        template_vars['additional_note'] = config.get('FORM',
-                                                      'additional_note')
+                     'topics': []}
     template_vars['institution'] = app.config.get('INSTITUTION', 'name')
     address = app.config.get('INSTITUTION','address')
     template_vars['location'] = '{0}, {1}'.format(
@@ -374,12 +470,12 @@ def create_mods(post, pid):
     if 'languages' in post:
         languages = post.getlist('languages')
         template_vars['languages'] = []
-        for code in languages:
-            template_vars['languages'].append(
-                config.get('LANGUAGE', code))
-    for advisor in post.getlist('advisors'):
-        template_vars['advisors'].append(config.get('FACULTY',
-                                                    advisor))
+        for lang_uri in languages:
+            language = get_language(lang_uri)
+            template_vars['languages'].append(language)
+    for advisor_iri in post.getlist('advisors'):
+        advisor_name = get_advisor_name(advisor_iri)
+        template_vars['advisors'].append(advisor_name)
     if 'freeform_advisor' in post:
         template_vars['advisors'].append(
             post.get('freeform_advisor'))
@@ -433,10 +529,12 @@ def update(name):
              app.config.get("REST_URL"),
              new_pid_result.status_code,
              new_pid_result.text))     
-    new_pid = new_pid_result.text    
+    new_pid = new_pid_result.text
+    print("NEW PID is {}".format(new_pid))   
     workflow = request.form.get('workflow')
-    config = workflows.get(workflow)
-    mods = create_mods(request.form, pid=new_pid)
+    mods = create_mods(post=request.form, 
+        pid=new_pid,
+        slug=name)
     mods_xml = etree.XML(mods)
     title = request.form.get('title')
     thesis_pdf = request.files.get('thesis_file')
@@ -479,9 +577,10 @@ def update(name):
         raise ValueError("Add PDF Object failed {} Error with URL {}\n{}".format(
             repo_add_pdf_thesis_result.status_code,
             add_pdf_thesis_url,
-             repo_add_pdf_thesis_result.text))    
+             repo_add_pdf_thesis_result.text))
+    collection_pid = get_collection_pid(name)
     save_rels_ext(pdf_pid,
-         collection_pid=config.get('FORM', 'fedora_collection'),
+         collection_pid=collection_pid,
          content_model="islandora:sp_pdf",
          restrictions=None,
          parent_pid=new_pid,
@@ -503,7 +602,7 @@ def update(name):
                 pid,
                 repo_add_mods_result.status_code,
                 repo_add_mods_result.text))
-
+    collection_pid = get_collection_pid(name)
     # Iterate through remaining files and add as supporting datastreams
     for i,file_name in enumerate(request.files.keys()):
         if file_name.startswith("thesis_file"):
@@ -548,7 +647,6 @@ def update(name):
                     file_pid,
                     new_file_result.status_code,
                     new_file_result.text))
-        collection_pid = config.get('FORM', 'fedora_collection')
         save_rels_ext(file_pid,
             collection_pid=collection_pid,
             content_model="islandora:sp_document",
@@ -557,7 +655,7 @@ def update(name):
             sequence_num=i+1)
     # Create RELS-EXT relationship with content type and parent collection
     save_rels_ext(new_pid,
-                  collection_pid=config.get('FORM', 'fedora_collection'))
+                  collection_pid=collection_pid)
                   
     etd_success_msg = {'advisors': request.form.getlist('advisors'),
                        'pid': new_pid,

@@ -234,7 +234,6 @@ function ThesisViewModel() {
        self.formError(true);
        return;
      } 
-     console.log("Before step three");
      self.resetViews();
      self.showStepThree(true);
      self.setProgressBar(40);
