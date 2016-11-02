@@ -608,27 +608,32 @@ def update(name):
         if file_name.startswith("thesis_file"):
             continue
         file_object = request.files.get(file_name)
-        if file_object.stream.__sizeof__() < 65:
+        print(file_object.filename, file_object.mimetype)
+        print("File size {}".format(file_object.stream.__sizeof__()))
+        if len(file_object.filename) < 3:
             continue
         #secondary_title = file_object.name
         file_title = request.form.get("{0}_title".format(file_name))
         if file_title is None or len(file_title) < 1:
             file_title = file_object.name.split(".")[0]
+        print("File title is {}".format(file_title))
         # label max length of 64 characters
         label = slugify(file_title)[0:63]
-        mime_type = mimetypes.guess_type(file_object.name)[0]
+        mime_type = file_object.mimetype
         if mime_type is None:
             mime_type = 'application/octet-stream'
         file_url = "{}new?{}".format(
             app.config.get("REST_URL"),
             urllib.parse.urlencode({"label": label,
                   "namespace": app.config.get("NAMESPACE")}))
+        print("File URL is {}".format(file_url))
         pid_result = requests.post(
             file_url,
             auth=app.config.get("FEDORA_AUTH"))
         if pid_result.status_code > 399:
             raise ValueError("Could not create pid with {}".format(file_url))
         file_pid = pid_result.text
+        print("File PID is {}".foramt(file_pid))
         new_file_url = "{}{}/datastreams/FILE?{}".format(
             app.config.get("REST_URL"),
             file_pid,
@@ -655,8 +660,8 @@ def update(name):
             sequence_num=i+1)
     # Create RELS-EXT relationship with content type and parent collection
     save_rels_ext(new_pid,
-                  collection_pid=collection_pid)
-                  
+                  collection_pid=collection_pid,
+                  content_model="islandora:compoundCModel")
     etd_success_msg = {'advisors': request.form.getlist('advisors'),
                        'pid': new_pid,
                        'title':title,

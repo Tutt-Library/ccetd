@@ -39,12 +39,14 @@
   </name>
   {% endif %}
   {% for advisor in advisors %}
+  {% if advisor is not None %}
   <name type="personal">
     <role>
       <roleTerm type="text" authority="marcrelator">thesis advisor</roleTerm>
     </role>
     <namePart>{{ advisor }}</namePart>
   </name>
+  {% endif %}
   {% endfor %}
   {% if freeform_advisor %}
   <name type="personal">
