@@ -609,10 +609,10 @@ def update(name):
             continue
         file_object = request.files.get(file_name)
         print(file_object.filename, file_object.mimetype)
-        print("File size {}".format(file_object.stream.__sizeof__()))
         if len(file_object.filename) < 3:
             continue
         #secondary_title = file_object.name
+        print("Trying to request dataset title")
         file_title = request.form.get("{0}_title".format(file_name))
         if file_title is None or len(file_title) < 1:
             file_title = file_object.name.split(".")[0]
@@ -633,7 +633,7 @@ def update(name):
         if pid_result.status_code > 399:
             raise ValueError("Could not create pid with {}".format(file_url))
         file_pid = pid_result.text
-        print("File PID is {}".foramt(file_pid))
+        print("File PID is {} title {} mime_type {}".format(file_pid, file_title, mime_type))
         new_file_url = "{}{}/datastreams/FILE?{}".format(
             app.config.get("REST_URL"),
             file_pid,

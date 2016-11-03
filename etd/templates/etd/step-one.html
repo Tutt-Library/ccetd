@@ -34,7 +34,6 @@
       {{ step_one_form.suffix(class_="form-control") }}
     </div>
  </div>
-{% if email_notices %}
  <div class="form-group">
   {# step_one_form.email.errors #}
   <label class='control-label col-lg-2' for="id_thesis-email">{{ step_one_form.email.label }}</label>
@@ -43,7 +42,6 @@
      <span class="help-block">(<i>To receive a notification e-mail when your thesis is submitted</i>)</span>
    </div>
  </div>
-{% endif %}
 <div class="form-group" data-bind="css: advisorsStatus">
   {# step_one_form.advisors.errors #}
    <label class='control-label col-lg-2' for='id_advisor-advisors'>{{ step_one_form.advisors.label }}*</label>

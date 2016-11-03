@@ -39,7 +39,7 @@
   </name>
   {% endif %}
   {% for advisor in advisors %}
-  {% if advisor is not None %}
+  {% if advisor %}
   <name type="personal">
     <role>
       <roleTerm type="text" authority="marcrelator">thesis advisor</roleTerm>
