@@ -1,6 +1,7 @@
 Flask
 Flask-login
 Flask-WTF
+flask-simpleldap
 requests
 elasticsearch
 elasticsearch_dsl

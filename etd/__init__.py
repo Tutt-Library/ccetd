@@ -7,7 +7,7 @@ import requests
 
 from bs4 import BeautifulSoup
 from flask import Flask, url_for
-from flask.ext.login import LoginManager 
+from flask_login import LoginManager
 from werkzeug.contrib.cache import FileSystemCache
 from .patron import Student
 
