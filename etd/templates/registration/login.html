@@ -11,30 +11,30 @@
 
 {% block body %}
 {% if form.errors %}
-  <h2 style="color: rgb(255,0,0); margin-top: 60px;">Error!</h2>
-  <p>Your TIGER number was not found. Please double-check your TIGER number 
-  and either visit or contact Tutt Library Circulation at (719) 389-6184 to 
-  confirm your TIGER number</p> 
+  <h2 style="color: rgb(255,0,0); margin-top: 60px;">Error! Username or Password was incorrect. </h2>
+  <p class="lead">Need <a href="https://www.coloradocollege.edu/offices/its/guides">help</a>? 
+     Call 719-389-6449</p> 
 {% endif %}
 <h1>Please login</h1>
 <div class="row">
  <div class="col-md-6">
- <form class="form-horizontal" method="post" action="/etd/login?next={% if next %}{{ next }}{% else %}{{ request.path }}{% endif %}">
+ <form class="form-horizontal" method="post" action="/login?next={% if next %}{{ next }}{% else %}{{ request.path }}{% endif %}">
+    {{ form.hidden_tag() }}
  {# csrf_token #}
   <div class="row">
   <section class="col-md-7">
   <div>
-    <label for="id_username" class="control-label">Your last name:</label>
+    <label for="id_username" class="control-label">Username:</label>
     <div>{{ form.username(class_="form-control") }}</div>
 
-   <label for="id_password" class="control-label">Your TIGER# (bottom of your Gold Card)</label>
+   <label for="id_password" class="control-label">Password</label>
    <div class="">
      {{ form.password(class_="form-control") }}
     </div>
   </div>
   <div>
     <div class="">
-      <input type="submit" class="btn btn-primary" value="Login" />
+      <input type="submit" class="btn btn-primary" value="Sign In" />
     </div>
   </div>
   </section>

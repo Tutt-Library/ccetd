@@ -33,7 +33,8 @@ import urllib.parse
 import mimetypes
 import xml.etree.ElementTree as etree
 from flask import abort, redirect, render_template, request, session, url_for
-from flask.ext.login import login_required, login_user, logout_user, current_user
+from flask_login import login_required, login_user, logout_user, current_user
+from flask_ldap3_login.forms import LDAPLoginForm
 from operator import itemgetter
 from werkzeug.exceptions import InternalServerError
 from . import app, ils_patron_check
@@ -197,14 +198,12 @@ def default():
 def login():
     """Login Method """
     next_page = request.args.get('next')
-    form = LoginForm()
-    if request.method == "POST": #form.validate()
-        username = form.username.data
-        ils_number = form.password.data
-        student = ils_patron_check(ils_number)
-        if student:
-            login_user(student)
-            return redirect(next_page or default())
+    form = LDAPLoginForm()
+    validation = form.validate_on_submit()
+    if validation:
+        login_user(form.user)
+        return redirect(next_page or default())
+    print(form.errors)
     return render_template("registration/login.html",
                            next=next_page,
                            user=None,

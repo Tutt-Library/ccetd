@@ -7,14 +7,17 @@ import requests
 
 from bs4 import BeautifulSoup
 from flask import Flask, url_for
+from flask_ldap3_login import LDAP3LoginManager
 from flask_login import LoginManager
+
 from werkzeug.contrib.cache import FileSystemCache
 from .patron import Student
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('conf.py') 
-login_manager = LoginManager()
-login_manager.init_app(app)
+login_manager = LoginManager(app)
+ldap_manager = LDAP3LoginManager(app)
+
 cache = FileSystemCache(
     app.config.get(
         "CACHE_DIR", 
@@ -23,7 +26,8 @@ cache = FileSystemCache(
                 os.path.abspath(os.path.curdir))[0],
                 "cache")))
 
-
+# Should user info be stored in 
+users = {}
 
 def ils_patron_check(user_id):
     student = Student()
@@ -42,19 +46,18 @@ def ils_patron_check(user_id):
             return student
 
 
+@ldap_manager.save_user
+def save_user(dn, username, data, memberships):
+    user = Student(dn, username, data)
+    users[dn] = user
+    return user
+
 @login_manager.user_loader
 def user_loader(user_id):
-    student = ils_patron_check(user_id)
-    return student 
-    
-@login_manager.request_loader
-def request_loader(request):
-    username = request.form.get('username')
-    user_id = request.form.get('password')
-    student = ils_patron_check(user_id)
-    if not student:
-        return
-    return student 
+    if user_id in users:
+        return users[user_id]
+    return None
+
 
 def harvest():
     """ Harvests Header, Tabs, and Footer from Library Website"""
