@@ -155,9 +155,6 @@ def person_not_auth(e):
 
 @app.errorhandler(500)
 def ccetd_error(e):
-#   print("Error is {} {}".format(e, type(e)))
-#    if not app.debug:
-#        pass 
     return render_template("etd/500.html", error=e), 500
 
 # Customer filters
@@ -199,11 +196,11 @@ def login():
     """Login Method """
     next_page = request.args.get('next')
     form = LDAPLoginForm()
+    #import pdb; pdb.set_trace()
     validation = form.validate_on_submit()
     if validation:
         login_user(form.user)
         return redirect(next_page or default())
-    print(form.errors)
     return render_template("registration/login.html",
                            next=next_page,
                            user=None,
