@@ -5,6 +5,13 @@
 
 {% block more_css %}
  <link href="{{ url_for('static', filename="css/thesis.css") }}" rel="stylesheet" />
+ <style>
+    #Login-content {
+        background: #f8f4e6 none repeat scroll 0 0 !important;
+        border: 2px solid #d7ceb2 !important;
+    }
+
+ </style>
 {% endblock %}
 
 
@@ -15,9 +22,10 @@
   <p class="lead">Need <a href="https://www.coloradocollege.edu/offices/its/guides">help</a>? 
      Call 719-389-6449</p> 
 {% endif %}
-<h1>Please login</h1>
+
 <div class="row">
- <div class="col-md-6">
+ <div class="col-md-4 col-md-offset-4" id="Login-content">
+  <h1>Colorado College Single Sign-In</h1>
  <form class="form-horizontal" method="post" action="/login?next={% if next %}{{ next }}{% else %}{{ request.path }}{% endif %}">
     {{ form.hidden_tag() }}
  {# csrf_token #}
@@ -27,7 +35,7 @@
     <label for="id_username" class="control-label">Username:</label>
     <div>{{ form.username(class_="form-control") }}</div>
 
-   <label for="id_password" class="control-label">Password</label>
+   <label for="id_password" class="control-label">Password:</label>
    <div class="">
      {{ form.password(class_="form-control") }}
     </div>
@@ -42,9 +50,6 @@
   {#<input type="hidden" name="next" 
    {% if next %}value="{{ next }}"{% else %}value="{{ request.path }}" {% endif %} />#}
 </form>
- </div>
- <div class="col-md-6">
-  <img src="{{ url_for('static', filename="img/cc-gold-card.jpg") }}">
  </div>
 </div>
 <br>

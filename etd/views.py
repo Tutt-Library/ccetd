@@ -194,13 +194,15 @@ def default():
 @app.route("/login", methods=['POST', 'GET'])
 def login():
     """Login Method """
-    next_page = request.args.get('next')
+    next_page = request.args.get('next', None)
     form = LDAPLoginForm()
-    #import pdb; pdb.set_trace()
+ #   import pdb; pdb.set_trace()
     validation = form.validate_on_submit()
     if validation:
+        if next_page is not None and next_page.endswith('login'):
+            next_page = None
         login_user(form.user)
-        return redirect(next_page or default())
+        return redirect(next_page or url_for('default'))
     return render_template("registration/login.html",
                            next=next_page,
                            user=None,
@@ -221,10 +223,12 @@ def logout():
 
     
 @app.route("/<name>")
-#@login_required
+@login_required
 def workflow(name):
     dept_iri = get_dept_iri(name)
     step_one_form = StepOneForm()
+    step_one_form.family.data = current_user.data.get('sn')
+    step_one_form.given.data = current_user.data.get('givenName')
     step_two_form = StepTwoForm()
     step_one_form.advisors.choices = get_advisors(dept_iri)
     step_one_form.graduation_dates.choices = get_grad_dates(dept_iri)
@@ -237,7 +241,7 @@ def workflow(name):
                    step_two_form=step_two_form,
                    step_three_form=StepThreeForm(),
                    step_four_form=StepFourForm(),
-                   user=None,
+                   user=current_user,
                    website=None,
                    workflow=name)
 
@@ -661,6 +665,3 @@ def update(name):
     if 'email' in request.form:
         etd_success_msg['email'] = request.form.get('email')
     session['etd-info'] = etd_success_msg
-    return redirect(url_for('success'))
-
-

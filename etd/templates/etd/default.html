@@ -98,20 +98,16 @@
    <p>The Digital Archives of Colorado College (DACC) electronic thesis and 
       dataset application allows students to self-submit their senior thesis
       to our institutional repository. The following departmental
-      web forms are available below:</p>
+      web forms are available below:
+   </p>
    <ul>
    {% for workflow in active %}
     <li><a 
-        {# if not user.is_authenticated %}href="/etd/login?next={{ workflow.get('iri') }}"
-        {% else #} 
+        {% if not user.is_authenticated %}href="{{ url_for('login') }}?next={{ workflow.get('slug') }}" 
+        {% else %} 
         href="{{ url_for('workflow', name=workflow.get('slug')) }}"
-        {# endif #}>
-        {# if workflow.1.has_option('FORM', 'label') }
-           {{ workflow.1.get('FORM', 'label') }}
-        {% else #}
-        {{ workflow.get('label') }}</a>
-
-     </li>
+        {% endif %}>{{ workflow.get('label') }}</a> 
+    </li>
    {% endfor %}
    </ul>
  {% endif %}

@@ -1,0 +1,58 @@
+@prefix bc: <http://knowledgelinks.io/ns/bibcat/> .
+@prefix bf: <http://id.loc.gov/ontologies/bibframe/> .
+@prefix cc_fac: <https://www.coloradocollege.edu/ns/faculty/> .
+@prefix cc_info: <https://www.coloradocollege.edu/ns/info/> .
+@prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix dbp: <http://dbpedia.org/property/> .
+@prefix dbr: <http://dbpedia.org/resource/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcr: <http://knowledgelinks.io/ns/dc/> .
+@prefix dcterm: <http://purl.org/dc/terms/> .
+@prefix etd: <http://catalog.coloradocollege.edu/ns/etd#> .
+@prefix es: <http://knowledgelinks.io/ns/elasticsearch/> .
+@prefix kdr: <http://knowledgelinks.io/ns/data-resources/> .
+@prefix kds: <http://knowledgelinks.io/ns/data-structures/> .
+@prefix iso6391: <http://id.loc.gov/vocabulary/iso639-1/> .
+@prefix loc: <http://id.loc.gov/authorities/> .
+@prefix loc1: <http://id.loc.gov/> .
+@prefix m21: <http://knowledgelinks.io/ns/marc21/> .
+@prefix mods: <http://www.loc.gov/mods/v3> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix pcdm: <http://pcdm.org/models#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix relators: <http://id.loc.gov/vocabulary/relators/> .
+@prefix schema: <http://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://catalog.coloradocollege.edu/e1f4904a-97a6-11e6-ac63-005056c00008>  etd:theses [etd:fedora38-pid "coccc:26672";
+            etd:language iso6391:en, iso6391:la, iso6391:el ;
+            etd:slug "classics" ], 
+        [ rdfs:label "Classics - Psychoanalysis Minor"@en ;
+          etd:fedora38-pid "coccc:26929" ;
+          etd:thesis_note "Senior Capstone -- Colorado College"@en ;
+          etd:additional-note "This capstone fulfills the requirements of the Colorado College Psychoanalysis Minor."@en ;
+          etd:slug "classics-psychoanalysis-minor" ] .
+
+<http://catalog.coloradocollege.edu/34f089c2-7082-11e6-a872-005056c00008> etd:theses [ etd:fedora38-pid "coccc:26674";
+        etd:slug "economics-and-business" ] .
+
+<http://catalog.coloradocollege.edu/90a1710c-97a0-11e6-b950-005056c00008> a schema:EducationalEvent ;
+    rdfs:label "Library Test Test Collection 2016-2017"@en ;
+    schema:organizer <https://www.coloradocollege.edu/library/> ;
+    schema:superEvent <http://catalog.coloradocollege.edu/6dc97f06-7080-11e6-ae7e-005056c00008> ;
+    etd:theses [ etd:fedora38-pid "coccc:17501" ;
+        etd:language iso6391:en, iso6391:la ;
+        etd:thesis_note "Senior Capstone -- Colorado College"@en ;
+        etd:additional-note "This fulfills the Book as an Object minor"@en ;
+        etd:slug "library-test" ];
+    cc_fac:assistant-professor <http://orcid.org/0000-0002-7543-3893> .
+
+<http://catalog.coloradocollege.edu/d0e7610a-72ba-11e6-b6dc-005056c00008> etd:theses [ etd:fedora38-pid "coccc:26687";
+        etd:slug "mathematics-and-computer-science" ] .
+
+
