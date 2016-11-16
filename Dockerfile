@@ -1,25 +1,19 @@
-FROM python:3.5.1
+# Dockerfile for CCETD
+FROM debian:8.6
 MAINTAINER Jeremy Nelson <jermnelson@gmail.com>
 
-ENV CCETD_GIT https://github.com/Tutt-Library/ccetd.git
-ENV CCETD_HOME /opt/ccetd
-ENV CCETD_CONF instance/conf.py
+ENV CCETD_HOME /opt/ccetd/
 
-RUN apt-get update && apt-get install -y && \
-  apt-get install -y python3-setuptools && \
-  apt-get install -y python3-pip
+RUN add-apt-repository ppa:fkrull/deadsnakes && \
+    apt-get update && \
+    apt-get -y install python3.5
 
-RUN git clone $CCETD_GIT $CCETD_HOME && \
-  cd $CCETD_HOME && \
-  mkdir instance && \
-  git checkout -b development && \
-  git pull origin development && \
-  pip3 install -r requirements.txt
-  
-COPY $CCETD_CONF $CCETD_HOME/instance/conf.py
-COPY workflows/library-science.ini $CCETD_HOME/workflows/library-science.ini
+COPY etd/ $CCETD_HOME/etd
+COPY instance/ $CCETD_HOME/instance
+COPY custom/ $CCETD_HOME/custom
+COPY requirements.txt $CCETD_HOME/.
+
+RUN cd $CCETD_HOME && \
+    pip3 install -r requirements.txt &&
 
 WORKDIR $CCETD_HOME
-EXPOSE 8095
-
-CMD ["python", "run.py"]
