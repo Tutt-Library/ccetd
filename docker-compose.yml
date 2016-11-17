@@ -1,0 +1,11 @@
+version: '2'
+services:
+    ccetd:
+        build: .
+        ports:
+         - "8095:8095"
+    semanticServer:
+        image: jermnelson/semantic-server-core:dev
+        ports:
+         - "8080:8080"
+         - "9999:9999"
