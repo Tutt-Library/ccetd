@@ -14,6 +14,7 @@ COPY etd/ $CCETD_HOME/etd
 COPY instance/ $CCETD_HOME/instance
 COPY custom/ $CCETD_HOME/custom
 COPY requirements.txt $CCETD_HOME/.
+COPY run.py $CCETD_HOME/.
 
 RUN cd $CCETD_HOME && \
     pip3 install -r requirements.txt 

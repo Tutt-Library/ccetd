@@ -3,8 +3,8 @@ services:
     etd:
         build: .
         ports:
-         - "8095:8095"
-    semanticServer:
+         - "8084:8084"
+    semanticserver:
         image: jermnelson/semantic-server-core:dev
         ports:
          - "8080:8080"
