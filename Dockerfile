@@ -1,12 +1,14 @@
 # Dockerfile for CCETD
-FROM debian:8.6
+FROM debian:jessie-slim
 MAINTAINER Jeremy Nelson <jermnelson@gmail.com>
 
 ENV CCETD_HOME /opt/ccetd/
 
-RUN add-apt-repository ppa:fkrull/deadsnakes && \
-    apt-get update && \
-    apt-get -y install python3.5
+RUN apt-get update && \
+    apt-get install -y libssl-dev openssl wget gcc make && \
+    wget https://www.python.org/ftp/python/3.5.2/Python-3.5.2.tgz && \
+    tar xzvf Python-3.5.2.tgz && cd Python-3.5.2 && \
+    ./configure && make && make install 
 
 COPY etd/ $CCETD_HOME/etd
 COPY instance/ $CCETD_HOME/instance
@@ -14,6 +16,8 @@ COPY custom/ $CCETD_HOME/custom
 COPY requirements.txt $CCETD_HOME/.
 
 RUN cd $CCETD_HOME && \
-    pip3 install -r requirements.txt &&
+    pip3 install -r requirements.txt 
 
 WORKDIR $CCETD_HOME
+
+CMD ["nohup", "gunicorn", "-w 2", "-b :8084", "run:app", "&"]

@@ -7,3 +7,4 @@ elasticsearch
 elasticsearch_dsl
 beautifulsoup4
 click
+gunicorn
