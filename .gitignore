@@ -2,3 +2,4 @@
 instance*
 *swp
 *.out
+tmp/*
