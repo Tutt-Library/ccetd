@@ -142,3 +142,14 @@
             etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
     schema:organizer <https://www.coloradocollege.edu/academics/dept/environmentalprogram/> .
 
+iso6391:el rdfs:label "Greek"@en .
+
+iso6391:en rdfs:label "English"@en .
+
+iso6391:fr rdfs:label "French"@en .
+
+iso6391:de rdfs:label "German"@en .
+
+iso6391:it rdfs:label "Italian"@en .
+
+iso6391:la rdfs:label "Latin"@en .
