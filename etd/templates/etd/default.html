@@ -135,7 +135,13 @@
 <script src="{{ url_for('static', filename="js/knockout.validation.min.js") }}"></script>
 <script src="{{ url_for('static', filename="js/thesis.js") }}"></script>
 <script>
- ko.applyBindings(new ThesisViewModel());
+ var view_model = new ThesisViewModel();
+ {% if user.is_authenticated %}
+ view_model.givenValue("{{ user.data.get('givenName') }}");
+ view_model.familyValue("{{ user.data.get('sn') }}");
+ view_model.emailValue("{{ user.data.get('mail') }}");
+ {% endif %}
+ ko.applyBindings(view_model);
 
  {% if workflow %}
   $('#open-web-alert-dlg').modal('show');

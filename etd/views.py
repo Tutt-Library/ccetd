@@ -227,8 +227,6 @@ def logout():
 def workflow(name):
     dept_iri = get_dept_iri(name)
     step_one_form = StepOneForm()
-    step_one_form.family.data = current_user.data.get('sn')
-    step_one_form.given.data = current_user.data.get('givenName')
     step_two_form = StepTwoForm()
     step_one_form.advisors.choices = get_advisors(dept_iri)
     step_one_form.graduation_dates.choices = get_grad_dates(dept_iri)
@@ -255,10 +253,10 @@ def success():
     """
     etd_success_msg = session['etd-info']
     if etd_success_msg is not None:
-        etd_success_msg['thesis_url'] = "{}/object/{}".format(
-            app.config.get('ISLANDORA_URL'), 
+        etd_success_msg['thesis_url'] = "{}/pid/{}".format(
+            app.config.get('DIGITAL_CC_URL', 'https://digitalcc.coloradocollege.edu'), 
             etd_success_msg['pid'])
-        if 'email' in etd_success_msg:# and app.config.get('DEBUG') is False:
+        if 'email' in etd_success_msg and app.config.get('DEBUG', True) is False:
             config = workflows.get(etd_success_msg.get('workflow'))
             raw_email = etd_success_msg['email']
             if len(raw_email) > 3 and raw_email.find('@') > -1: # Rough email validation
@@ -475,10 +473,11 @@ def create_mods(**kwargs):
             template_vars['languages'].append(language)
     for advisor_iri in post.getlist('advisors'):
         advisor_name = get_advisor_name(advisor_iri)
-        template_vars['advisors'].append(advisor_name)
+        template_vars['advisors'].append({"name": advisor_name,
+                                          "iri": advisor_iri})
     if 'freeform_advisor' in post:
-        template_vars['advisors'].append(
-            post.get('freeform_advisor'))
+        template_vars['advisors'].append({"name": post.get('freeform_advisor'),
+                                          "iri": None})
 
     for word in post.getlist('keyword'):
         if len(word) > 0:
@@ -665,3 +664,4 @@ def update(name):
     if 'email' in request.form:
         etd_success_msg['email'] = request.form.get('email')
     session['etd-info'] = etd_success_msg
+    return redirect(url_for('success'))

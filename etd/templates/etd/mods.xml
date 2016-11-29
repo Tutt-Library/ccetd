@@ -44,18 +44,13 @@
     <role>
       <roleTerm type="text" authority="marcrelator">thesis advisor</roleTerm>
     </role>
-    <namePart>{{ advisor }}</namePart>
+    <namePart>{{ advisor.name }}</namePart>
+    {% if advisor.iri %}
+    <url>{{ advisor.iri }}</url>
+    {% endif %}
   </name>
   {% endif %}
   {% endfor %}
-  {% if freeform_advisor %}
-  <name type="personal">
-    <role>
-      <roleTerm type="text" authority="marcrelator">thesis advisor</roleTerm>
-    </role>
-    <namePart>{{ freeform_advisor }}</namePart>
-  </name>
-  {% endif %}
   {% if department %}
   <name type="corporate">
     <role>
@@ -110,7 +105,7 @@
   </language>
   {% endif %}
   <location>
-    <url usage="primary display">{{ config.get('ISLANDORA_URL') }}/objects/{{ pid }}</url>
+    <url usage="primary display">{{ config.get('DIGITAL_CC_URL', 'https://digitalcc.coloradocollege.edu') }}/pid/{{ pid }}</url>
   </location>
 </mods>
 {% endautoescape %}

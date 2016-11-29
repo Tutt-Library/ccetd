@@ -7,6 +7,7 @@
    </h2>
   <p>
     Please fill out any required fields that are marked with an *.
+    
  </p>
   <h3>Your Name:</h3>
   <div class="form-group" data-bind="css: givenNameStatus"> 
@@ -38,7 +39,7 @@
   {# step_one_form.email.errors #}
   <label class='control-label col-lg-2' for="id_thesis-email">{{ step_one_form.email.label }}</label>
    <div class="col-lg-6">
-       {{ step_one_form.email(class_="form-control") }}
+       {{ step_one_form.email(class_="form-control", **{"data-bind": "value: emailValue"}) }}
      <span class="help-block">(<i>To receive a notification e-mail when your thesis is submitted</i>)</span>
    </div>
  </div>
