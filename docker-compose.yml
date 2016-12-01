@@ -10,8 +10,9 @@ services:
          - "8080:8080"
          - "9999:9999"
     web:
-        build: .
-        dockerfile: DockerfileNginx
+        build: 
+            context: .
+            dockerfile: DockerfileNginx
         ports:
          - "80:80"
          - "443:443"
