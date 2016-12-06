@@ -35,6 +35,7 @@ import xml.etree.ElementTree as etree
 from flask import abort, redirect, render_template, request, session, url_for
 from flask_login import login_required, login_user, logout_user, current_user
 from flask_ldap3_login.forms import LDAPLoginForm
+from legacy_fedora import indexer
 from operator import itemgetter
 from werkzeug.exceptions import InternalServerError
 from . import app, ils_patron_check
@@ -251,11 +252,15 @@ def success():
 
     :param request: Django request object
     """
+    indexer = indexer.Indexer(app=app)
     etd_success_msg = session['etd-info']
     if etd_success_msg is not None:
+        pid = etd_success_msg['pid']
         etd_success_msg['thesis_url'] = "{}/pid/{}".format(
             app.config.get('DIGITAL_CC_URL', 'https://digitalcc.coloradocollege.edu'), 
-            etd_success_msg['pid'])
+            pid)
+        ancestors = indexer.__get_ancestry__(pid)
+        indexer.index_pid(etd_success_msg['pid'], ancestors[0], ancestors) 
         if 'email' in etd_success_msg and app.config.get('DEBUG', True) is False:
             config = workflows.get(etd_success_msg.get('workflow'))
             raw_email = etd_success_msg['email']
