@@ -1,0 +1,28 @@
+# Electronic Thesis and Dissertation Flask Application
+
+The Electronic Thesis and Dissertation Flask application was originally a 
+pylons application developed at Colorado College, next it was migrated to
+Django and now is part of the Discover Aristotle project at Colorado College 
+Tutt Library. It now runs as an independent Flask application running
+under gunicorn.
+
+Unless explictly set, all software code, ideas, 
+configuations, and any associated intellectual work is licensed under the Apache 2 
+open source license or under a Creative Commons copyright.
+
+
+## Dependencies
+    *  Flask
+    *  Flask-Login
+    *  Flask-WTForms
+    *  requests
+    *  BeautifulSoup
+
+## Running under gunicorn
+To run the ccetd application, use the following command:
+
+    `nohup gunicorn -b 0.0.0.0:8095 run:parent_app &` 
+
+    `nohup gunicorn -f uconfig.py run:parent_app &`
+
+
