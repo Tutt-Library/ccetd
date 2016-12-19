@@ -9,3 +9,4 @@ beautifulsoup4
 click
 gunicorn
 rdflib
+Fedora3.8_Utilities
