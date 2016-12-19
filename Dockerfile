@@ -17,11 +17,10 @@ COPY requirements.txt $CCETD_HOME/.
 COPY run.py $CCETD_HOME/.
 
 RUN cd $CCETD_HOME && \
-    pip3 install -r requirements.txt && \
-    git clone https://github.com/Tutt-Library/ccetd.git && \
-    cd ccetd && git checkout -b development && \
-    git pull origin development && \
-    python setup.py install
+    pip3 install -r requirements.txt && cd ../ && \
+    git clone https://github.com/Tutt-Library/fedora38-utilities.git && \
+    cd fedora38-utilities && python setup.py install && \
+    cd $CCETD_HOME
 
 WORKDIR $CCETD_HOME
 
