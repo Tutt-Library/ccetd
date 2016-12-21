@@ -256,7 +256,7 @@ def success():
     etd_success_msg = session['etd-info']
     if etd_success_msg is not None:
         pid = etd_success_msg['pid']
-        etd_success_msg['thesis_url'] = "{}/pid/{}".format(
+        etd_success_msg['thesis_url'] = "{}/{}".format(
             app.config.get('DIGITAL_CC_URL', 'https://digitalcc.coloradocollege.edu/islandora/object'), 
             pid)
         #ancestors = thesis_indexer.__get_ancestry__(pid)
