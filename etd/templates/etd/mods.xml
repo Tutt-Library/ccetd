@@ -40,14 +40,11 @@
   {% endif %}
   {% for advisor in advisors %}
   {% if advisor %}
-  <name type="personal">
+  <name type="personal"{% if advisor.iri %} authorityURI="{{ advisor.iri }}"{% endif %}>
     <role>
       <roleTerm type="text" authority="marcrelator">thesis advisor</roleTerm>
     </role>
     <namePart>{{ advisor.name }}</namePart>
-    {% if advisor.iri %}
-    <url>{{ advisor.iri }}</url>
-    {% endif %}
   </name>
   {% endif %}
   {% endfor %}
