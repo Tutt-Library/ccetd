@@ -257,13 +257,13 @@ def success():
     if etd_success_msg is not None:
         pid = etd_success_msg['pid']
         etd_success_msg['thesis_url'] = "{}/pid/{}".format(
-            app.config.get('DIGITAL_CC_URL', 'https://digitalcc.coloradocollege.edu'), 
+            app.config.get('DIGITAL_CC_URL', 'https://digitalcc.coloradocollege.edu/islandora/object'), 
             pid)
-        ancestors = thesis_indexer.__get_ancestry__(pid)
-        if len(ancestors) < 0:
-            thesis_indexer.index_pid(etd_success_msg['pid'])
-        else:
-            thesis_indexer.index_pid(etd_success_msg['pid'], ancestors[0], ancestors)
+        #ancestors = thesis_indexer.__get_ancestry__(pid)
+        #if len(ancestors) < 1:
+        #    thesis_indexer.index_pid(etd_success_msg['pid'])
+        #else:
+        #    thesis_indexer.index_pid(etd_success_msg['pid'], ancestors[0], ancestors)
         if 'email' in etd_success_msg and app.config.get('DEBUG', True) is False:
             config = workflows.get(etd_success_msg.get('workflow'))
             raw_email = etd_success_msg['email']
