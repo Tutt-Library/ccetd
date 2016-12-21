@@ -99,8 +99,7 @@
             etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
     schema:organizer <https://www.coloradocollege.edu/academics/dept/politicalscience/> .
 
-<http://catalog.coloradocollege.edu/6acdb924-b03b-11e6-a599-005056c00008> etd:theses [ rdfs:label "Senior Capstone -- Colorado College"@en ;
-            etd:fedora38-pid "coccc:26680" ;
+<http://catalog.coloradocollege.edu/6acdb924-b03b-11e6-a599-005056c00008> etd:theses [ etd:fedora38-pid "coccc:26680" ;
             etd:slug "film-and-media-studies" ;
             etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
     schema:organizer <https://www.coloradocollege.edu/academics/dept/filmandnewmedia/> .

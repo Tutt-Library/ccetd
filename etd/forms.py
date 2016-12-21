@@ -23,7 +23,7 @@ import logging
 import mimetypes
 import re
 import xml.etree.ElementTree as etree
-from flask_wtf import Form 
+from flask_wtf import FlaskForm as Form 
 from flask_wtf.file import FileField
 
 import wtforms
