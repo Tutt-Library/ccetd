@@ -260,7 +260,10 @@ def success():
             app.config.get('DIGITAL_CC_URL', 'https://digitalcc.coloradocollege.edu'), 
             pid)
         ancestors = thesis_indexer.__get_ancestry__(pid)
-        thesis_indexer.index_pid(etd_success_msg['pid'], ancestors[0], ancestors) 
+        if len(ancestors) < 0:
+            thesis_indexer.index_pid(etd_success_msg['pid'])
+        else:
+            thesis_indexer.index_pid(etd_success_msg['pid'], ancestors[0], ancestors)
         if 'email' in etd_success_msg and app.config.get('DEBUG', True) is False:
             config = workflows.get(etd_success_msg.get('workflow'))
             raw_email = etd_success_msg['email']
