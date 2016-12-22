@@ -4,6 +4,7 @@ import hashlib
 import os
 import re
 import requests
+import logging
 
 from bs4 import BeautifulSoup
 from flask import Flask, url_for
@@ -17,6 +18,11 @@ app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('conf.py') 
 login_manager = LoginManager(app)
 ldap_manager = LDAP3LoginManager(app)
+
+ldap_manager_log = logging.getLogger('flask_ldap3_login')
+ldap_debug_handler = logging.StreamHandler()
+ldap_debug_handler.setLevel(logging.DEBUG)
+ldap_manager_log.addHandler(ldap_debug_handler)
 
 cache = FileSystemCache(
     app.config.get(

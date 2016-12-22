@@ -10,6 +10,7 @@ parent_app = DispatcherMiddleware(
     simple, 
     {"/etd": app})
 
+parent_app.debug = True
 app.debug = True
 
 if __name__ == '__main__':
