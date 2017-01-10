@@ -9,6 +9,7 @@ import logging
 from bs4 import BeautifulSoup
 from flask import Flask, url_for
 from flask_ldap3_login import LDAP3LoginManager
+from flask_ldap3_login import log as ldap_manager_log
 from flask_login import LoginManager
 
 from werkzeug.contrib.cache import FileSystemCache
@@ -18,11 +19,6 @@ app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('conf.py') 
 login_manager = LoginManager(app)
 ldap_manager = LDAP3LoginManager(app)
-
-ldap_manager_log = logging.getLogger('flask_ldap3_login')
-ldap_debug_handler = logging.StreamHandler()
-ldap_debug_handler.setLevel(logging.DEBUG)
-ldap_manager_log.addHandler(ldap_debug_handler)
 
 cache = FileSystemCache(
     app.config.get(

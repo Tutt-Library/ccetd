@@ -44,7 +44,7 @@
                 iso6391:en ;
             etd:slug "german" ;
             etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
-    schema:organizer <https://www.coloradocollege.edu/academics/dept/greal/ /> .
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/greal/> .
 
 <http://catalog.coloradocollege.edu/1a70ed64-b035-11e6-b974-005056c00008> etd:theses [ etd:fedora38-pid "coccc:26679" ;
             etd:slug "feminist-and-gender-studies" ;

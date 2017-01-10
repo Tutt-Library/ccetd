@@ -103,6 +103,7 @@ WHERE {{
 """
 
 THESES_LIST = PREFIX + """
+
 SELECT DISTINCT ?dept_name ?label ?slug
 WHERE {
     ?dept_year etd:theses ?thesis .

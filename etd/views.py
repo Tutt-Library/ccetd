@@ -33,6 +33,7 @@ import urllib.parse
 import mimetypes
 import xml.etree.ElementTree as etree
 from flask import abort, redirect, render_template, request, session, url_for
+from flask import current_app
 from flask_login import login_required, login_user, logout_user, current_user
 from flask_ldap3_login.forms import LDAPLoginForm
 from legacy_fedora import indexer
@@ -197,7 +198,6 @@ def login():
     """Login Method """
     next_page = request.args.get('next', None)
     form = LDAPLoginForm()
- #   import pdb; pdb.set_trace()
     validation = form.validate_on_submit()
     if validation:
         if next_page is not None and next_page.endswith('login'):
