@@ -102,7 +102,7 @@
   </language>
   {% endif %}
   <location>
-    <url usage="primary display">{{ config.get('DIGITAL_CC_URL', 'https://digitalcc.coloradocollege.edu') }}/pid/{{ pid }}</url>
+    <url usage="primary display">{{ config.get('DIGITAL_CC_URL', 'https://digitalcc.coloradocollege.edu') }}/{{ pid }}</url>
   </location>
 </mods>
 {% endautoescape %}

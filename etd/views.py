@@ -28,6 +28,8 @@ import rdflib
 import re
 import requests
 import smtplib
+import sys
+import time
 import urllib.parse
 
 import mimetypes
@@ -45,7 +47,7 @@ from .forms import StepFourForm
 from .sparql import ADDL_NOTES, ADVISOR_NAME, COLLECTION_PID, DEGREE_INFO 
 from .sparql import DEPARTMENT_FACULTY, DEPARTMENT_IRI, DEPARTMENT_NAME  
 from .sparql import GRAD_DATES, LANG_LABEL, THESES_LIST, THESIS_LANGUAGES 
-from .sparql import THESIS_NOTE
+from .sparql import THESIS_NOTE, DEPARTMENT_STAFF
 
 mimetypes.add_type("application/x-sas", ".sas")
 
@@ -259,13 +261,15 @@ def success():
         etd_success_msg['thesis_url'] = "{}/{}".format(
             app.config.get('DIGITAL_CC_URL', 'https://digitalcc.coloradocollege.edu/islandora/object'), 
             pid)
-        #ancestors = thesis_indexer.__get_ancestry__(pid)
-        #if len(ancestors) < 1:
-        #    thesis_indexer.index_pid(etd_success_msg['pid'])
-        #else:
-        #    thesis_indexer.index_pid(etd_success_msg['pid'], ancestors[0], ancestors)
+        # Allow changes to propagated through Fedora repository
+        time.sleep(10)
+        ancestors = thesis_indexer.__get_ancestry__(pid)
+        if len(ancestors) < 1:
+            thesis_indexer.index_pid(etd_success_msg['pid'])
+        else:
+            ancestors.reverse()
+            thesis_indexer.index_pid(etd_success_msg['pid'], ancestors[-1], ancestors)
         if 'email' in etd_success_msg and app.config.get('DEBUG', True) is False:
-            config = workflows.get(etd_success_msg.get('workflow'))
             raw_email = etd_success_msg['email']
             if len(raw_email) > 3 and raw_email.find('@') > -1: # Rough email validation
                 to_email_addrs = [etd_success_msg['email'],]
@@ -274,9 +278,14 @@ def success():
             for row in etd_success_msg['advisors']:
                 if row.find("@") > -1:
                     to_email_addrs.append(row)
-            if config.has_section('STAFF'):
-                for email in config.options('STAFF'):
-                    to_email_addrs.append(email)
+            staff_result = requests.post(app.config.get("TRIPLESTORE_URL"),
+                data={query: DEPARTMENT_STAFF.format(etd_success_msg['workflow']),
+                      "format": "json"})
+            if staff_result.status_code < 399:
+                bindings = staff_result.json().get('results').get('bindings')
+                for row in bindings:
+                    to_email.addrs.append(row.get('email').get('value'))
+                
             institution_name = app.config.get('INSTITUTION')['name']
             email_message = "{0} successfully submitted to {1}".format(
                 etd_success_msg['title'],

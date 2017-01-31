@@ -76,6 +76,16 @@ WHERE {{
     ?iri rdfs:label ?name .
 }}"""
 
+DEPARTMENT_STAFF = PREFIX + """
+SELECT DISTINCT ?name ?email
+WHERE {{
+    ?thesis etd:slug "{0}" .
+    ?workflow etd:theses ?thesis .
+    ?workflow etd:contact ?person .
+    ?person rdfs:label ?name .
+    ?person schema:email ?email .
+}}"""
+
 GRAD_DATES = PREFIX + """
 SELECT DISTINCT ?date ?label
 WHERE {{
