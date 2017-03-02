@@ -635,6 +635,13 @@ def update(name):
         mime_type = file_object.mimetype
         if mime_type is None:
             mime_type = 'application/octet-stream'
+        content_model = "islandora:sp_document"
+        if 'video' in mime_type:
+            content_model = "islandora:sp_videoCModel"
+        elif 'audio' in mime_type:
+            content_model = "islandora:sp-audioCModel"
+        elif 'pdf' in mime_type:
+            content_model = "islandora:sp_pdf" 
         file_url = "{}new?{}".format(
             app.config.get("REST_URL"),
             urllib.parse.urlencode({"label": label,
@@ -645,7 +652,7 @@ def update(name):
         if pid_result.status_code > 399:
             raise ValueError("Could not create pid with {}".format(file_url))
         file_pid = pid_result.text
-        new_file_url = "{}{}/datastreams/FILE?{}".format(
+        new_file_url = "{}{}/datastreams/OBJ?{}".format(
             app.config.get("REST_URL"),
             file_pid,
             urllib.parse.urlencode({"label": label,
@@ -665,7 +672,7 @@ def update(name):
                     new_file_result.text))
         save_rels_ext(file_pid,
             collection_pid=collection_pid,
-            content_model="islandora:sp_document",
+            content_model=content_model,
             restrictions=None,
             parent_pid=new_pid,
             sequence_num=i+1)
