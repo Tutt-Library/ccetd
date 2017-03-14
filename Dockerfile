@@ -23,4 +23,4 @@ RUN cd $CCETD_HOME && \
 
 WORKDIR $CCETD_HOME
 
-CMD ["nohup", "gunicorn", "-w 2", "-b :8084", "run:parent_app", "&"]
+CMD ["nohup", "gunicorn", "-w 2", "-b :8084", "-t 300", "run:parent_app", "&"]
