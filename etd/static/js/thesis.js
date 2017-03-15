@@ -207,7 +207,11 @@ function ThesisViewModel() {
        self.formErrors.push({'error': 'Thesis File is required'});
      } else {
        var filename = $('#thesis_file').val().replace(/.*(\/|\\)/, '');
-       var ext = filename.split(".")[1];
+       var file_parts = filename.split(".");
+       var ext = '';
+       if (file_parts.length > 1) {
+          ext = file_parts[1];  
+       }
        ext = ext.toLowerCase();
        if(ext != 'pdf' && ext != 'mp4') {
          self.thesisFileStatus('has-error');
