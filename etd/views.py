@@ -47,9 +47,13 @@ from .forms import StepFourForm
 from .sparql import ADDL_NOTES, ADVISOR_NAME, COLLECTION_PID, DEGREE_INFO 
 from .sparql import DEPARTMENT_FACULTY, DEPARTMENT_IRI, DEPARTMENT_NAME  
 from .sparql import GRAD_DATES, LANG_LABEL, THESES_LIST, THESIS_LANGUAGES 
-from .sparql import THESIS_NOTE, DEPARTMENT_STAFF
+from .sparql import THESIS_NOTE, DEPARTMENT_STAFF, ADVISOR_EMAIL
 
 mimetypes.add_type("application/x-sas", ".sas")
+
+HOME = os.path.abspath(os.curdir)
+with open(os.path.join(HOME, "VERSION")) as fo:
+    VERSION = fo.read()
 
 # Helper functions
 def get_advisors(dept_iri):
@@ -195,6 +199,12 @@ def default():
                             user=None,
                             active=workflows)
 
+@app.route("/about")
+def about_ccetd():
+    return render_template("etd/about.html",
+        version=VERSION)
+          
+
 @app.route("/login", methods=['POST', 'GET'])
 def login():
     """Login Method """
@@ -269,17 +279,23 @@ def success():
         else:
             ancestors.reverse()
             thesis_indexer.index_pid(etd_success_msg['pid'], ancestors[-1], ancestors)
-        if 'email' in etd_success_msg and app.config.get('DEBUG', True) is False:
+        if 'email' in etd_success_msg and app.config.get('DEBUG') is False:
             raw_email = etd_success_msg['email']
             if len(raw_email) > 3 and raw_email.find('@') > -1: # Rough email validation
                 to_email_addrs = [etd_success_msg['email'],]
             else:
                 to_email_addrs = []
             for row in etd_success_msg['advisors']:
-                if row.find("@") > -1:
-                    to_email_addrs.append(row)
+                results = requests.post(app.config.get("TRIPLESTORE_URL"),
+                    data={"query": ADVISOR_EMAIL.format(row),
+                          "format": "json"})
+                bindings = results.json().get('results').get('bindings')
+                for binding in bindings:
+                    email = binding.get('email').get('value')
+                    if email.find("@") > -1:
+                        to_email_addrs.append(email)
             staff_result = requests.post(app.config.get("TRIPLESTORE_URL"),
-                data={query: DEPARTMENT_STAFF.format(etd_success_msg['workflow']),
+                data={"query": DEPARTMENT_STAFF.format(etd_success_msg['workflow']),
                       "format": "json"})
             if staff_result.status_code < 399:
                 bindings = staff_result.json().get('results').get('bindings')
@@ -293,8 +309,8 @@ def success():
             email_message += " Digital Archives available at {0}".format(
                 etd_success_msg['thesis_url'])
             if len(to_email_addrs) > 0:
-                send_email({"subject": '{0} submitted to DACC'.format(etd_success_msg['title'].encode()),
-                            "text": email_message.encode(),
+                send_email({"subject": '{0} submitted to DACC'.format(etd_success_msg['title']),
+                            "text": email_message,
                             "recipients": to_email_addrs})
 
         etd_success_msg['repository_url'] = app.config.get('FEDORA_URI')
@@ -507,7 +523,12 @@ def send_email(info):
     recipients = info.get('recipients') 
     subject = info.get('subject')
     text = info.get('text')
-    message = """\From: {}\nTo: {}\nSubject: {}\n\n{}""".format(
+    message = """From: <{0}>
+To: <{1}>
+Subject: {2}
+
+
+{3}""".format(
         sender,
         ",".join(recipients),
         subject,
@@ -519,6 +540,7 @@ def send_email(info):
     server.ehlo()
     if app.config.get('EMAIL')['tls']:
         server.starttls()
+    server.ehlo()
     server.login(sender,
                  app.config.get("EMAIL")["password"])
     server.sendmail(sender, recipients, message)
@@ -680,6 +702,7 @@ def update(name):
     save_rels_ext(new_pid,
                   collection_pid=collection_pid,
                   content_model="islandora:compoundCModel")
+    advisor_emails = []
     etd_success_msg = {'advisors': request.form.getlist('advisors'),
                        'pid': new_pid,
                        'title':title,

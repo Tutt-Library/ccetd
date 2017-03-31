@@ -10,8 +10,8 @@ parent_app = DispatcherMiddleware(
     simple, 
     {"/etd": app})
 
-parent_app.debug = True
-app.debug = True
+if app.config.get("DEBUG") is True:
+    parent_app.debug = True
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8095, debug=True)

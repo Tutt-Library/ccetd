@@ -17,6 +17,7 @@ from .patron import Student
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('conf.py') 
+
 login_manager = LoginManager(app)
 ldap_manager = LDAP3LoginManager(app)
 

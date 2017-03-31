@@ -15,6 +15,11 @@ WHERE {{
     ?thesis etd:additional-note ?note .
 }}"""
 
+ADVISOR_EMAIL = PREFIX + """
+SELECT DISTINCT ?email
+WHERE {{
+    <{0}> schema:email ?email .
+}}"""
 
 ADVISOR_NAME = PREFIX + """
 SELECT DISTINCT ?name
