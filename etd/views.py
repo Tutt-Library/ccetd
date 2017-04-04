@@ -300,7 +300,7 @@ def success():
             if staff_result.status_code < 399:
                 bindings = staff_result.json().get('results').get('bindings')
                 for row in bindings:
-                    to_email.addrs.append(row.get('email').get('value'))
+                    to_email_addrs.append(row.get('email').get('value'))
                 
             institution_name = app.config.get('INSTITUTION')['name']
             email_message = "{0} successfully submitted to {1}".format(
