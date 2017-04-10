@@ -32,6 +32,7 @@ import sys
 import time
 import urllib.parse
 
+import email.mime.text as email_text
 import mimetypes
 import xml.etree.ElementTree as etree
 from flask import abort, redirect, render_template, request, session, url_for
@@ -533,6 +534,7 @@ Subject: {2}
         ",".join(recipients),
         subject,
         text)
+    message = email_text.MIMEText(message, _charset="UTF-8")
     #try:
     server = smtplib.SMTP(app.config.get('EMAIL')['host'],
                               app.config.get('EMAIL')['port'])
@@ -543,7 +545,7 @@ Subject: {2}
     server.ehlo()
     server.login(sender,
                  app.config.get("EMAIL")["password"])
-    server.sendmail(sender, recipients, message)
+    server.sendmail(sender, recipients, message.as_string())
     server.close()
     #except:
     #    print("Error trying to send email")
