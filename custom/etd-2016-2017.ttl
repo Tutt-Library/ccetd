@@ -73,9 +73,7 @@
 
 <http://catalog.coloradocollege.edu/22396808-b655-11e6-a431-005056c00008> a etd:workflow ;
     etd:contact <http://catalog.coloradocollege.edu/3dbee952-f2e6-11e6-bb11-005056c00008>,
-        <http://catalog.coloradocollege.edu/3e12fcc0-f2e6-11e6-adae-005056c00008>,
-        <http://catalog.coloradocollege.edu/07c8e9fe-b0f1-11e6-a7be-005056c00008>,
-        <http://catalog.coloradocollege.edu/5ee6fb30-2e8f-11e7-a2cf-005056c00008> ;
+        <http://catalog.coloradocollege.edu/3e12fcc0-f2e6-11e6-adae-005056c00008> ;
     etd:theses [ etd:fedora38-pid "coccc:26689" ;
             etd:slug "music" ;
             etd:thesis_note "Senior Capstone -- Colorado College"@en ] ;
