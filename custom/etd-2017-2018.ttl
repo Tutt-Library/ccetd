@@ -27,4 +27,206 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+<http://catalog.coloradocollege.edu/08ae960a-bd9c-11e7-a843-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28394" ;
+            etd:slug "physics" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/physics/> .
+
+<http://catalog.coloradocollege.edu/12f453ec-bd98-11e7-b3a2-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28402" ;
+            etd:slug "theatre-and-dance" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/theatredance/> .
+
+<http://catalog.coloradocollege.edu/20bb3f88-bd94-11e7-b474-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28377" ;
+            etd:language iso6391:en,
+                iso6391:es,
+                iso6391:pt ;
+            etd:slug "spanish-and-portuguese" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/spanish/> .
+
+<http://catalog.coloradocollege.edu/2f72067e-bd9c-11e7-b3ca-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28376" ;
+            etd:slug "environmental-program" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/environmentalprogram/> .
+
+<http://catalog.coloradocollege.edu/325b79f6-bd93-11e7-b85d-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28382" ;
+            etd:language iso6391:de,
+                iso6391:en ;
+            etd:slug "german" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/greal/> .
+
+<http://catalog.coloradocollege.edu/35dd96fe-bd9b-11e7-b58a-005056c00008> a etd:workflow ;
+    etd:theses [ rdfs:label "Classics - Psychoanalysis Minor"@en ;
+            etd:additional-note "This capstone fulfills the requirements of the Colorado College Psychoanalysis Minor."@en ;
+            etd:fedora38-pid "coccc:28370" ],
+        [ etd:fedora38-pid "coccc:28371" ;
+            etd:language iso6391:el,
+                iso6391:en,
+                iso6391:la ;
+            etd:slug "classics" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/classics/> .
+
+<http://catalog.coloradocollege.edu/361df480-bd9a-11e7-914f-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28391" ;
+            etd:slug "neuroscience" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/neuroscience/> .
+
+<http://catalog.coloradocollege.edu/3743d12e-bd99-11e7-a53a-005056c00008> a etd:workflow ;
+    etd:theses [ rdfs:label "Education - Undergraduate Thesis"@en ;
+            etd:fedora38-pid "coccc:28374" ;
+            etd:slug "education-undergraduate-thesis" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ],
+        [ rdfs:label "Master of Arts in Teaching"@en ;
+            etd:fedora38-pid "coccc:28375" ;
+            etd:slug "education-fifth-year-ma" ;
+            etd:thesis_note "Master of Arts in Teaching -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/education/> .
+
+<http://catalog.coloradocollege.edu/3fc45b9c-bd96-11e7-9e19-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28368" ;
+            etd:language iso6391:en,
+                iso6391:ja,
+                iso6391:zh ;
+            etd:slug "asian-studies" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/asianstudies/> .
+
+<http://catalog.coloradocollege.edu/4ccb1946-bd97-11e7-91ac-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28395" ;
+            etd:slug "political-science" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/politicalscience/> .
+
+<http://catalog.coloradocollege.edu/4eee495c-bd98-11e7-8e47-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28396" ;
+            etd:slug "race-ethnicity-and-migration-studies" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/raceethnicitymigration/> .
+
+<http://catalog.coloradocollege.edu/6dd45524-bd92-11e7-ab98-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28367" ;
+            etd:slug "art" ;
+            etd:thesis_note "Senior Capstone -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/art/> .
+
+<http://catalog.coloradocollege.edu/6ddb31a8-bd98-11e7-b253-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28397" ;
+            etd:slug "religion" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/religion/> .
+
+<http://catalog.coloradocollege.edu/7d5661ba-bd96-11e7-986f-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28384" ;
+            etd:slug "history-thesis" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ],
+        [ etd:fedora38-pid "coccc:28383" ;
+            etd:slub "history-essay" ;
+            etd:thesis_note "Senior Essay -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/history/> .
+
+<http://catalog.coloradocollege.edu/81be7592-bd9a-11e7-9769-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28388" ;
+            etd:slug "mathematics-and-computer-science" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/mathematics/> .
+
+<http://catalog.coloradocollege.edu/82f6ba8a-bd94-11e7-9ec1-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28390" ;
+            etd:slug "music" ;
+            etd:thesis_note "Senior Capstone -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/music/> .
+
+<http://catalog.coloradocollege.edu/861ad310-bd97-11e7-a6ea-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28378" ;
+            etd:slug "film-and-media-studies" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/filmandnewmedia/> .
+
+<http://catalog.coloradocollege.edu/90d0122e-bd98-11e7-8921-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28399" ;
+            etd:slug "sociology" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/sociology/> .
+
+<http://catalog.coloradocollege.edu/9346fec8-bd95-11e7-b9c8-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28373" ;
+            etd:slug "economics-and-business" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/economics/> .
+
+<http://catalog.coloradocollege.edu/ad53be48-bd97-11e7-a692-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28398" ;
+            etd:language iso6391:en,
+                iso6391:ru ;
+            etd:slug "russian-and-eurasian-studies" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/russianeurasianstudies/> .
+
+<http://catalog.coloradocollege.edu/c1a087d8-bd95-11e7-8b0f-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28392" ;
+            etd:slug "organismal-biology-and-ecology" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/obe/> .
+
+<http://catalog.coloradocollege.edu/c31eeca8-bd9c-11e7-b044-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28400" ;
+            etd:language iso6391:en,
+                iso6391:es ;
+            etd:slug "southwest-studies" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/southweststudies/> .
+
+<http://catalog.coloradocollege.edu/ccf380c6-bd93-11e7-8cfd-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28377" ;
+            etd:slug "feminist-and-gender-studies" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/feministandgenderstudies/> .
+
+<http://catalog.coloradocollege.edu/cd177f6e-bd98-11e7-bbc0-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28379" ;
+            etd:language iso6391:en,
+                iso6391:fr,
+                iso6391:it ;
+            etd:slug "french-and-italian" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/french-italian-arabic/> .
+
+<http://catalog.coloradocollege.edu/ceee3cb8-bd92-11e7-9734-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28369" ;
+            etd:slug "chemistry-and-biochemistry" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/chemistry/> .
+
+<http://catalog.coloradocollege.edu/d203128c-bd94-11e7-94a5-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28393" ;
+            etd:slug "philosophy" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/philosophy/> .
+
+<http://catalog.coloradocollege.edu/d6b9873a-bd9b-11e7-b161-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28380" ;
+            etd:slug "geology" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/geology/> .
+
+<http://catalog.coloradocollege.edu/d72e2ac6-bd97-11e7-b355-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28372" ;
+            etd:slug "comparative-literature" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/comparativeliterature/> .
+
+<http://catalog.coloradocollege.edu/f2b2cf5a-bd9a-11e7-8d03-005056c00008> a etd:workflow ;
+    etd:theses [ etd:fedora38-pid "coccc:28389" ;
+            etd:slug "molecular-biology" ;
+            etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
+    schema:organizer <https://www.coloradocollege.edu/academics/dept/molecularbiology/> .
 
