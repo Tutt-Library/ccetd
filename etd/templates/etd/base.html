@@ -21,6 +21,9 @@
 
     <!-- Custom styles for this template -->
     <link href="{{ url_for('static', filename="css/default.css") }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename="css/thesis.css") }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename="css/cc-header-footer.css") }}" rel="stylesheet" />
+
     {% block more_css %}{% endblock %}
 
   </head>
@@ -29,14 +32,8 @@
    <div id="main">
 
   {% block navbar %}
-  <div class="container">
-   <div class="row">
-     <div class="col-md-12 col-sm-12">
-      <iframe src="{{ url_for('header') }}" class="website-header" scrolling="no"></iframe>
-     </div>
-   </div>
-  </div>
-  {% endblock %} 
+    {% include 'etd/header.html' %}
+ {% endblock %} 
   
   {# START body container #}
   <div class="container main-container"> 
@@ -58,14 +55,8 @@
   </div>
 
   {% block footer %}
-  {# START footer DIV #}
-<div class="container">
- <div class="row-fluid">
-  <div class="span12 offset1">
-   <iframe src="{{ url_for('footer') }}" class="website-footer" scrolling="no"></iframe>
-  </div>
-</div>
- {% endblock %} 
+    {% include 'etd/footer.html' %}
+  {% endblock %} 
 
   {% block dialogs %}
     {% include 'etd/snippets/help.html' %}
@@ -77,6 +68,8 @@
     <script src="{{ url_for('static', filename="js/jquery.js") }}"></script>
     <script src="{{ url_for('static', filename="js/bootstrap.min.js") }}"></script>
     <script src="{{ url_for('static', filename="js/knockout.js") }}"></script>
+    <script src="{{ url_for('static', filename="js/popper.min.js") }}"></script>
+
    {% block more_js %}{% endblock %} 
   </body>
 </html>

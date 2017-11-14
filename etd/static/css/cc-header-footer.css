@@ -1,0 +1,115 @@
+    .cc-header-tools {
+        background: rgba(0,0,0,0) url("/static/img/stripe-black.png") repeat scroll 0 0;
+    }
+
+    .cc-txt-gold, a.cc-txt-gold:hover {
+        color: rgb(208, 155, 44);
+    }
+
+    a.cc-link-txt, a.cc-link-txt:hover {
+        color: #212529;
+        font-weight: 800;
+    }
+
+    div.library-tabs {
+        background-image: url("/static/img/busy-library.jpg");
+        height: 75px;
+    }
+
+    a.tab {
+        color: #fff;
+        background-color: #4b6282;
+        border-top-left-radius: 7px;
+        border-top-right-radius: 7px;
+        display: inline;
+        font-weight: 600;
+    }
+
+    a.tab-highlight {
+        background-color: #fddb55;
+        color: #1f375a;
+    }
+
+   div.search-header {
+        background-color: #2d4873;
+        color: #fff;
+        padding: .5em;
+    }
+
+
+    h1.search-header, h3.search-header {
+        color: #fddb55;
+    }
+
+
+    .cc-bg-gold {
+        background-color: rgb(208, 155, 44);
+    }
+
+    .cc-footer {
+        background-color: #000;
+        color: #fff;
+        padding-top: .5em;
+    }
+
+    a.cc-footer, a.cc-footer:hover {
+        color: #fff;
+    }
+   
+    .cc-footer-mtn {
+        background-image: url("/static/img/cc-mountains-2x.png");
+        background-position: center bottom;
+        background-repeat: no-repeat;
+        background-size: contain;
+    }
+
+    .cc-footer-links {
+        background: rgba(0, 0, 0, 0) url("/static/img/stripe-white.png") repeat scroll center bottom;
+        padding-bottom: 7px;
+
+    }
+
+    p.address {
+        font-family: "Crimson Text",serif;
+    } 
+
+    .cc-txt-sans {
+        font-family: Montserrat,sans-serif;
+    }
+
+    .cc-txt-black-bold-sans {
+        color: rgb(0, 0, 0);
+        font-family: Montserrat,sans-serif;
+        font-weight: 800;
+    }
+
+    .dropdown-menu {
+        background-color: rgb(0,0,0);
+    }
+
+    .cc-txt-white {
+        color: #fff;
+    }
+
+    a.dropdown-item, a.dropdown-item:hover {
+        background-color: rgb(0,0,0);
+        color: #fff;
+        font-weight: 400
+    }
+
+    form.search-box {
+        background-color: #f1ece5;
+        border: 5px solid #ffffff;
+        padding-left: 10px;
+        padding-top: 15px;
+    }
+
+    a.search-box {
+        color: 	rgb(150,23,46);
+        font-size: 11pt;
+        font-weight: bold;
+    }
+
+    .main-body {
+        background-color: #f1ece5;
+    }

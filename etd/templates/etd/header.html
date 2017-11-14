@@ -1,0 +1,159 @@
+<div class="header container">
+    <div class="row" >
+        <div class="col-md-6" style="padding-top: 1em;">
+            <img src="{{ url_for('static', filename='img/cc-logo.png') }}" 
+                 style="padding-bottom: 1em;"
+                 alt="Colorado College Logo">
+        </div>
+        <div class="col-md-6 cc-header-tools">
+            <div class="row" style="padding-top: .5em">
+                <div class="col-md-7 ml-md-auto">
+                    <a href="https://www.coloradocollege.edu/ssi" class="cc-link-txt">
+                        <i class="fa fa-sign-in cc-txt-gold"></i> Sign Into CC
+                    </a>
+                    <a href="https://www.coloradocollege.edu/directory" class="cc-link-txt">
+                        <i class="fa fa-user cc-txt-gold"></i> Campus Directory
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2 ml-md-auto">
+                    <img src="{{ url_for('static', filename='img/cc-est-1874.svg') }}" style="max-height: 36px"
+                      alt="Colorado College Established in 1874">
+                </div>
+                <div class="col-md-9">
+                    <form class="form-inline" action="https://www.coloradocollege.edu/search" method="GET">
+                        <input class="form-control" style="height: 36px; width: 304px" placeholder="Search Colorado College" type="text"></input>
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" style="background-color: #fff" type="submit">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </span>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-9 ml-md-auto">
+                    <a href="http://cctigers.com/" class="cc-link-txt">Athletics</a> <strong class="cc-txt-gold">|</strong>
+                    <a href="https://www.coloradocollege.edu/fac" class="cc-link-txt">Fine Arts Center</a> <strong class="cc-txt-gold">|</strong>
+                    <a href="https://www.coloradocollege.edu/library" class="cc-link-txt">Tutt Library</a> <strong class="cc-txt-gold">|</strong>
+                    <a href="https://krcc.org/" class="cc-link-txt">KRCC</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{# START Secondary Navigation #}
+<div class="container-flex cc-bg-gold">
+    <div class="container cc-bg-gold">
+        <div class="row no-gutters">
+            {# START Nav div #}
+            <div class="col-md-10">
+                <nav class="navbar navbar-expand-lg">
+                    <ul class="navbar-nav mr-auto">
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle cc-txt-black-bold-sans" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">About CC</a>
+                                        <div class="dropdown-menu" aria-labelledby="dropdown01">
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/basics/welcome">Welcome</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/basics/blockplan">The Block Plan</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/basics/aftercc">Success After Graduation</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/us/planning">Strategic Plan</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle cc-txt-black-bold-sans" id="dropdown02" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Admission</a>
+                                        <div class="dropdown-menu" aria-labelledby="dropdown02">
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/admission/application/instructions">Apply to CC</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/admission/introduceyourself/visit">Visit &amp; Connect</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/admission/introduceyourself/youradmissionstaff">Meet Your Admission Rep</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/admission/tuition">Tuition &amp; Fees</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/admission/financialaid">Financial Aid</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle  cc-txt-black-bold-sans" id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Academics</a>
+                                        <div class="dropdown-menu" aria-labelledby="dropdown03">
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/academics/curriculum">Overview</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/academics/curriculum/requirements">Academic Requirements</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/academics/dept/majors">Majors &amp; Minors</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/academics/dept/">Departments &amp; Programs</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/academics/faculty">Faculty</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/offices/international">Study Abroad &amp; International Programs</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/library">Tutt Library</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle cc-txt-black-bold-sans" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Campus Life</a>
+                                        <div class="dropdown-menu" aria-labelledby="dropdown04">
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/lifeatcc">Overview</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/lifeatcc/recreation">Athletics &amp; Fitness</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/basics/campus/map">Campus Map</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/lifeatcc/activities/studentorgs">Clubs &amp; Intramurals</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/lifeatcc/housing/whereweeat">Food</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/offices/studenthealthcenter">Health Care</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/offices/housing-and-conferences/on-campus-housing">Housing</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/admission/financialaid/studentemployment">Work Study</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/lifeatcc/support">Other Services</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle cc-txt-black-bold-sans" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">News &amp; Events</a>
+                                        <div class="dropdown-menu" aria-labelledby="dropdown05">
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/newsevents/stories.html">CC Stories</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/newsevents/calendar">Campus Event Calendar</a>
+                                            <a class="dropdown-item" href="https://www.coloradocollege.edu/academics/curriculum/calendar/">Academic Calendar</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link cc-txt-black-bold-sans" href="https://www.coloradocollege.edu/us/giving">Giving &amp; Connecting</a>
+                                    </li>
+                                </ul>
+                        </nav>
+                    {# END Nav div #}
+                    </div>
+                    <div class="col-md-2">
+                        <div class="btn-group" style="padding-top: .5em">
+                            <a href="https://www.coloradocollege.edu/admission/application/instructions/">
+                                 <button type="button" class="btn btn-outline-secondary cc-txt-black-bold-sans text-uppercase">
+                                            <i class="fa fa-check cc-txt-white"></i> Apply</button>
+                              </a>
+                              <a href="https://ccbasecamp.coloradocollege.edu/portal/campus-visits">
+                                     <button type="button" class="btn btn-outline-secondary cc-txt-black-bold-sans text-uppercase ml-2">
+                                                <i class="fa fa-map-marker cc-txt-white"></i> Visit</button>
+                             </a>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+{# END Secondary Navigation #}
+        </div>
+<div class="row library-tabs ">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <div class="container">
+           <br><br>
+           <ul class="nav nav-fill">
+               <li class="nav-item  align-bottom">
+                   <a href="https://www.coloradocollege.edu/library/" class="nav-link tab">Tutt Library Home</a>
+               </li>
+               <li class="nav-item">
+                   <a href="https://www.coloradocollege.edu/library/about/" 
+                      class="nav-link tab">About the Library</a>
+               </li>
+               <li class="nav-item">
+                   <a href="https://www.coloradocollege.edu/library/resources/"
+                       class="nav-link tab">Find Resources</a>
+               </li>
+               <li class="nav-item">
+                   <a href="https://www.coloradocollege.edu/library/help/"
+                      class="nav-link tab">Help &amp; How-To's</a>
+               </li>
+                <li class="nav-item">
+                   <a href="https://www.coloradocollege.edu/other/library-partners/"
+                      class="nav-link tab tab-highlight">Library Partners</a>
+               </li>
+             
+           </ul>
+        </div>{# END container DIV #}
+    </div>{# END library-tabs DIV #}
+</div>

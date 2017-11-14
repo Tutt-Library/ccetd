@@ -1,11 +1,6 @@
 {% extends 'etd/base.html' %}
 
 {% block head_title %}Electronic Thesis Submission for Colorado College{% endblock %}
-{% block more_css %}
- <link href="{{ url_for('static', filename="css/thesis.css") }}" rel="stylesheet" />
- 
-{% endblock %}
-
 
 {% block action_view_subtitle %}
 {% if workflow %}
@@ -19,12 +14,12 @@
 
 {% block body %}
 <div class="row" style="top-margin: 800px">
- <div class="col-sm-8 col-md-8" style=" margin-top: 0px">
+ <div class="col-sm-8 col-md-8">
   <ul class="breadcrumb" >
-   <li><a href="http://www.coloradocollege.edu/library">Library Home</a></li>
-   <li><a href="/etd">ETD</a></li>
+   <li class="breadcrumb-item"><a href="http://www.coloradocollege.edu/library">Library Home</a></li>
+   <li class="breadcrumb-item{% if not workflow %} active{% endif %}"><a href="/etd">ETD</a></li>
   {% if workflow %}
-   <li class="active"><a href="#" >{# config|get_department_name #}</a></li>
+   <li class="breadcrumb-item active"><a href="#" >{# config|get_department_name #}</a></li>
   {% endif %}
   </ul>
  </div>
@@ -116,15 +111,6 @@
 </div>
 </div>
 {% endblock %}
-
-{% block footer %}
-<div class="container">
- <div class="row-fluid">
-  <div class="span12 offset1">
-   <iframe src="{{ url_for('footer') }}" class="website-footer" scrolling="no"></iframe>
-  </div>
-</div>
-{% endblock %} 
 
 {% block more_js %}
 {#
