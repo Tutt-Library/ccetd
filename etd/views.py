@@ -68,7 +68,6 @@ def get_advisors(dept_iri):
     sparql = DEPARTMENT_FACULTY.format(
         dept_iri,
         datetime.datetime.utcnow().isoformat())
-    print(sparql)
     result = requests.post(app.config.get("TRIPLESTORE_URL"),
         data={"query": sparql,
               "format": "json"})

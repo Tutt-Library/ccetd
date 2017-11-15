@@ -11,52 +11,60 @@
  </p>
   <h3>Your Name:</h3>
   <div class="form-group" data-bind="css: givenNameStatus"> 
-   <label class="control-label col-lg-2" for="id_creator-given">{{ step_one_form.given.label }}*:</label>
-   <div class="col-lg-4">
+   <label class="control-label" for="id_creator-given">{{ step_one_form.given.label }}*:</label>
+   <div>
      {{ step_one_form.given(max_size=50, class_="form-control", **{"data-bind": "value: givenValue"}) }}{# step_one_form.given.errors #}
    </div>
   </div>
   <div class="form-group" >
-    <label class="control-label col-lg-2" for="id_creator-middle">{{ step_one_form.middle.label }}:</label>
-    <div class="col-lg-4">
+    <label class="control-label" for="id_creator-middle">{{ step_one_form.middle.label }}:</label>
+    <div>
       {{ step_one_form.middle(max_size=50, class_="form-control") }}
      </div>
   </div>
   <div class="form-group" data-bind="css: familyNameStatus">
      {# step_one_form.family.errors #}
-   <label class="control-label col-lg-2" for="id_creator-family">{{ step_one_form.family.label }}*:</label>
-   <div class="col-lg-4">
+   <label class="control-label" for="id_creator-family">{{ step_one_form.family.label }}*:</label>
+   <div>
     {{ step_one_form.family(max_size=50, class_="form-control", **{"data-bind": "value: familyValue"}) }}       
    </div>
   </div>
-  <div class="form-group">
-    <label class="control-label col-lg-2" for="id_creator-suffix">{{ step_one_form.suffix.label }}:</label>
-     <div class="col-lg-2">
+  <div class="row">
+    <div class="col-md-3">
+        <label class="control-label" for="id_creator-suffix">{{ step_one_form.suffix.label }}:</label>
+    </div>
+    <div class="col-md-4">
       {{ step_one_form.suffix(class_="form-control") }}
     </div>
  </div>
- <div class="form-group">
+ <div class="row">
   {# step_one_form.email.errors #}
-  <label class='control-label col-lg-2' for="id_thesis-email">{{ step_one_form.email.label }}</label>
-   <div class="col-lg-6">
+    <div class="col-md-3">
+        <label class='control-label' for="id_thesis-email">{{ step_one_form.email.label }}</label>
+    </div>
+    <div  class="col">
        {{ step_one_form.email(class_="form-control", **{"data-bind": "value: emailValue"}) }}
      <span class="help-block">(<i>To receive a notification e-mail when your thesis is submitted</i>)</span>
    </div>
  </div>
-<div class="form-group" data-bind="css: advisorsStatus">
+<div class="row" data-bind="css: advisorsStatus">
   {# step_one_form.advisors.errors #}
-   <label class='control-label col-lg-2' for='id_advisor-advisors'>{{ step_one_form.advisors.label }}*</label>
-   <p>(To add more than one advisor, use control + enter)</p>
-   <div class="col-lg-4">
-     {{ step_one_form.advisors(class_="form-control", **{"data-bind": "selectedOptions: advisorList"}) }}
-    <label>{{ step_one_form.freeform_advisor.label }}</label>
+    <div class="col-md-3">
+        <label class='control-label' for='id_advisor-advisors'>{{ step_one_form.advisors.label }}*</label>
+        <p>(To add more than one advisor, use control + enter)</p>
+    </div>
+    <div class="col">
+        {{ step_one_form.advisors(class_="form-control", **{"data-bind": "selectedOptions: advisorList"}) }}
+        <label>{{ step_one_form.freeform_advisor.label }}</label>
         {{ step_one_form.freeform_advisor(class_="form-control",**{"data-bind": "value: advisorFreeFormValue"})  }}
    </div>
 </div>
-<div class="form-group">
-   {# step_one_form.graduation_dates.errors #}
-  <label class='control-label col-lg-2' for='id_grad-date'>Graduation Date*:</label>
-  <div class="col-lg-3">
+<div class="row">
+    <div class="col-md-3">
+        {# step_one_form.graduation_dates.errors #}
+        <label class='control-label col-lg-2' for='id_grad-date'>Graduation Date*:</label>
+    </div>
+    <div class="col-md-4">
      {{ step_one_form.graduation_dates(class_="form-control") }}
   </div>
 </div>
