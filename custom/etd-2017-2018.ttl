@@ -281,3 +281,26 @@
             etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
     schema:organizer <https://www.coloradocollege.edu/academics/dept/molecularbiology/> .
 
+iso6391:de a etd:workflow ;
+    rdfs:label "German"@en .
+
+iso6391:el a etd:workflow ;
+    rdfs:label "Greek"@en .
+
+iso6391:fr a etd:workflow ;
+    rdfs:label "French"@en .
+
+iso6391:it a etd:workflow ;
+    rdfs:label "Italian"@en .
+
+iso6391:ja a etd:workflow ;
+    rdfs:label "Japanese"@en .
+
+iso6391:la a etd:workflow ;
+    rdfs:label "Latin"@en .
+
+iso6391:en a etd:workflow ;
+    rdfs:label "English"@en .
+
+iso6391:zh a etd:workflow ;
+    rdfs:label "Chinese"@en .
