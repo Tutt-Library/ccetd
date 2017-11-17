@@ -1,5 +1,5 @@
     .cc-header-tools {
-        background: rgba(0,0,0,0) url("/static/img/stripe-black.png") repeat scroll 0 0;
+        background: rgba(0,0,0,0) url("/etd/static/img/stripe-black.png") repeat scroll 0 0;
     }
 
     .cc-txt-gold, a.cc-txt-gold:hover {
@@ -12,7 +12,7 @@
     }
 
     div.library-tabs {
-        background-image: url("/static/img/busy-library.jpg");
+        background-image: url("/etd/static/img/busy-library.jpg");
         height: 75px;
     }
 
@@ -57,14 +57,14 @@
     }
    
     .cc-footer-mtn {
-        background-image: url("/static/img/cc-mountains-2x.png");
+        background-image: url("/etd/static/img/cc-mountains-2x.png");
         background-position: center bottom;
         background-repeat: no-repeat;
         background-size: contain;
     }
 
     .cc-footer-links {
-        background: rgba(0, 0, 0, 0) url("/static/img/stripe-white.png") repeat scroll center bottom;
+        background: rgba(0, 0, 0, 0) url("/etd/static/img/stripe-white.png") repeat scroll center bottom;
         padding-bottom: 7px;
 
     }
