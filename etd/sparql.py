@@ -47,10 +47,11 @@ SELECT DISTINCT ?person_iri ?name
 WHERE {{
     ?person_iri rdfs:label ?name .
     ?person_iri schema:familyName ?lname .
-    ?dept_year schema:organizer <{0}> .
+    ?dept_year schema:organizer ?org .
     ?dept_year schema:superEvent ?academic_year .
     ?academic_year schema:startDate ?start_date .
     ?academic_year schema:endDate ?end_date .
+    ?etd schema:organizer ?org .
     {{ ?dept_year cc_fac:assistant-professor ?person_iri }}
     UNION
     {{ ?dept_year cc_fac:associate-professor ?person_iri }}
@@ -58,8 +59,11 @@ WHERE {{
     {{ ?dept_year cc_fac:professor ?person_iri }}
     UNION 
     {{ ?dept_year cc_fac:visiting-assistant-professor ?person_iri }}
+    UNION 
+    {{ ?etd cc_fac:faculty ?person_iri }}
     FILTER (?start_date < "{1}")
     FILTER (?end_date > "{1}")
+    BIND(<{0}> as ?org)
 }} ORDER BY ?lname
 """
 
