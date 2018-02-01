@@ -115,7 +115,8 @@ def get_grad_dates(dept_iri):
     :param dept_iri: Department IRI, required
     """
     grad_dates = []
-    sparql = GRAD_DATES.format(dept_iri)
+    sparql = GRAD_DATES.format(dept_iri, 
+        datetime.datetime.utcnow().isoformat())
     result = requests.post(app.config.get("TRIPLESTORE_URL"),
          data={"query": sparql,
                "format": "json"})
@@ -430,7 +431,7 @@ def create_mods(**kwargs):
         bindings = __run_query__(sparql)
         if len(bindings) == 1:
             return bindings[0].get('name').get('value')
-        
+       
 
     def get_language(lang_uri):
         sparql = LANG_LABEL.format(lang_uri)

@@ -61,8 +61,8 @@ WHERE {{
     {{ ?dept_year cc_fac:visiting-assistant-professor ?person_iri }}
     UNION 
     {{ ?etd cc_fac:faculty ?person_iri }}
-    FILTER (?start_date < "{1}")
-    FILTER (?end_date > "{1}")
+    FILTER (?start_date < "{1}"^^xsd:dateTime)
+    FILTER (?end_date > "{1}"^^xsd:dateTime)
     BIND(<{0}> as ?org)
 }} ORDER BY ?lname
 """
@@ -103,6 +103,11 @@ WHERE {{
      ?academic_year cc_info:graduation ?grad .
      ?grad rdf:value ?date .
      ?grad rdfs:label ?label .
+     ?academic_year schema:startDate ?start_date .
+     ?academic_year schema:endDate ?end_date .
+     FILTER (?start_date < "{1}"^^xsd:dateTime)
+     FILTER (?end_date > "{1}"^^xsd:dateTime)
+
 }} ORDER BY ?date
 """
 
