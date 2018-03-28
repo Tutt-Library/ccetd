@@ -571,7 +571,6 @@ def update(name):
              new_pid_result.status_code,
              new_pid_result.text))     
     new_pid = new_pid_result.text
-    print("NEW PID is {}".format(new_pid))   
     workflow = request.form.get('workflow')
     mods = create_mods(post=request.form, 
         pid=new_pid,
