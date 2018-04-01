@@ -193,6 +193,11 @@
 <http://catalog.coloradocollege.edu/9346fec8-bd95-11e7-b9c8-005056c00008> a etd:workflow ;
     etd:contact <http://catalog.coloradocollege.edu/aa64bdb8-c4b8-11e7-ad7d-005056c00008>,
         <http://catalog.coloradocollege.edu/b38ec026-7084-11e6-917d-005056c00008> ;
+    etd:exclude <http://catalog.coloradocollege.edu/3e2b3f48-bcd4-11e6-a3f1-005056c00008>,
+        <http://catalog.coloradocollege.edu/3c2bf9be-bcd4-11e6-a9c4-005056c00008>,
+        <http://catalog.coloradocollege.edu/3d31b754-bcd4-11e6-9f70-005056c00008>,
+        <http://catalog.coloradocollege.edu/3cb03828-bcd4-11e6-8c2d-005056c00008>,
+        <http://catalog.coloradocollege.edu/26cc1a6c-b0f2-11e6-96e9-005056c00008>;
     etd:theses [ etd:fedora38-pid "coccc:28373" ;
             etd:slug "economics-and-business" ;
             etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;

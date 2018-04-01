@@ -14,12 +14,13 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
-  Copyright: 2011-2016 Jeremy Nelson, Colorado College
+  Copyright: 2011-2018 Jeremy Nelson, Colorado College
 """
 
 
 __author__ = 'Jeremy Nelson'
 
+import click
 import datetime
 import os
 import configparser
@@ -49,6 +50,7 @@ from .sparql import ADDL_NOTES, ADVISOR_NAME, COLLECTION_PID, DEGREE_INFO
 from .sparql import DEPARTMENT_FACULTY, DEPARTMENT_IRI, DEPARTMENT_NAME  
 from .sparql import GRAD_DATES, LANG_LABEL, THESES_LIST, THESIS_LANGUAGES 
 from .sparql import THESIS_NOTE, DEPARTMENT_STAFF, ADVISOR_EMAIL
+from .sparql import FACULTY_EXCLUDE
 
 mimetypes.add_type("application/x-sas", ".sas")
 
@@ -65,15 +67,26 @@ def get_advisors(dept_iri):
     :param config: Workflow RawConfigObject, required
     """
     faculty_choices = []
+    today = datetime.datetime.utcnow().isoformat()
     sparql = DEPARTMENT_FACULTY.format(
         dept_iri,
-        datetime.datetime.utcnow().isoformat())
+        today)
     result = requests.post(app.config.get("TRIPLESTORE_URL"),
         data={"query": sparql,
               "format": "json"})
     bindings = result.json().get('results').get('bindings')
+    fac_exclude_sparql = FACULTY_EXCLUDE.format(dept_iri, today)
+    exclude_result = requests.post(app.config.get("TRIPLESTORE_URL"),
+        data={"query": fac_exclude_sparql,
+              "format": "json"})
+    excluded = []
+    for row in exclude_result.json().get('results').get('bindings'):
+        excluded.append(row.get('person').get('value'))
     for row in bindings:
-        faculty_choices.append((row.get('person_iri').get('value'),
+        person_iri = row.get('person_iri').get('value')
+        if person_iri in excluded:
+            continue
+        faculty_choices.append((person_iri,
                                 row.get('name').get('value')))
     return faculty_choices
 

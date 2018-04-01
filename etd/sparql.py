@@ -63,6 +63,7 @@ WHERE {{
     {{ ?etd cc_fac:faculty ?person_iri }}
     FILTER (?start_date < "{1}"^^xsd:dateTime)
     FILTER (?end_date > "{1}"^^xsd:dateTime)
+    FILTER NOT EXISTS {{ ?etd etd:exclude ?person_iri . }}
     BIND(<{0}> as ?org)
 }} ORDER BY ?lname
 """
@@ -93,6 +94,20 @@ WHERE {{
     ?workflow etd:contact ?person .
     ?person rdfs:label ?name .
     ?person schema:email ?email .
+}}"""
+
+FACULTY_EXCLUDE = PREFIX + """
+SELECT DISTINCT ?person 
+WHERE {{
+    ?dept_year schema:organizer ?org .
+    ?dept_year schema:superEvent ?academic_year .
+    ?academic_year schema:startDate ?start_date .
+    ?academic_year schema:endDate ?end_date .
+    ?etd schema:organizer ?org ; 
+         etd:exclude ?person .
+    FILTER (?start_date < "{1}"^^xsd:dateTime)
+    FILTER (?end_date > "{1}"^^xsd:dateTime)
+    BIND(<{0}> as ?org)
 }}"""
 
 GRAD_DATES = PREFIX + """
