@@ -197,6 +197,7 @@
         <http://catalog.coloradocollege.edu/3c2bf9be-bcd4-11e6-a9c4-005056c00008>,
         <http://catalog.coloradocollege.edu/3d31b754-bcd4-11e6-9f70-005056c00008>,
         <http://catalog.coloradocollege.edu/3cb03828-bcd4-11e6-8c2d-005056c00008>,
+        <http://catalog.coloradocollege.edu/3dab5a5e-bcd4-11e6-a06f-005056c00008>,
         <http://catalog.coloradocollege.edu/26cc1a6c-b0f2-11e6-96e9-005056c00008>;
     etd:theses [ etd:fedora38-pid "coccc:28373" ;
             etd:slug "economics-and-business" ;
