@@ -170,7 +170,8 @@
     schema:organizer <https://www.coloradocollege.edu/academics/dept/mathematics/> .
 
 <http://catalog.coloradocollege.edu/82f6ba8a-bd94-11e7-9ec1-005056c00008> a etd:workflow ;
-    etd:contact <http://catalog.coloradocollege.edu/3e12fcc0-f2e6-11e6-adae-005056c00008> ;
+    etd:contact <http://catalog.coloradocollege.edu/3e12fcc0-f2e6-11e6-adae-005056c00008>,
+        <http://catalog.coloradocollege.edu/5ee6fb30-2e8f-11e7-a2cf-005056c00008> ;
     etd:theses [ etd:fedora38-pid "coccc:28390" ;
             etd:slug "music" ;
             etd:thesis_note "Senior Capstone -- Colorado College"@en ] ;
