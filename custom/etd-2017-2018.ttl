@@ -158,7 +158,7 @@
             etd:slug "history-thesis" ;
             etd:thesis_note "Senior Thesis -- Colorado College"@en ],
         [ etd:fedora38-pid "coccc:28383" ;
-            etd:slub "history-essay" ;
+            etd:slug "history-essay" ;
             etd:thesis_note "Senior Essay -- Colorado College"@en ] ;
     schema:organizer <https://www.coloradocollege.edu/academics/dept/history/> .
 
@@ -288,26 +288,26 @@
             etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
     schema:organizer <https://www.coloradocollege.edu/academics/dept/molecularbiology/> .
 
-iso6391:de a etd:workflow ;
+iso6391:de a schema:Language ;
     rdfs:label "German"@en .
 
-iso6391:el a etd:workflow ;
+iso6391:el a schema:Language ;
     rdfs:label "Greek"@en .
 
-iso6391:fr a etd:workflow ;
+iso6391:fr a schema:Language;
     rdfs:label "French"@en .
 
-iso6391:it a etd:workflow ;
+iso6391:it a schema:Language;
     rdfs:label "Italian"@en .
 
-iso6391:ja a etd:workflow ;
+iso6391:ja a schema:Language;
     rdfs:label "Japanese"@en .
 
-iso6391:la a etd:workflow ;
+iso6391:la a schema:Language;
     rdfs:label "Latin"@en .
 
-iso6391:en a etd:workflow ;
+iso6391:en a schema:Language ;
     rdfs:label "English"@en .
 
-iso6391:zh a etd:workflow ;
+iso6391:zh a schema:Language;
     rdfs:label "Chinese"@en .

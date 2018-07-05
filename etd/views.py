@@ -37,7 +37,7 @@ import email.mime.text as email_text
 import mimetypes
 import xml.etree.ElementTree as etree
 from flask import abort, redirect, render_template, request, session, url_for
-from flask import current_app
+from flask import current_app, jsonify
 from flask_login import login_required, login_user, logout_user, current_user
 from flask_ldap3_login.forms import LDAPLoginForm
 from legacy_fedora import indexer
@@ -219,6 +219,19 @@ def about_ccetd():
     return render_template("etd/about.html",
         version=VERSION)
           
+@app.route("/fast")
+def fast_suggest():
+    term = request.args.get('q')
+    start = request.args.get("start", 0)
+    oclc_fast_base = "http://fast.oclc.org/searchfast/fastsuggest"
+    url = "{}?query={}&wt=json&fl=suggestall&queryReturn=suggestall,id".format(
+        oclc_fast_base,
+        term)
+    if int(start) > 0:
+        url += "&start={}".format(start)
+    fast_result = requests.get(url)
+    return jsonify(fast_result.json().get("response").get('docs'))
+
 
 @app.route("/login", methods=['POST', 'GET'])
 def login():

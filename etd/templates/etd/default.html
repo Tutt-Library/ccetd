@@ -120,6 +120,8 @@
 #}
 <script src="{{ url_for('static', filename="js/knockout.validation.min.js") }}"></script>
 <script src="{{ url_for('static', filename="js/thesis.js") }}"></script>
+<script src="{{ url_for('static', filename='js/typeahead.bundle.min.js') }}"></script>
+
 <script>
  var view_model = new ThesisViewModel();
  {% if user.is_authenticated %}
@@ -133,6 +135,47 @@
   $('#open-web-alert-dlg').modal('show');
 
  {% endif %}
+ {% if user.is_authenticated %}
+   var oclcFast = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+            url: "{{ url_for('fast_suggest') }}?q=%QUERY",
+            wildcard: '%QUERY'
+        }
+    });
+
+    $("#fast-suggestion .typeahead").typeahead({
+            highlight: true 
+        },
+        {
+            name: 'oclc-fast',
+            display: 'suggestall',
+            id: 'id',
+            source: oclcFast.ttAdapter(),
+            templates: {
+                empty: [
+                    '<div style="padding: 1em 2em">',
+                    'unable to find any FAST headings',
+                    '</div>'
+                ].join('\n'),
+                suggestion: function(data) {
+                    return '<div style="background-color: white" id="' + data.id + '">' + data.suggestall + '</div>';
+                }
+            }
+    }).on('typeahead:selected', function(obj, datum) {
+        $('.typeahead').typeahead('val','');
+        $("#keywords").append(
+            ['<div class="alert alert-primary alert-dismissible fade show text-dark">',
+             '<input type="hidden" name="keyword" id="' + datum.id + '" value="' + datum.suggestall + '">',
+
+              datum.suggestall,
+              '<button type="button" class="close" data-dismiss="alert" aria-label="Close">',
+              '<span aria-hidden="true">&times;</span></button></div>'].join('\n'));
+    });
+ 
+    
+  {% endif %}
 </script>
 {% endblock %}
 

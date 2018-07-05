@@ -20,28 +20,6 @@ ko.validation.rules['pdfOnly'] = {
 ko.validation.registerExtenders();
 
 
-// Thesis Javascript file
-function AddKeywords()
- {
-  var span_kw = document.getElementById('span-keywords');
-  var name_seed = span_kw.childNodes.length - 1;
-  if (name_seed > 7)
-  {
-    var more_anchor = document.getElementById('more-a');
-    more_anchor.style.visibility = "hidden";
-  } 
-  span_kw.appendChild(document.createElement('br'));
-
-  for(i=0;i<=2;i++)
-  {
-
-     var input = document.createElement('input');
-     input.type = 'text';
-     input.size = 20;
-     input.name = "subject-keyword_" + (name_seed+i);
-     span_kw.appendChild(input);
-  }
- }
 
 // Thesis Knockout.js View Models
 function ThesisViewModel() {
@@ -160,27 +138,27 @@ function ThesisViewModel() {
      self.formErrors.removeAll();
      if(!self.givenValue()) {
        self.givenNameStatus('has-error');
-       self.formErrors.push({'error': 'First name is required'});
+       self.formErrors.push({error: 'First name is required'});
      } else {
        self.givenNameStatus();
      }
      
      if(!self.familyValue()) {
        self.familyNameStatus('has-error');
-       self.formErrors.push({'error': 'Last name is required'});
+       self.formErrors.push({error: 'Last name is required'});
 
      } else {
        self.familyNameStatus();
-     }     
-
+     }
+    
      if(self.advisorList().length < 1 && !self.advisorFreeFormValue())  {
        self.advisorsStatus('has-error'); 
-       self.formErrors.push({'error': 'At least one advisor is required'});
+       self.formErrors.push({error: 'At least one advisor is required'});
      } else {
        self.advisorsStatus(); 
     }
 
-     if(!self.stepOneViewModel.isValid()) {
+     if(self.formErrors().length > 0) {
        self.formError(true);
        return
      }  
@@ -234,7 +212,7 @@ function ThesisViewModel() {
        self.thesisKeywordsStatus('');
      }
 
-     if(!self.stepTwoViewModel().isValid() || self.formErrors().length > 0) {
+     if(self.formErrors().length > 0) {
        self.formError(true);
        return;
      } 
