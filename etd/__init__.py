@@ -21,14 +21,6 @@ app.config.from_pyfile('conf.py')
 login_manager = LoginManager(app)
 ldap_manager = LDAP3LoginManager(app)
 
-cache = FileSystemCache(
-    app.config.get(
-        "CACHE_DIR", 
-        os.path.join(
-            os.path.split(
-                os.path.abspath(os.path.curdir))[0],
-                "cache")))
-
 # Should user info be stored in 
 users = {}
 
@@ -103,12 +95,6 @@ def harvest():
             base_url,
             src)
    
-    cache.set('styles', '\n'.join([str(s) for s in styles]))
-    cache.set("header", str(header))
-    cache.set("tabs", str(tabs))
-    cache.set("footer", str(footer))
-    cache.set("scripts", '\n'.join([str(s) for s in scripts]))
-    
 
 from .views import *
 from .filters import *

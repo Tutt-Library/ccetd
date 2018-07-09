@@ -1,5 +1,5 @@
 __author__ = "Jeremy Nelson"
-from . import app, harvest, cache
+from . import app, harvest
 
 @app.template_filter('footer')
 def get_footer(s):
