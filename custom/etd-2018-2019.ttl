@@ -134,7 +134,7 @@
             etd:thesis_note "Senior Essay -- Colorado College"@en ] ;
     schema:organizer <https://www.coloradocollege.edu/academics/dept/history/> .
 
-<http://catalog.coloradocollege.edu/701a9f08-8092-11e8-b792-001fc69cf6df> a etd:workflow ;
+<https://orcid.org/0000-0002-5976-3083> a etd:workflow ;
     etd:contact <http://catalog.coloradocollege.edu/49851cca-c4b9-11e7-a7a9-005056c00008> ;
     etd:theses [ etd:fedora38-pid "coccc:30156" ;
             etd:slug "independently-designed-major" ;
