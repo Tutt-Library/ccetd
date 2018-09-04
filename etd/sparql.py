@@ -2,10 +2,10 @@ __author__ = "Jeremy Nelson"
 
 PREFIX = """PREFIX bf: <http://id.loc.gov/ontologies/bibframe/>
 PREFIX cc_fac: <https://www.coloradocollege.edu/ns/faculty/>
-PREFIX cc_info: <https://www.coloradocollege.edu/ns/info/>  
-PREFIX etd: <http://catalog.coloradocollege.edu/ns/etd#> 
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+PREFIX cc_info: <https://www.coloradocollege.edu/ns/info/>
+PREFIX etd: <http://catalog.coloradocollege.edu/ns/etd#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX schema: <http://schema.org/>"""
 
 ADDL_NOTES = PREFIX + """
@@ -30,8 +30,15 @@ WHERE {{
 COLLECTION_PID = PREFIX + """
 SELECT DISTINCT ?pid
 WHERE {{
-    ?thesis etd:slug "{0}" .
-    ?thesis etd:fedora38-pid ?pid .
+    ?thesis etd:slug "{0}" ;
+            etd:fedora38-pid ?pid .
+     ?theses etd:theses ?thesis ;
+            schema:superEvent ?dept_year .
+    ?dept_year schema:superEvent ?academic_year .
+    ?academic_year schema:startDate ?start_date .
+    ?academic_year schema:endDate ?end_date .
+    FILTER (?start_date < "{1}"^^xsd:dateTime)
+    FILTER (?end_date > "{1}"^^xsd:dateTime)
 }}"""
 
 DEGREE_INFO = PREFIX + """
@@ -57,9 +64,9 @@ WHERE {{
     {{ ?dept_year cc_fac:associate-professor ?person_iri }}
     UNION
     {{ ?dept_year cc_fac:professor ?person_iri }}
-    UNION 
+    UNION
     {{ ?dept_year cc_fac:visiting-assistant-professor ?person_iri }}
-    UNION 
+    UNION
     {{ ?etd cc_fac:faculty ?person_iri }}
     FILTER (?start_date < "{1}"^^xsd:dateTime)
     FILTER (?end_date > "{1}"^^xsd:dateTime)
@@ -78,8 +85,8 @@ WHERE {{
 
 
 DEPARTMENT_NAME = PREFIX + """
-SELECT DISTINCT ?name 
-WHERE {{ 
+SELECT DISTINCT ?name
+WHERE {{
     ?thesis etd:slug "{0}" .
     ?year etd:theses ?thesis .
     ?year schema:organizer ?iri .
@@ -97,13 +104,13 @@ WHERE {{
 }}"""
 
 FACULTY_EXCLUDE = PREFIX + """
-SELECT DISTINCT ?person 
+SELECT DISTINCT ?person
 WHERE {{
     ?dept_year schema:organizer ?org .
     ?dept_year schema:superEvent ?academic_year .
     ?academic_year schema:startDate ?start_date .
     ?academic_year schema:endDate ?end_date .
-    ?etd schema:organizer ?org ; 
+    ?etd schema:organizer ?org ;
          etd:exclude ?person .
     FILTER (?start_date < "{1}"^^xsd:dateTime)
     FILTER (?end_date > "{1}"^^xsd:dateTime)
@@ -159,4 +166,3 @@ WHERE {{
     ?thesis etd:slug "{0}" .
     ?thesis etd:thesis-note ?note .
 }}"""
-

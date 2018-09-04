@@ -46,9 +46,9 @@ from werkzeug.exceptions import InternalServerError
 from . import app, ils_patron_check
 from .forms import LoginForm, StepOneForm, StepTwoForm, StepThreeForm
 from .forms import StepFourForm
-from .sparql import ADDL_NOTES, ADVISOR_NAME, COLLECTION_PID, DEGREE_INFO 
-from .sparql import DEPARTMENT_FACULTY, DEPARTMENT_IRI, DEPARTMENT_NAME  
-from .sparql import GRAD_DATES, LANG_LABEL, THESES_LIST, THESIS_LANGUAGES 
+from .sparql import ADDL_NOTES, ADVISOR_NAME, COLLECTION_PID, DEGREE_INFO
+from .sparql import DEPARTMENT_FACULTY, DEPARTMENT_IRI, DEPARTMENT_NAME
+from .sparql import GRAD_DATES, LANG_LABEL, THESES_LIST, THESIS_LANGUAGES
 from .sparql import THESIS_NOTE, DEPARTMENT_STAFF, ADVISOR_EMAIL
 from .sparql import FACULTY_EXCLUDE
 
@@ -96,7 +96,9 @@ def get_collection_pid(slug):
     Args:
         slug -- Thesis Slug
     """
-    sparql = COLLECTION_PID.format(slug)
+    sparql = COLLECTION_PID.format(
+        slug,
+        datetime.datetime.utcnow().isoformat())
     result = requests.post(app.config.get("TRIPLESTORE_URL"),
         data={"query": sparql,
               "format": "json"})
@@ -128,7 +130,7 @@ def get_grad_dates(dept_iri):
     :param dept_iri: Department IRI, required
     """
     grad_dates = []
-    sparql = GRAD_DATES.format(dept_iri, 
+    sparql = GRAD_DATES.format(dept_iri,
         datetime.datetime.utcnow().isoformat())
     result = requests.post(app.config.get("TRIPLESTORE_URL"),
          data={"query": sparql,
@@ -160,7 +162,7 @@ def set_languages(slug, step_two_form):
                             row.get('label').get('value')))
         step_two_form.languages.choices = choices
         return True
-    return False  
+    return False
 
 def slugify(value):
     """
@@ -218,7 +220,7 @@ def default():
 def about_ccetd():
     return render_template("etd/about.html",
         version=VERSION)
-          
+
 @app.route("/fast")
 def fast_suggest():
     term = request.args.get('q')
@@ -249,11 +251,11 @@ def login():
                            user=None,
                            form=form)
 
-@app.route("/header")        
+@app.route("/header")
 def header():
     return render_template("etd/snippets/header.html")
 
-@app.route("/footer")        
+@app.route("/footer")
 def footer():
     return render_template("etd/snippets/footer.html")
 
@@ -262,7 +264,7 @@ def logout():
     logout_user()
     return redirect(url_for('default'))
 
-    
+
 @app.route("/<name>")
 @login_required
 def workflow(name):
@@ -297,7 +299,7 @@ def success():
     if etd_success_msg is not None:
         pid = etd_success_msg['pid']
         etd_success_msg['thesis_url'] = "{}/{}".format(
-            app.config.get('DIGITAL_CC_URL', 'https://digitalcc.coloradocollege.edu/islandora/object'), 
+            app.config.get('DIGITAL_CC_URL', 'https://digitalcc.coloradocollege.edu/islandora/object'),
             pid)
         # Allow changes to propagated through Fedora repository
         time.sleep(10)
@@ -329,7 +331,7 @@ def success():
                 bindings = staff_result.json().get('results').get('bindings')
                 for row in bindings:
                     to_email_addrs.append(row.get('email').get('value'))
-                
+
             institution_name = app.config.get('INSTITUTION')['name']
             email_message = "{0} successfully submitted to {1}".format(
                 etd_success_msg['title'],
@@ -457,14 +459,14 @@ def create_mods(**kwargs):
         bindings = __run_query__(sparql)
         if len(bindings) == 1:
             return bindings[0].get('name').get('value')
-       
+
 
     def get_language(lang_uri):
         sparql = LANG_LABEL.format(lang_uri)
         bindings = __run_query__(sparql)
         if len(bindings) == 1:
             return bindings[0].get('language').get('value')
-       
+
     def get_thesis_note():
         sparql = THESIS_NOTE.format(slug)
         bindings = __run_query__(sparql)
@@ -548,7 +550,7 @@ def create_mods(**kwargs):
 
 def send_email(info):
     sender = app.config.get('EMAIL')['user']
-    recipients = info.get('recipients') 
+    recipients = info.get('recipients')
     subject = info.get('subject')
     text = info.get('text')
     message = """From: <{0}>
@@ -578,7 +580,7 @@ Subject: {2}
     #    print("Error trying to send email")
     #    return False
     return True
-    
+
 
 @app.route("/<name>/update", methods=['POST'])
 @login_required
@@ -595,10 +597,10 @@ def update(name):
             "New pid generation failed with Fedora {}\nCode={} Error={}".format(
              app.config.get("REST_URL"),
              new_pid_result.status_code,
-             new_pid_result.text))     
+             new_pid_result.text))
     new_pid = new_pid_result.text
     workflow = request.form.get('workflow')
-    mods = create_mods(post=request.form, 
+    mods = create_mods(post=request.form,
         pid=new_pid,
         slug=name)
     mods_xml = etree.XML(mods)
@@ -616,7 +618,7 @@ def update(name):
     repo_modify_obj_result = requests.put(
         modify_obj_url,
         auth=app.config.get("FEDORA_AUTH"))
-    # Adds Thesis PDF Datastream 
+    # Adds Thesis PDF Datastream
     add_thesis_url = "{}new?{}".format(
             app.config.get("REST_URL"),
             urllib.parse.urlencode({"label": "{} PDF".format(title),
@@ -691,7 +693,7 @@ def update(name):
         elif 'audio' in mime_type:
             content_model = "islandora:sp-audioCModel"
         elif 'pdf' in mime_type:
-            content_model = "islandora:sp_pdf" 
+            content_model = "islandora:sp_pdf"
         file_url = "{}new?{}".format(
             app.config.get("REST_URL"),
             urllib.parse.urlencode({"label": label,
