@@ -4,11 +4,15 @@ services:
         build: .
         ports:
          - "8084:8084"
+        networks:
+         - new
     semanticserver:
         image: jermnelson/semantic-server-core:dev
         ports:
          - "8080:8080"
          - "9999:9999"
+        networks:
+         - new
     web:
         build: 
             context: .
@@ -16,3 +20,8 @@ services:
         ports:
          - "80:80"
          - "443:443"
+        networks:
+         - new
+
+networks:
+  new:   
