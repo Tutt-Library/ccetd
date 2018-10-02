@@ -299,7 +299,7 @@ def success():
     if etd_success_msg is not None:
         pid = etd_success_msg['pid']
         etd_success_msg['thesis_url'] = "{}/{}".format(
-            app.config.get('DIGITAL_CC_URL', 'https://digitalcc.coloradocollege.edu/islandora/object'),
+            app.config.get('DIGITAL_CC_URL', 'https://digitalccbeta.coloradocollege.edu/pid'),
             pid)
         # Allow changes to propagated through Fedora repository
         time.sleep(10)
