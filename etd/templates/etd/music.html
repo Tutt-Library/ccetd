@@ -35,7 +35,7 @@
  <li>Honor code and submission agreements</li>
  {% comment %}<li>Upload a PDFa<sup><a href="#" onclick="alert('PDFa is an archival PDF format, most Word Processors should allow you to save your thesis as a PDFa. Please contact the library at 389-6661 for more information.')">?</a></sup>{% if workflow.dataset %} and any
 supporting datasets.{% endif %}</li>{% endcomment %}
- <li>Submit your Senior Capstone to the Digital Archives of Colorado College</li>
+ <li>Submit your Senior Capstone to the DigitalCC/li>
 </ol> 
 {% else %}
 <h1><strong><a href="#">{% trans "What now?" %}</a></strong></h1>
@@ -69,10 +69,7 @@ supporting datasets.{% endif %}</li>{% endcomment %}
  {% include 'capstone-form.html' %}
  {% else %}
  <h1>Colorado College Electronic Thesis Capstone Submission</h1>
- <p>The Digital Archives of Colorado College (DACC) electronic thesis and 
-    dataset application allows students to self-submit their senior thesis
-    to our institutional repository. The following departmental
-    web forms are available below:</p>
+ <p>Submit your thesis here!</p>
  <ul>
  {% for workflow in active %}
    <li><a href="/etd/{{ workflow.0 }}">{{ workflow.1|get_department }}</a></li>
