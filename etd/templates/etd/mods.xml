@@ -99,14 +99,6 @@
   {% else %}
   <language>
     <languageTerm>English</languageTerm>
-    <languageTerm>French</languageTerm>
-    <languageTerm>German</languageTerm>
-    <languageTerm>Italian</languageTerm>
-    <languageTerm>Spanish</languageTerm>
-    <languageTerm>Japanese</languageTerm>
-    <languageTerm>Chinese</languageTerm>
-    <languageTerm>Russian</languageTerm>
-    <languageTerm>Portuguese</languageTerm>
   </language>
   {% endif %}
   <location>
