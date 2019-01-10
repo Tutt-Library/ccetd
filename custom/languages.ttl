@@ -1,0 +1,36 @@
+@prefix iso6391: <http://id.loc.gov/vocabulary/iso639-1/> .
+@prefix schema: <http://schema.org/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+iso6391:de a schema:Language ;
+    rdfs:label "German"@en .
+
+iso6391:el a schema:Language ;
+    rdfs:label "Greek"@en .
+
+iso6391:fr a schema:Language;
+    rdfs:label "French"@en .
+
+iso6391:it a schema:Language;
+    rdfs:label "Italian"@en .
+
+iso6391:ja a schema:Language;
+    rdfs:label "Japanese"@en .
+
+iso6391:la a schema:Language;
+    rdfs:label "Latin"@en .
+
+iso6391:en a schema:Language ;
+    rdfs:label "English"@en .
+
+iso6391:zh a schema:Language;
+    rdfs:label "Chinese"@en .
+    
+iso6391:es a schema:Language;
+    rdfs:label "Spanish"@en .
+    
+iso6391:pt a schema:Language;
+    rdfs:label "Portuguese"@en .
+    
+iso6391:ru a schema:Language;
+    rdfs:label "Russian"@en .    
