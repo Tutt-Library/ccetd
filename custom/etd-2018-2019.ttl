@@ -142,7 +142,6 @@
     schema:superEvent <http://catalog.coloradocollege.edu/a2244212-7b1b-11e8-9f34-001fc69cf6df> .
 
 <http://catalog.coloradocollege.edu/6f08a258-8093-11e8-b19f-001fc69cf6df> a etd:workflow ;
-    etd:contact <http://catalog.coloradocollege.edu/2d104812-f2e6-11e6-8d76-005056c00008> ;
     etd:theses [ etd:fedora38-pid "coccc:30153" ;
             etd:slug "history-thesis" ;
             etd:thesis_note "Senior Thesis -- Colorado College"@en ],
