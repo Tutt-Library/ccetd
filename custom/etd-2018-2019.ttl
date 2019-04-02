@@ -146,6 +146,7 @@
             etd:slug "history-thesis" ;
             etd:thesis_note "Senior Thesis -- Colorado College"@en ],
         [ etd:fedora38-pid "coccc:30152" ;
+            etd:slug "history-essay" ;
             etd:thesis_note "Senior Essay -- Colorado College"@en ] ;
     schema:organizer <https://www.coloradocollege.edu/academics/dept/history/> ;
     schema:superEvent <http://catalog.coloradocollege.edu/a2241bba-7b1b-11e8-a449-001fc69cf6df> .
