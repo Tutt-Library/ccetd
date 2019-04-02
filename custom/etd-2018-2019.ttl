@@ -142,10 +142,12 @@
     schema:superEvent <http://catalog.coloradocollege.edu/a2244212-7b1b-11e8-9f34-001fc69cf6df> .
 
 <http://catalog.coloradocollege.edu/6f08a258-8093-11e8-b19f-001fc69cf6df> a etd:workflow ;
-    etd:theses [ etd:fedora38-pid "coccc:30153" ;
+    etd:theses [ rdfs:label "History - Thesis Option"@en ;
+            etd:fedora38-pid "coccc:30153" ;
             etd:slug "history-thesis" ;
             etd:thesis_note "Senior Thesis -- Colorado College"@en ],
-        [ etd:fedora38-pid "coccc:30152" ;
+        [ rdfs:label "History - Essay Option"@en ;
+            etd:fedora38-pid "coccc:30152" ;
             etd:slug "history-essay" ;
             etd:thesis_note "Senior Essay -- Colorado College"@en ] ;
     schema:organizer <https://www.coloradocollege.edu/academics/dept/history/> ;
