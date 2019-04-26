@@ -287,7 +287,8 @@
 
 <https://orcid.org/0000-0002-5976-3083> a etd:workflow ;
     etd:contact <http://catalog.coloradocollege.edu/49851cca-c4b9-11e7-a7a9-005056c00008> ;
-    etd:theses [ etd:fedora38-pid "coccc:30156" ;
+    etd:theses [ rdfs:label "Independently Designed Major"@en ;
+            etd:fedora38-pid "coccc:30156" ;
             etd:slug "independently-designed-major" ;
             etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
     schema:organizer <https://www.coloradocollege.edu/offices/dean/> ;
