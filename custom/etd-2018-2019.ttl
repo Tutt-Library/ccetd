@@ -256,7 +256,7 @@
 
 <http://catalog.coloradocollege.edu/d3bc1ef0-8091-11e8-9367-001fc69cf6df> a etd:workflow ;
     etd:contact <http://catalog.coloradocollege.edu/cfc1f1b8-f2e5-11e6-82dc-005056c00008> ;
-    etd:theses [ rdfs:label "Master of Arts in Teaching"@en ;
+    etd:theses [ rdfs:label "Education - Master of Arts in Teaching"@en ;
             etd:fedora38-pid "coccc:30144" ;
             etd:slug "education-fifth-year-mat" ;
             etd:thesis_note "Master of Arts in Teaching -- Colorado College"@en ],
