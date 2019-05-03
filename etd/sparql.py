@@ -68,8 +68,6 @@ WHERE {{
     {{ ?dept_year cc_fac:visiting-assistant-professor ?person_iri }}
     UNION
     {{ ?etd cc_fac:faculty ?person_iri }}
-     UNION
-    {{ ?etd  cc_staff:director ?person_iri }}
     FILTER (?start_date < "{1}"^^xsd:dateTime)
     FILTER (?end_date > "{1}"^^xsd:dateTime)
     FILTER NOT EXISTS {{ ?etd etd:exclude ?person_iri . }}
