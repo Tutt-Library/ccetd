@@ -33,7 +33,7 @@
     schema:superEvent <http://catalog.coloradocollege.edu/a2265ab6-7b1b-11e8-a731-001fc69cf6df> .
 
 <http://catalog.coloradocollege.edu/1618dab6-8092-11e8-aa92-001fc69cf6df> a etd:workflow ;
-    etd:theses [ etd:fedora38-pid "coccc:30160" ;
+    etd:theses [ etd:fedora38-pid "coccc:31341)" ;
             etd:slug "neuroscience" ;
             etd:thesis_note "Senior Thesis -- Colorado College"@en ] ;
     schema:organizer <https://www.coloradocollege.edu/academics/dept/neuroscience/> ;
